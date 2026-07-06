@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="人生副本：回答 12 題，生成你的專屬人生角色卡。不是 MBTI，不是星座，是你的遊戲設定。" />
+  <meta name="keywords" content="人生角色卡, 心理測驗, MBTI, 戀愛測驗, 人生副本, 角色卡, 性格測驗" />
+  <meta property="og:title" content="人生副本｜你的角色卡販賣機" />
+  <meta property="og:description" content="回答 12 題，抽出你的專屬人生角色卡：稀有度、技能、弱點、戀愛屬性、本週任務一次生成。" />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#12121a" />
+  <title>人生副本｜你的角色卡販賣機</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-grid"></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="人生副本首頁">
+      <span class="brand-mark">副</span>
+      <span>
+        <strong>人生副本</strong>
+        <small>角色卡販賣機</small>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="主要選單">
+      <a href="#cards">範例卡</a>
+      <a href="#quiz">開始測驗</a>
+      <a href="#premium">完整報告</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="ghost-btn" id="openSavedBtn" type="button">我的收藏</button>
+  </header>
+
+  <main>
+    <section class="hero section-pad">
+      <div class="hero-copy">
+        <p class="eyebrow">不是 MBTI，不是星座，是你的遊戲設定</p>
+        <h1>你在人生副本裡，<span>是什麼角色？</span></h1>
+        <p class="hero-text">回答 12 題，生成你的專屬人生角色卡。稀有度、技能、弱點、戀愛屬性、社交定位和本週任務一次抽出來。</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#quiz">開始抽我的角色卡</a>
+          <a class="secondary-btn" href="#cards">先看範例</a>
+        </div>
+        <div class="trust-row" aria-label="網站特色">
+          <span>⚡ 3 分鐘完成</span>
+          <span>🎴 可下載卡片</span>
+          <span>🧃 適合限動分享</span>
+        </div>
+      </div>
+
+      <div class="hero-stage" aria-label="角色卡預覽">
+        <div class="floating-badge badge-left">SSR?</div>
+        <div class="floating-badge badge-right">本週任務 +1</div>
+        <article class="preview-card rare-ssr">
+          <div class="preview-top">
+            <span class="rarity-pill">SSR</span>
+            <span class="card-number">#042</span>
+          </div>
+          <div class="avatar-orb">🧙‍♂️</div>
+          <h2>戀愛逃跑法師</h2>
+          <p>越喜歡越冷淡，越在意越裝沒差。</p>
+          <div class="stat-list">
+            <span>主技能：已讀後小劇場</span>
+            <span>弱點：怕自己太認真</span>
+            <span>任務：今天不要裝沒事</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-pad demo-section" id="cards">
+      <div class="section-title center">
+        <p class="eyebrow">先偷看幾張</p>
+        <h2>每一張都要讓人覺得：這也太像我</h2>
+      </div>
+      <div class="demo-grid" id="demoCards"></div>
+    </section>
+
+    <section class="section-pad quiz-section" id="quiz">
+      <div class="quiz-shell">
+        <div class="quiz-intro">
+          <p class="eyebrow">開始進入副本</p>
+          <h2>12 題抽出你的角色卡</h2>
+          <p>不要想太久，選最像你平常反應的答案。結果不是診斷，是娛樂，但會故意講得很像你。</p>
+          <div class="mini-note">小提醒：結果會保存在本機瀏覽器，不會上傳你的答案。</div>
+        </div>
+
+        <div class="quiz-panel" id="quizPanel">
+          <div class="progress-wrap">
+            <div class="progress-meta">
+              <span id="progressText">第 1 / 12 題</span>
+              <span id="progressMood">新手村入口</span>
+            </div>
+            <div class="progress-track" aria-hidden="true"><div id="progressBar"></div></div>
+          </div>
+
+          <div class="question-box">
+            <h3 id="questionTitle"></h3>
+            <p id="questionHint"></p>
+            <div class="options-grid" id="optionsGrid"></div>
+          </div>
+
+          <div class="quiz-controls">
+            <button class="secondary-btn small" id="prevBtn" type="button">上一題</button>
+            <button class="ghost-btn small" id="resetBtn" type="button">重新開始</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad result-section hidden" id="resultSection">
+      <div class="section-title center">
+        <p class="eyebrow">副本結算</p>
+        <h2>你的角色卡生成完成</h2>
+      </div>
+
+      <div class="result-layout">
+        <div class="card-export-wrap">
+          <article class="result-card" id="resultCard" aria-label="你的角色卡">
+            <div class="result-card-inner">
+              <div class="card-header-row">
+                <div>
+                  <span class="rarity-pill" id="resultRarity">SR</span>
+                  <span class="role-code" id="resultCode">#000</span>
+                </div>
+                <span class="card-logo">人生副本</span>
+              </div>
+              <div class="role-art" id="resultEmoji">🛡️</div>
+              <h2 id="resultName">角色名稱</h2>
+              <p class="role-line" id="resultLine">一句話描述</p>
+              <div class="trait-row" id="traitRow"></div>
+              <div class="card-divider"></div>
+              <div class="ability-list">
+                <div><strong>主技能</strong><span id="resultSkill"></span></div>
+                <div><strong>被動技能</strong><span id="resultPassive"></span></div>
+                <div><strong>致命弱點</strong><span id="resultWeakness"></span></div>
+                <div><strong>本週任務</strong><span id="resultQuest"></span></div>
+              </div>
+              <p class="card-footer-text" id="resultSummary">這是一張專屬你的角色卡。</p>
+            </div>
+          </article>
+        </div>
+
+        <aside class="result-info">
+          <div class="info-card">
+            <h3>完整解析</h3>
+            <div class="detail-list">
+              <div><strong>戀愛屬性</strong><p id="detailLove"></p></div>
+              <div><strong>社交定位</strong><p id="detailSocial"></p></div>
+              <div><strong>工作模式</strong><p id="detailWork"></p></div>
+              <div><strong>隱藏 Boss</strong><p id="detailBoss"></p></div>
+            </div>
+          </div>
+
+          <div class="action-stack">
+            <button class="primary-btn full" id="downloadBtn" type="button">下載我的角色卡 PNG</button>
+            <button class="secondary-btn full" id="shareBtn" type="button">複製 Threads 分享文</button>
+            <button class="ghost-btn full" id="saveBtn" type="button">收藏這張卡</button>
+            <button class="ghost-btn full" id="againBtn" type="button">重抽一次</button>
+          </div>
+
+          <div class="share-copy" id="shareCopy" aria-live="polite"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-pad premium-section" id="premium">
+      <div class="premium-card">
+        <div>
+          <p class="eyebrow">準備變現的位置</p>
+          <h2>完整角色報告，之後可以賣 49 元</h2>
+          <p>免費版給角色卡。付費版給戀愛攻略、社交定位、工作模式、金錢弱點、7 日升級任務和高畫質桌布。</p>
+        </div>
+        <div class="price-box">
+          <span>早鳥價</span>
+          <strong>NT$49</strong>
+          <button class="primary-btn full" id="waitlistBtn" type="button">我想解鎖完整報告</button>
+        </div>
+      </div>
+      <div class="premium-grid">
+        <article><span>💘</span><h3>戀愛攻略</h3><p>分析你在曖昧、交往、冷掉時最容易卡住的點。</p></article>
+        <article><span>👥</span><h3>朋友定位</h3><p>你在群體裡是輸出、補師、軍師、吉祥物還是隱藏 Boss。</p></article>
+        <article><span>⚔️</span><h3>7 日任務</h3><p>每天一個小任務，讓角色真的有升級感。</p></article>
+        <article><span>🎴</span><h3>高畫質卡面</h3><p>適合做手機桌布、限動圖、頭貼和實體卡。</p></article>
+      </div>
+    </section>
+
+    <section class="section-pad faq-section" id="faq">
+      <div class="section-title center">
+        <p class="eyebrow">常見問題</p>
+        <h2>先把市場測起來</h2>
+      </div>
+      <div class="faq-grid">
+        <details open>
+          <summary>這是心理測驗嗎？</summary>
+          <p>不是正式心理測驗，是娛樂型角色卡。重點是好玩、好分享、讓人覺得「有像」。</p>
+        </details>
+        <details>
+          <summary>第一版需要資料庫嗎？</summary>
+          <p>不用。答案存在瀏覽器本機，角色規則也寫在前端。等有流量再接資料庫和金流。</p>
+        </details>
+        <details>
+          <summary>可以怎麼變現？</summary>
+          <p>免費卡片衝分享，付費完整報告 49 元，雙人合卡 99 元，實體收藏卡 199～299 元。</p>
+        </details>
+        <details>
+          <summary>可以上 GitHub Pages 嗎？</summary>
+          <p>可以。這是一個純 HTML、CSS、JavaScript 的靜態網站，直接上傳就能跑。</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <div class="saved-drawer" id="savedDrawer" aria-hidden="true">
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="savedTitle">
+      <div class="drawer-head">
+        <h2 id="savedTitle">我的收藏</h2>
+        <button class="icon-btn" id="closeSavedBtn" type="button" aria-label="關閉收藏">×</button>
+      </div>
+      <div class="saved-list" id="savedList"></div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <div class="brand footer-brand">
+      <span class="brand-mark">副</span>
+      <span><strong>人生副本</strong><small>你的角色卡販賣機</small></span>
+    </div>
+    <p>© 2026 人生副本. Made for fun, sharing, and tiny emotional damage.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
