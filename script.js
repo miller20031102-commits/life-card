@@ -154,16 +154,162 @@ function buildSummary(name,v){
   return `${name} 的真正能力，是在普通日子裡活出自己的設定。`;
 }
 
-const premiumTemplates = [
-  ['角色核心','你這張卡的核心不是單一性格，而是一種反差：你有想被懂的一面，也有不想被看穿的一面。免費版像卡面，付費版才是設定集。'],
-  ['戀愛攻略','你不需要突然變成很會撩的人。你真正要練的是「清楚一點點」：比平常多一句在意、少一次裝沒事，關係就會開始不同。'],
-  ['社交定位','你在群體裡的價值不是一直輸出，而是你有自己的節奏。有人會喜歡熱鬧版的你，也會有人願意等你安靜版回來。'],
-  ['金錢弱點','你最容易花錢的時刻通常不是最需要，而是最累、最想補償自己的時候。買之前先問：這是在升級，還是在逃避？'],
-  ['工作模式','你需要看得到進度條。把大目標拆成小任務，會比靠意志力硬撐有效。你不是不能努力，是不能一直在沒有回饋的黑暗裡努力。'],
-  ['隱藏 Boss','你的 Boss 不一定是外面的敵人，常常是腦內那個一直說「你還不夠」的聲音。打敗它的方法不是反駁，是拿出實際行動紀錄。'],
-  ['7 日升級任務','Day1 寫下你現在的角色名稱。Day2 做一件拖很久的小事。Day3 主動傳一則訊息。Day4 整理一個角落。Day5 拒絕一件消耗你的事。Day6 保存一個自己的優點。Day7 發布或分享一個小成果。'],
-  ['最終提醒','這份報告不是要定義你，而是給你一個有趣的切入點。你可以笑，也可以認真；真正重要的是你下一步要怎麼讓角色升級。']
+const premiumBlueprints = [
+  '付費總覽', '角色核心設定', '戀愛攻略', '朋友與社交定位', '工作與賺錢模式', '金錢弱點', '隱藏 Boss 攻略', '7 日升級任務', '30 天養成路線', '專屬台詞包'
 ];
+
+const rolePremiumNotes = {
+  'warm-assassin': {
+    hook:'你最容易讓人誤會的地方，是你明明很在乎，卻總是用「沒差」包裝。你的付費報告重點是：把溫柔講得更清楚，而不是一直藏在行動裡。',
+    love:'你喜歡一個人時，不一定會變黏，反而會變得更克制。真正適合你的相處方式，是讓對方知道你不是冷淡，而是需要安全感才會慢慢打開。',
+    money:'你常為了「不想麻煩別人」自己扛成本，或為了照顧氣氛而多花錢。付費版提醒：你的溫柔不應該變成你的財務漏洞。',
+    mission:'本週把一次照顧別人的行動，改成一句直接的關心。'
+  },
+  'love-runaway': {
+    hook:'你的戀愛副本最大特色是「越心動越像沒事」。你不是不想愛，是太怕一旦認真就會輸。這份報告會幫你把逃跑反射拆開。',
+    love:'你需要練習的不是撩人技巧，而是小幅度誠實。像是「我剛剛其實有在等你回」這種一句話，會比裝冷淡更有用。',
+    money:'你容易為了維持形象、轉移焦慮或讓自己看起來沒那麼在意而消費。付款前先問自己：這是我真的想要，還是在補曖昧的不安？',
+    mission:'傳一則你平常會刪掉的訊息，但不要寫太滿，只多真誠 10%。'
+  },
+  'battery-hunter': {
+    hook:'你不是不愛社交，你是需要電量管理。你有外向的一面，也有必須關機的一面；真正懂你的人，會尊重這個切換。',
+    love:'戀愛裡你最需要的是「可以一起熱鬧，也可以一起安靜」的人。對方若把你的低電量解讀成冷掉，你會很快感到壓力。',
+    money:'你容易在累到沒電時用消費換回血，例如飲料、宵夜、網購、小廢物。不是不能買，而是要分清楚補血和逃避。',
+    mission:'安排一個不回訊息也不愧疚的休息時段，並事先告知重要的人。'
+  },
+  'restart-hero': {
+    hook:'你是那種明明覺得自己很廢，卻一直沒有真的放棄的人。你的強不是現在多完美，而是你總會想辦法重開一局。',
+    love:'你在感情裡容易想證明自己值得被選，但真正穩的關係不是靠表現換來的。你要找的是看見你努力，也允許你累的人。',
+    money:'你適合把錢花在會讓自己升級的東西：課程、工具、作品、形象、健康。要小心的是衝動買「立刻變強」的幻覺。',
+    mission:'選一個最小可完成任務，今天做完，不准再規劃十年人生。'
+  },
+  'emotion-wizard': {
+    hook:'你的感覺系統太敏銳，常常別人還沒講，你已經感覺到氣氛歪掉。付費報告重點：學會分辨「我的情緒」和「我接收到的情緒」。',
+    love:'戀愛中你很容易讀對方表情、語氣、已讀速度。這是天賦，但也會讓你過度解讀。你需要的是能清楚溝通的人。',
+    money:'你容易為了安撫情緒而消費，尤其是壓力大、被冷落、覺得自己不被理解時。先安頓心情，再決定要不要付款。',
+    mission:'今天遇到情緒波動時，先寫下「這真的是我的嗎？」'
+  },
+  'happy-clown': {
+    hook:'你很會把場面變好笑，但付費版要講真話：你不該永遠靠搞笑證明自己沒事。你的快樂不是義務，是能力。',
+    love:'你戀愛時會用玩笑試探，也用玩笑保護自己。真正親密的關係，需要你偶爾把梗收起來，讓對方碰到真心。',
+    money:'你容易為了氣氛、人情、朋友聚會而花錢。你不是小氣，你只是需要知道哪些熱鬧值得，哪些只是消耗。',
+    mission:'今天講一句不包裝成玩笑的真心話。'
+  },
+  'midnight-sorcerer': {
+    hook:'你的人生很多大魔王都出現在深夜。白天能處理的事，晚上會變成巨大劇情。這份報告會幫你把腦內劇場降噪。',
+    love:'戀愛裡你最容易因為一點細節開始推演。對你來說，安全感不是猜出來的，是問出來、確認出來的。',
+    money:'深夜消費、情緒購物、突然想改變人生，是你的高風險時段。晚上想買的東西，先放到早上再判斷。',
+    mission:'睡前把三個擔心寫下來，旁邊補一句「明天再處理」。'
+  },
+  'procrastination-smith': {
+    hook:'你不是沒能力，而是太常把開始設定得太巨大。你的天賦需要被「小版本」救回來。',
+    love:'戀愛裡你可能會拖著不說、拖著不確認、拖著不開始。你以為是在等時機，其實有時是在等自己不害怕。',
+    money:'你容易買工具、課程、設備，幻想買了就會開始。真正該買的是能降低開始阻力的東西，不是新的逃避入口。',
+    mission:'今天只做 20 分鐘，把任務切到小到不能再小。'
+  },
+  'quiet-knight': {
+    hook:'你平常安靜，但你的忍耐條其實有上限。付費報告重點：不要等暴走才讓別人知道你受傷。',
+    love:'你在關係裡很能扛，但如果一直不講，對方會以為你真的沒事。你要練習的是提前說不舒服，而不是最後一次離開。',
+    money:'你容易因為責任感硬扛費用、幫人收拾爛攤。請記得：可靠不等於什麼都要自己付。',
+    mission:'在不爆炸之前，先說一句「這樣我不太舒服」。'
+  },
+  'warm-guardian': {
+    hook:'你是護短型角色，愛一個人或重視一個朋友時，會默默把對方放進保護範圍。問題是，你不一定會讓對方知道。',
+    love:'戀愛中你是行動派守護者，會做很多但不一定會講。付費版建議：行動之外，要補上語言，否則你的愛容易被低估。',
+    money:'你容易替重要的人花錢，甚至覺得這是照顧。照顧可以，但不要讓愛變成沒有上限的付款。',
+    mission:'把一次默默付出，改成一句清楚的「因為我在乎」。'
+  },
+  'doubt-summoner': {
+    hook:'你的腦袋很會開自我審判庭。付費版不是要灌你雞湯，而是幫你建立證據：你其實沒有你想得那麼差。',
+    love:'你很容易把對方的普通反應解讀成自己不夠好。穩定關係的關鍵，是不要替別人的沉默亂寫判決書。',
+    money:'你可能會為了補自信而消費，買形象、買療癒、買「我應該變更好」。可以投資自己，但別因自責付款。',
+    mission:'寫下今天一件做得不錯的事，句尾不能加「可是」。'
+  },
+  'healer-friend': {
+    hook:'你是很多人的安全屋，但安全屋也需要維修。付費報告重點：讓你知道怎麼照顧別人，同時不把自己耗乾。',
+    love:'你戀愛時容易給很多，甚至還沒確認對方值不值得就先付出。你要學會看回應，而不是只看自己的投入。',
+    money:'你容易因為人情、同情、朋友需求而花錢。記住：你可以善良，但不需要用錢證明你是好人。',
+    mission:'今天拒絕一件超出你電量的請求。'
+  },
+  'vanish-ninja': {
+    hook:'你很會消失，不是因為不在乎，而是壓力一大就想切隱身。付費版會幫你把「消失」改成「有交代地休息」。',
+    love:'戀愛中你需要空間，但對方需要知道你不是丟下他。你最適合的句型是：我需要休息，但我不是不在乎。',
+    money:'你容易在想逃避社交或壓力時，用一個人的消費讓自己恢復。不要禁止，而是設定上限。',
+    mission:'下次想消失前，留一句「我先安靜一下，晚點回」。'
+  },
+  'burnout-warrior': {
+    hook:'你太習慣燃燒自己。付費報告要提醒你：真正的戰士不是一直硬撐，而是知道什麼時候維修裝備。',
+    love:'你在關係中容易把自己搞得很有用，卻忘了你不需要靠功能性被愛。你可以不是最強，也依然值得被留住。',
+    money:'你適合投資效率工具、健康、睡眠、技能，但要避免用花錢買焦慮感的解藥。',
+    mission:'今天排一段休息，並把它當成任務，不是偷懶。'
+  },
+  'love-ghost': {
+    hook:'你像半透明角色，明明出現了，卻又不敢完全被看見。付費版重點：讓你的在意不要永遠只停在朋友名義。',
+    love:'你的攻略不是突然告白，而是提高存在感。多一點主動、多一點回應、多一點讓對方知道他是特別的。',
+    money:'你容易為了暗戀、曖昧、想被注意而花錢。先確認這筆錢是為自己開心，不是為了換對方看見。',
+    mission:'承認一次「我其實有在意」，可以先寫在備忘錄。'
+  },
+  'quiet-ambition': {
+    hook:'你看起來低調，但內心其實有排行榜。這份報告會幫你把野心從暗處拿出來，變成真的路線。',
+    love:'感情裡你可能會假裝不在乎輸贏，但你其實很在意自己有沒有被選擇。你要找的是欣賞你野心，也不怕你變強的人。',
+    money:'你適合把錢花在能累積身份感與能力的項目：作品集、技能、形象、工具。避免為了比較而消費。',
+    mission:'把一個目標寫成第一步，今天就做 15 分鐘。'
+  },
+  'passive-cat': {
+    hook:'你是貓系角色：不是不需要人，是需要安全又不壓迫的靠近。付費報告重點：讓被動不再害你錯過重要關係。',
+    love:'你喜歡被溫柔邀請，但也要偶爾主動伸爪。對方如果一直得猜，你的在意會被誤會成無感。',
+    money:'你容易為了安撫孤單或提升生活小確幸而花錢。小確幸可以，但不要讓它變成逃避主動的替代品。',
+    mission:'主動約一個你其實想見的人，訊息不用完美。'
+  },
+  'mouth-strategist': {
+    hook:'你有軍師腦，也有嘴砲外殼。付費版要把你的吐槽升級成影響力：讓真話被聽見，而不是只被當玩笑。',
+    love:'感情裡你可能會用鬧、嘴、吐槽掩飾認真。真正有用的不是更會講，而是知道什麼時候不要用玩笑逃開。',
+    money:'你容易被有趣、新奇、能讓你有話題的東西吸引。買之前問：這會變成作品或經驗，還是只是一時好玩？',
+    mission:'今天給一個人一句不酸、不鬧、很直球的稱讚。'
+  },
+  'glass-tank': {
+    hook:'你是坦克外殼、玻璃內心。付費報告重點：讓你不必一直假裝不痛，還能保留你的耐打。',
+    love:'你在關係裡很容易硬撐，甚至受傷還說沒事。你需要的是能接住你脆弱的人，不是只看見你能扛的人。',
+    money:'你容易在受傷後買東西補償自己。補償可以，但要小心把每次情緒都變成付款。',
+    mission:'今天如果被一句話刺到，練習說出「剛剛那句我有點受傷」。'
+  },
+  'hidden-boss': {
+    hook:'你平常可能很低調，但認真起來很有壓迫感。付費報告重點：讓你的 Boss 感不要只在被逼急時才出現。',
+    love:'你需要能承受你強度的人。太弱的關係會讓你縮小自己；真正適合你的人，會希望你越來越像自己。',
+    money:'你適合投資能放大你實力的東西。要小心的是為了證明自己而花錢，尤其在被看輕之後。',
+    mission:'把一件你想贏的事說出口，至少對自己承認。'
+  },
+  'wandering-maker': {
+    hook:'你腦中有很多宇宙，但出口常常還沒蓋好。付費版重點：把靈感變成可分享的小作品。',
+    love:'你在關係裡需要能理解你跳躍腦袋的人。對方不一定要跟你一樣怪，但要願意聽你說那些奇怪的想法。',
+    money:'你容易為了新點子買工具。先問自己：這個工具會服務哪個作品？如果答不出來，先不要買。',
+    mission:'選一個點子做最小版本，今天只完成第一格。'
+  },
+  'steady-farmer': {
+    hook:'你的強不是爆紅，而是養成。付費報告重點：讓你看見穩定其實是很稀有的能力。',
+    love:'你適合慢慢變熟、慢慢累積安全感的關係。太刺激的人可能讓你心動，但太不穩的人會消耗你。',
+    money:'你適合固定存、固定投資自己、固定升級生活品質。不要因為別人衝很快就亂跟單。',
+    mission:'選一個小習慣維持三天，不要求完美。'
+  },
+  'chaos-rocket': {
+    hook:'你很有爆發力，但容易同時點燃太多火箭。付費報告重點：保留你的衝勁，但減少炸到自己的機率。',
+    love:'你在感情裡可能來得快、熱得快，也容易因為無聊想找刺激。你需要的是能一起冒險，但也能幫你降落的人。',
+    money:'你容易為了新鮮感、限時、衝動而消費。最有效的做法不是禁止，而是設定冷卻時間。',
+    mission:'今天只開一個任務，不准同時啟動三條主線。'
+  },
+  'silent-archer': {
+    hook:'你不一定話多，但觀察很準。付費報告重點：讓你的準度被看見，而不是一直藏在沉默裡。',
+    love:'感情裡你會先觀察很久，確定安全才出手。這很好，但要小心觀察到最後，機會已經走遠。',
+    money:'你適合謹慎投資、慢慢累積，不適合被煽動型銷售帶走。只要有人催你立刻買，就先退一步。',
+    mission:'把一個觀察變成一句具體表達。'
+  },
+  'sunny-shield': {
+    hook:'你像小太陽，但太陽也會沒電。付費報告重點：讓你的溫暖不再變成討好。',
+    love:'你在關係裡很容易讓對方舒服，但也可能忘記問自己舒不舒服。你值得被照顧，不只是照亮別人。',
+    money:'你容易為了聚會、禮物、氣氛、大家開心而花錢。請把自己的感受也列入預算。',
+    mission:'今天不用照亮所有人，留一點電給自己。'
+  }
+};
 
 const state = { current:0, answers:Array(questions.length).fill(null), scores:{}, currentRole:null, resultId:null };
 const $ = (id)=>document.getElementById(id);
@@ -308,21 +454,140 @@ function renderResult(role){
 }
 
 function buildPremium(role){
-  return premiumTemplates.map(([title,base],idx)=>{
-    if(idx===0) return [title, `${role.name} 的核心設定是：${role.summary} 你的主技能「${role.skill}」代表你最擅長的不是表面上的個性，而是在關鍵時刻展現出的處理方式。`];
-    if(idx===1) return [title, role.love + ' 付費版提醒：你不一定要變外向，也不一定要秒回，但你要練習讓對方知道你不是完全沒感覺。'];
-    if(idx===2) return [title, role.social + ' 你的社交價值不是取悅所有人，而是找到會尊重你節奏的人。'];
-    if(idx===5) return [title, role.boss + ' 面對這個 Boss，你的打法是把模糊焦慮變成具體行動，而不是一直在腦內重播。'];
-    return [title, base];
-  });
+  const note = rolePremiumNotes[role.id] || {};
+  const v = role.vector || {};
+  const topAxes = Object.entries(v).sort((a,b)=>(b[1]||0)-(a[1]||0)).slice(0,4).map(([k])=>axisLabel(k));
+  const score = premiumScore(v);
+  const tone = getTonePack(role);
+  const report = [
+    {
+      title:'付費總覽｜你不是一張普通卡',
+      html:`<p class="lead">${note.hook || `${role.name} 的付費版重點，是把免費卡面背後的反差、弱點和升級路線講清楚。`}</p>
+      <div class="premium-kpis">
+        <span><b>${role.rarity}</b><small>稀有度</small></span>
+        <span><b>${score.power}</b><small>爆發力</small></span>
+        <span><b>${score.sensitivity}</b><small>敏銳度</small></span>
+        <span><b>${score.growth}</b><small>升級感</small></span>
+      </div>
+      <ul><li>你的主軸：${topAxes.join('、')}</li><li>你的卡面台詞：${role.line}</li><li>這份報告適合收藏、截圖，也適合當作這週的自我升級提醒。</li></ul>`
+    },
+    {
+      title:'角色核心設定｜你真正的反差',
+      html:`<p>${role.name} 的核心不是「${role.traits[0]}」這麼簡單，而是你同時有兩種力量：一種是外面看得見的反應，另一種是你不太會說出口的內在需求。</p>
+      <ul><li><b>外顯設定：</b>${role.traits.join('、')}。</li><li><b>主技能：</b>${role.skill}</li><li><b>被動技能：</b>${role.passive}</li><li><b>真正需求：</b>${tone.need}</li></ul>
+      <p>你最有魅力的地方，是你不是單薄的人設。你有矛盾、有防禦、有可愛的逃跑機制，也有想要變好的部分。</p>`
+    },
+    {
+      title:'戀愛攻略｜怎麼靠近你才不會踩雷',
+      html:`<p>${note.love || role.love}</p>
+      <ul><li><b>你心動時的反應：</b>${tone.loveSignal}</li><li><b>你最容易扣分的點：</b>${tone.loveRisk}</li><li><b>適合你的關係：</b>${tone.bestPartner}</li></ul>
+      <p class="quote">付費版提醒：你不需要變成另一個人，你只需要讓對方更容易讀懂你 10%。</p>`
+    },
+    {
+      title:'朋友與社交定位｜你在隊伍裡的位置',
+      html:`<p>${role.social}</p>
+      <ul><li><b>隊伍定位：</b>${teamRole(v)}</li><li><b>你被需要的原因：</b>${tone.socialValue}</li><li><b>你要避免：</b>${tone.socialWarning}</li></ul>
+      <p>你不是要讓所有人都喜歡你，而是要找到能讓你不用一直演、也不用一直撐的圈子。</p>`
+    },
+    {
+      title:'工作與賺錢模式｜你要怎麼升級',
+      html:`<p>${role.work}</p>
+      <ul><li><b>適合節奏：</b>${workRhythm(v)}</li><li><b>適合任務：</b>${workTask(v)}</li><li><b>最容易卡住：</b>${workTrap(v)}</li></ul>
+      <p>你的成長關鍵不是每天都熱血，而是把人生做成「看得到進度條」的任務。只要你有回饋，你就比較能撐下去。</p>`
+    },
+    {
+      title:'金錢弱點｜你最容易在哪裡失血',
+      html:`<p>${note.money || moneyNote(v)}</p>
+      <ul><li><b>高風險時刻：</b>${moneyRiskTime(v)}</li><li><b>購買前先問：</b>${moneyQuestion(v)}</li><li><b>比較值得花：</b>${moneyGoodSpend(v)}</li></ul>
+      <p class="quote">不是叫你不要花錢，是讓每一筆錢更像升級，不像逃避。</p>`
+    },
+    {
+      title:'隱藏 Boss 攻略｜打敗最煩的自己',
+      html:`<p>${role.boss}</p>
+      <ul><li><b>Boss 技能：</b>${bossSkill(v)}</li><li><b>你常用但沒效的打法：</b>${badBossStrategy(v)}</li><li><b>真正有效的打法：</b>${goodBossStrategy(v)}</li></ul>
+      <p>面對這個 Boss，不要只靠意志力。你要做的是把焦慮變小、把任務變具體、把勝利變得可記錄。</p>`
+    },
+    {
+      title:'7 日升級任務｜照做就有感',
+      html:`<ol class="mission-list">${sevenDayMissions(role, v, note).map((m,i)=>`<li><b>Day ${i+1}</b><span>${m}</span></li>`).join('')}</ol>`
+    },
+    {
+      title:'30 天養成路線｜從好玩變成真的變好',
+      html:`<ul><li><b>第 1 週：認識模式。</b>記錄自己最常出現的反應，不急著改。</li><li><b>第 2 週：降低內耗。</b>把一個大問題拆成每天 15 分鐘的小任務。</li><li><b>第 3 週：練習表達。</b>把「沒事、隨便、都可以」換成比較真實的句子。</li><li><b>第 4 週：做出成果。</b>完成一個能被看見的小作品、小改變或小決定。</li></ul>
+      <p>30 天後，你不一定變成完全不同的人，但你會更知道怎麼操作自己這張卡。</p>`
+    },
+    {
+      title:'專屬台詞包｜可以截圖發限動',
+      html:`<ul class="quote-list"><li>「${role.summary}」</li><li>「我不是沒感覺，我只是需要一點安全讀條。」</li><li>「我的人生還沒滿等，但我已經不是新手村的我。」</li><li>「${note.mission || role.quest.replace('本週任務：','')}」</li></ul>
+      <p>這張角色卡不是要限制你，而是給你一個有梗、有畫面、也有一點點真心的自我介紹。</p>`
+    }
+  ];
+  return report;
 }
+
 function showPremiumReport(){
   const role = state.currentRole;
   if(!role) return;
-  $('premiumGrid').innerHTML = buildPremium(role).map(([title,text])=>`<article class="premium-item"><h3>${title}</h3><p>${text}</p></article>`).join('');
+  $('premiumGrid').innerHTML = buildPremium(role).map(item=>`<article class="premium-item"><h3>${item.title}</h3>${item.html}</article>`).join('');
   $('premiumReport').classList.remove('hidden');
   $('lockedUpsell').classList.add('hidden');
 }
+
+function stripHtml(html){
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent.replace(/\s+\n/g,'\n').replace(/\n\s+/g,'\n').replace(/\s{2,}/g,' ').trim();
+}
+
+function axisLabel(axis){
+  return {warm:'溫柔感',cool:'冷靜感',social:'社交輸出',solo:'獨處能量',romance:'戀愛感',avoid:'防禦感',ambition:'野心值',chaos:'混亂靈感',support:'支援力',warrior:'戰鬥力',creative:'創造力',overthink:'腦內劇場'}[axis] || axis;
+}
+function premiumScore(v){
+  const power = Math.min(99, 55 + ((v.warrior||0)+(v.ambition||0)+(v.chaos||0))*7);
+  const sensitivity = Math.min(99, 50 + ((v.overthink||0)+(v.warm||0)+(v.support||0))*6);
+  const growth = Math.min(99, 58 + ((v.ambition||0)+(v.creative||0)+(v.warrior||0))*6);
+  return {power, sensitivity, growth};
+}
+function getTonePack(role){
+  const v = role.vector;
+  return {
+    need: (v.avoid||0)>=3 ? '你需要安全感與退路，才敢真的靠近。' : (v.support||0)>=3 ? '你需要被照顧，而不是永遠當照顧別人的人。' : (v.ambition||0)>=4 ? '你需要看見自己正在升級，而不是只被要求忍耐。' : '你需要有人看見你真正的節奏。',
+    loveSignal: (v.romance||0)>=3 && (v.avoid||0)>=2 ? '越在意越會假裝自然，訊息可能打了又刪。' : (v.warm||0)>=3 ? '會用小動作照顧對方，而不是一直講甜言蜜語。' : (v.cool||0)>=3 ? '會先觀察很久，確認安全才出手。' : '會在好奇、靠近、退後之間來回測試。',
+    loveRisk: (v.overthink||0)>=3 ? '把對方的小反應解讀成大劇情。' : (v.avoid||0)>=3 ? '太會保護自己，連機會也一起擋掉。' : '把真心藏太深，讓對方以為你沒有很在意。',
+    bestPartner: (v.solo||0)>=3 ? '尊重空間、回應穩定、不逼你立刻表態的人。' : (v.ambition||0)>=3 ? '欣賞你想變強，也不會因為你低潮就看輕你的人。' : '能接住你的真心，也能跟你一起笑的人。',
+    socialValue: (v.support||0)>=3 ? '你讓人覺得安全、可靠、可以講真話。' : (v.social||0)>=3 ? '你能讓氣氛動起來，讓場子不那麼尷尬。' : (v.cool||0)>=3 ? '你觀察準、判斷清楚，關鍵時候很有用。' : '你有自己的味道，不需要一直刷存在感。',
+    socialWarning: (v.support||0)>=3 ? '不要把每個人的情緒都當成你的責任。' : (v.solo||0)>=3 ? '不要消失到讓在乎你的人以為自己被討厭。' : '不要為了維持好相處而犧牲自己的感受。'
+  };
+}
+function teamRole(v){
+  if((v.support||0)>=4) return '補師／安全屋，負責接住大家的情緒。';
+  if((v.social||0)>=3) return '氣氛輸出，負責讓場面活起來。';
+  if((v.cool||0)>=3) return '軍師／觀察手，負責看清局勢。';
+  if((v.warrior||0)>=3) return '前排戰士，關鍵時候負責扛。';
+  return '特殊輔助位，有自己的節奏和存在感。';
+}
+function workRhythm(v){ return (v.chaos||0)>=3 ? '短衝刺 + 明確收尾，不適合無限開新坑。' : (v.overthink||0)>=3 ? '低壓開始 + 小步交付，比巨大計畫更有效。' : (v.ambition||0)>=3 ? '有目標、有回饋、有排名或成長曲線時最能爆發。' : '穩定累積，慢慢養成。'; }
+function workTask(v){ return (v.creative||0)>=3 ? '企劃、內容、設計、網站、短影音、個人品牌、把無聊變有趣的事。' : (v.support||0)>=3 ? '整理、協調、服務、專案支援、社群經營、讓系統穩定的事。' : (v.cool||0)>=3 ? '分析、規劃、資料整理、策略判斷、需要冷靜的任務。' : '需要行動力與抗壓的任務。'; }
+function workTrap(v){ return (v.overthink||0)>=3 ? '想太久，開始太晚。' : (v.chaos||0)>=3 ? '開始很快，收尾失蹤。' : (v.avoid||0)>=3 ? '怕失敗，所以假裝自己沒有很想要。' : '太想一次做到最好，反而卡住。'; }
+function moneyNote(v){ return (v.overthink||0)>=3 ? '你容易在焦慮時消費，像是在買一個「我會變好」的保證。' : (v.chaos||0)>=3 ? '你容易被限時、新鮮、好玩帶走，冷卻時間對你很重要。' : (v.support||0)>=3 ? '你容易為了別人舒服而花錢，但你也要把自己算進預算。' : '你最值得花的錢，是能留下能力、作品或健康的錢。'; }
+function moneyRiskTime(v){ return (v.overthink||0)>=3 ? '深夜、心情差、被比較、覺得自己落後時。' : (v.social||0)>=3 ? '朋友局、聚會、氣氛到了、不想掃興時。' : '累、煩、想立刻變好的時候。'; }
+function moneyQuestion(v){ return (v.ambition||0)>=3 ? '這筆錢會讓我真的升級，還是只是讓我看起來像在努力？' : '這是我真的需要，還是我正在用付款安撫情緒？'; }
+function moneyGoodSpend(v){ return (v.creative||0)>=3 ? '能做出作品的工具、素材、課程。' : (v.ambition||0)>=3 ? '技能、健康、形象、能累積長期價值的東西。' : '睡眠、健康、生活穩定與讓你少內耗的東西。'; }
+function bossSkill(v){ return (v.overthink||0)>=3 ? '把小事放大成連續劇。' : (v.avoid||0)>=3 ? '把你推回安全區，順便關掉機會。' : (v.chaos||0)>=3 ? '一次開太多任務，讓你無法收尾。' : '用「你還不夠好」消耗你的行動力。'; }
+function badBossStrategy(v){ return (v.overthink||0)>=3 ? '一直想通、一直分析、一直重播。' : (v.avoid||0)>=3 ? '假裝不想要，等自己不怕再說。' : '靠一陣熱血硬衝，然後把自己耗乾。'; }
+function goodBossStrategy(v){ return (v.overthink||0)>=3 ? '把腦內問題寫成下一個具體動作。' : (v.avoid||0)>=3 ? '只前進 10%，不要逼自己一次全裸真心。' : (v.chaos||0)>=3 ? '限制同時任務數，把收尾當成主線。' : '每天留下一個可被看見的小證據。'; }
+function sevenDayMissions(role, v, note){
+  return [
+    `寫下你的角色名：${role.name}，再寫一句你最想保留的能力。`,
+    `做一件拖很久、但 15 分鐘內能開始的小事。`,
+    (v.romance||0)>=3 ? '傳一則比平常真誠 10% 的訊息。' : '主動聯絡一個你其實有點想念的人。',
+    (v.solo||0)>=3 ? '安排一段不愧疚的關機時間。' : '整理一個讓你最煩的小角落。',
+    (v.support||0)>=3 ? '拒絕一件超出你電量的請求。' : '拒絕一個會讓你內耗的小誘惑。',
+    `完成你的專屬任務：${note.mission || role.quest.replace('本週任務：','')}`,
+    '截圖或複製一句你最有感的台詞，當作下週提醒。'
+  ];
+}
+
 function hasPremiumAccess(resultId){ return Boolean(localStorage.getItem(`lifequest:premium:${resultId}`)); }
 function grantPremiumAccess(resultId, code){ localStorage.setItem(`lifequest:premium:${resultId}`, JSON.stringify({code:maskCode(code), at:new Date().toISOString()})); }
 function maskCode(code){ return code ? code.slice(0,4)+'****'+code.slice(-4) : ''; }
@@ -361,7 +626,7 @@ function showSavedCards(){
 }
 function copyPremiumReport(){
   if(!state.currentRole) return;
-  const text = buildPremium(state.currentRole).map(([t,p])=>`【${t}】\n${p}`).join('\n\n');
+  const text = buildPremium(state.currentRole).map(item=>`【${item.title}】\n${stripHtml(item.html)}`).join('\n\n');
   copyText(`${state.currentRole.name}｜完整角色報告\n\n${text}`,'已複製完整報告');
 }
 
