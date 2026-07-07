@@ -31,7 +31,7 @@
       <a href="#samples">範例</a>
       <a href="#quiz">測驗</a>
       <a href="#premium">付費版</a>
-      <a href="#faq">FAQ</a>
+      <a href="#faq">說明</a>
     </nav>
     <button class="ghost-btn tiny" id="savedBtn" type="button">我的卡冊</button>
   </header>
@@ -74,8 +74,8 @@
 
     <section class="section-pad strip-section reveal" aria-label="網站亮點">
       <div class="strip-card"><strong>免費版</strong><span>產生角色卡、下載 PNG、分享文案</span></div>
-      <div class="strip-card"><strong>付費版</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
-      <div class="strip-card"><strong>後台版</strong><span>Google Sheet 一次性解鎖碼，用過就失效</span></div>
+      <div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
+      <div class="strip-card"><strong>安全解鎖</strong><span>每組解鎖碼僅能使用一次，已解鎖報告會存進卡冊</span></div>
     </section>
 
     <section class="section-pad samples-section" id="samples">
@@ -92,7 +92,7 @@
           <p class="eyebrow">開始進入副本</p>
           <h2>12 題抽出你的角色卡</h2>
           <p>不用想太久，選最像你平常反應的答案。這不是診斷，是娛樂，但文案會故意寫得像在偷看你的人生。</p>
-          <div class="mini-note">你的答案只存在本機瀏覽器，不會上傳。只有付費解鎖時會送出解鎖碼驗證。</div>
+          <div class="mini-note">你的答案只會用來生成這次結果。解鎖完整報告時，系統只會驗證解鎖碼與結果編號。</div>
         </aside>
 
         <div class="quiz-panel" id="quizPanel">
@@ -187,11 +187,11 @@
     <section class="section-pad premium-section" id="premium">
       <div class="premium-card reveal">
         <div>
-          <p class="eyebrow">正式付費商品</p>
-          <h2>免費抽卡，付費解鎖完整報告</h2>
-          <p>使用者先免費玩，覺得準、有趣、想收藏時，再用 NT$49 解鎖完整報告。這比一進站就收費更容易成交。</p>
+          <p class="eyebrow">完整收藏版</p>
+          <h2>先抽出角色卡，再解鎖完整報告</h2>
+          <p>免費版可以生成角色卡；喜歡這張卡時，可以用 NT$49 解鎖更完整的戀愛、朋友、工作、金錢與 7 日任務分析。</p>
         </div>
-        <div class="price-box"><span>早鳥價</span><strong>NT$49</strong><button class="primary-btn full" data-open-pay type="button">查看解鎖方式</button></div>
+        <div class="price-box"><span>完整報告</span><strong>NT$49</strong><button class="primary-btn full" data-open-pay type="button">解鎖方式</button></div>
       </div>
       <div class="premium-feature-grid reveal">
         <article><span>💘</span><h3>戀愛攻略</h3><p>分析你在曖昧、交往、冷掉時最常卡住的點。</p></article>
@@ -202,20 +202,20 @@
     </section>
 
     <section class="section-pad roadmap-section reveal">
-      <div class="section-title center"><p class="eyebrow">下一波可以賣更高</p><h2>之後可以延伸的爆點版本</h2></div>
+      <div class="section-title center"><p class="eyebrow">即將開放</p><h2>更多有趣玩法準備中</h2></div>
       <div class="roadmap-grid">
-        <article><strong>雙人合卡</strong><span>情侶、曖昧、朋友配對，定價 99～149。</span></article>
+        <article><strong>雙人合卡</strong><span>情侶、曖昧、朋友配對，看看你們是什麼副本組合。</span></article>
         <article><strong>朋友團隊卡</strong><span>開房間一起測，產生隊伍組成，很適合群組分享。</span></article>
-        <article><strong>實體收藏卡</strong><span>把結果做成卡牌寄出，定價 199～299。</span></article>
+        <article><strong>實體收藏卡</strong><span>把喜歡的角色卡做成可以收藏的實體卡牌。</span></article>
       </div>
     </section>
 
     <section class="section-pad faq-section" id="faq">
-      <div class="section-title center reveal"><p class="eyebrow">FAQ</p><h2>上線前你需要知道的事</h2></div>
+      <div class="section-title center reveal"><p class="eyebrow">常見問題</p><h2>使用前可以先看這裡</h2></div>
       <div class="faq-grid reveal">
-        <details open><summary>解鎖碼真的只能用一次嗎？</summary><p>是。正式設定 Google Apps Script 後，使用者輸入解鎖碼，後台會把那組碼標記為 USED，第二次輸入會顯示已使用。</p></details>
-        <details><summary>為什麼不用一開始串金流？</summary><p>先用人工收款最省時間。確認真的有人願意買，再串綠界、藍新或 Gumroad 之類的正式付款。</p></details>
-        <details><summary>GitHub Pages 可以跑這個嗎？</summary><p>前台可以。一次性解鎖碼狀態要靠 Google Sheet + Apps Script 記錄，因為靜態網站不能保存全站共用狀態。</p></details>
+        <details open><summary>解鎖碼可以重複使用嗎？</summary><p>每組解鎖碼只能成功解鎖一次。解鎖完成後，這組碼就不能再拿去解鎖其他卡牌。</p></details>
+        <details><summary>付款後怎麼拿到解鎖碼？</summary><p>完成付款後，請依頁面指示提供付款資訊與訂單編號。確認後會提供一組專屬解鎖碼。</p></details>
+        <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有自己的結果編號。你可以在「我的卡冊」選擇想解鎖的卡牌。</p></details>
         <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會永久保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
       </div>
     </section>
@@ -232,11 +232,11 @@
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
       <p class="eyebrow">解鎖付費版</p>
       <h2 id="payTitle">完整角色報告 NT$49</h2>
-      <p class="modal-copy">付款後你會拿到一組一次性解鎖碼。輸入後，這組碼會在後台標記為已使用，不能再給別人用。</p>
+      <p class="modal-copy">付款後你會拿到一組專屬解鎖碼。解鎖成功後，完整報告會保存到這台裝置的「我的卡冊」。</p>
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
       <div class="pay-steps">
         <div><strong>1</strong><span>轉帳 / LINE Pay / 你指定的收款方式</span></div>
-        <div><strong>2</strong><span>把付款截圖與訂單編號傳給站主</span></div>
+        <div><strong>2</strong><span>把付款資訊與訂單編號傳給客服確認</span></div>
         <div><strong>3</strong><span>收到解鎖碼後，在下方輸入</span></div>
       </div>
       <div class="order-box"><span>你的訂單編號</span><strong id="orderIdText">LQ-000000</strong><button class="ghost-btn tiny" id="copyOrderBtn" type="button">複製</button></div>
@@ -246,7 +246,7 @@
         <button class="primary-btn full" id="redeemBtn" type="button">驗證並解鎖完整報告</button>
       </div>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
-      <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製付款回報訊息</button>
+      <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製付款資訊</button>
     </div>
   </div>
 

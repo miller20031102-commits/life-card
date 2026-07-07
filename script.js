@@ -1,13 +1,8 @@
-/*
-  人生副本｜角色卡販賣機
-  上線前只需要改這裡：
-  1) APPS_SCRIPT_URL：貼上 Google Apps Script Web App URL，才能啟用一次性解鎖碼。
-  2) PAYMENT_NOTE：改成你的付款方式或表單連結。
-*/
+/* 人生副本｜角色卡販賣機 */
 const CONFIG = {
   price: 'NT$49',
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2XTRcqt6Tjiy_ueGJIfd6rkIULHOdvyLYcs4ZSM_gA7ofdmZK3yBpmLU58U9Dd9pDeA/exec',
-  PAYMENT_NOTE: '付款方式：請改成你的銀行轉帳 / LINE Pay / 表單連結。付款後傳截圖與訂單編號給站主。',
+  PAYMENT_NOTE: '付款方式：請依頁面公告完成 NT$49 付款，並附上付款資訊與訂單編號；確認後會提供專屬解鎖碼。',
   brand: '人生副本'
 };
 
@@ -348,7 +343,7 @@ function bindEvents(){
   $('saveCardBtn').addEventListener('click',saveCurrentCard);
   $('savedBtn').addEventListener('click',showSavedCards);
   $('copyPremiumBtn').addEventListener('click',copyPremiumReport);
-  $('copyOrderBtn').addEventListener('click',()=>copyText($('orderIdText').textContent,'已複製訂單編號'));
+  $('copyOrderBtn').addEventListener('click',()=>copyText($('orderIdText').textContent,'已複製訂單編號')); hideToast();
   $('copyPayInfoBtn').addEventListener('click',copyPaymentInfo);
   $('redeemBtn').addEventListener('click',redeemCode);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
@@ -690,13 +685,13 @@ async function downloadCard(){
 
     if(jpgCanvas.toBlob){
       jpgCanvas.toBlob(blob=>{
+        hideToast();
         showSaveImageModal(dataUrl, fileName, blob);
         if(!isIOSLike() && !isInAppBrowser()) triggerBlobDownload(blob, fileName);
-        toast('JPG 已生成，手機可長按圖片儲存');
       }, 'image/jpeg', 0.94);
     }else{
+      hideToast();
       showSaveImageModal(dataUrl, fileName, null);
-      toast('JPG 已生成，手機可長按圖片儲存');
     }
   }catch(err){
     console.error(err);
@@ -724,6 +719,7 @@ function showSaveImageModal(dataUrl, fileName, blob){
 
 function closeSaveImageModal(){
   $('saveImageModal')?.classList.add('hidden');
+  hideToast();
 }
 
 function retryImageDownload(){
@@ -871,7 +867,7 @@ function openPayModal(){
   if(target) target.textContent = `正在解鎖：${state.currentRole.name}｜${state.currentRole.rarity}｜${state.resultId}`;
   $('payModal').classList.remove('hidden');
   $('unlockCodeInput').focus();
-  $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '尚未設定 Apps Script URL：目前無法真正驗證一次性解鎖碼，請先照 README 設定後台。';
+  $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '目前暫停線上解鎖，請聯絡客服協助。';
 }
 function closePayModal(){ $('payModal').classList.add('hidden'); }
 function setOrderId(){
@@ -887,7 +883,7 @@ function redeemCode(){
   const code = normalizeCode($('unlockCodeInput').value);
   if(!state.currentRole) return setModalMessage('請先完成測驗。',false);
   if(!code) return setModalMessage('請輸入解鎖碼。',false);
-  if(!CONFIG.APPS_SCRIPT_URL) return setModalMessage('還沒設定 Apps Script URL，所以目前不能真正驗證一次性解鎖碼。請照 README 完成後台設定。',false);
+  if(!CONFIG.APPS_SCRIPT_URL) return setModalMessage('目前暫停線上解鎖，請聯絡客服協助。',false);
   $('redeemBtn').disabled = true;
   setModalMessage('正在驗證解鎖碼...',true);
   redeemViaJsonp(code, state.currentRole.id, state.resultId)
@@ -902,7 +898,7 @@ function redeemCode(){
         setModalMessage(res.message || '解鎖失敗，請確認代碼是否正確。', false);
       }
     })
-    .catch(()=>setModalMessage('連線失敗，請確認 Apps Script 已部署成「任何人可存取」。', false))
+    .catch(()=>setModalMessage('連線失敗，請稍後再試，或聯絡客服協助。', false))
     .finally(()=>{ $('redeemBtn').disabled = false; });
 }
 function redeemViaJsonp(code, roleId, resultId){
@@ -934,4 +930,18 @@ async function copyText(text,msg){
   try{ await navigator.clipboard.writeText(text); toast(msg || '已複製'); }
   catch{ const area=document.createElement('textarea'); area.value=text; document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove(); toast(msg || '已複製'); }
 }
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>t.classList.remove('show'),2200); }
+function toast(msg){
+  const t=$('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer=setTimeout(hideToast,1800);
+}
+function hideToast(){
+  const t=$('toast');
+  if(!t) return;
+  t.classList.remove('show');
+  t.textContent='';
+  clearTimeout(window.__toastTimer);
+}

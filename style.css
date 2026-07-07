@@ -500,3 +500,25 @@ a,button,input{-webkit-tap-highlight-color:transparent}button,.primary-btn,.seco
   .result-card .result-inner{padding:24px 20px 28px}
   .result-card .result-summary{padding:12px 14px;border-radius:16px}
 }
+
+
+/* ==== Final launch polish: no sticky black toast over image preview ==== */
+.toast{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateX(-50%) translateY(26px) scale(.96);
+  transition:opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
+}
+.toast.show{
+  opacity:1;
+  visibility:visible;
+  transform:translateX(-50%) translateY(0) scale(1);
+  transition:opacity .18s ease, transform .18s ease, visibility 0s;
+}
+.modal:not(.hidden) ~ .toast,
+body:has(#saveImageModal:not(.hidden)) .toast{
+  opacity:0!important;
+  visibility:hidden!important;
+  transform:translateX(-50%) translateY(26px) scale(.96)!important;
+}
