@@ -231,7 +231,22 @@ function resetQuiz(){
   $('resultSection').classList.add('hidden'); $('premiumReport').classList.add('hidden'); $('lockedUpsell').classList.remove('hidden');
   renderQuestion(); location.hash = '#quiz';
 }
-function scrollToQuiz(){ $('quiz').scrollIntoView({behavior:'smooth',block:'start'}); }
+
+function scrollToQuiz(){
+  // 手機版不要跳回整個測驗區頂部，否則上方說明區會把題目往下擠。
+  // 直接對準題目卡，並預留 sticky header + iPhone 安全區高度。
+  const panel = $('quizPanel');
+  if(!panel) return;
+
+  const header = document.querySelector('.site-header');
+  const headerHeight = header ? header.getBoundingClientRect().height : 0;
+  const isMobile = window.matchMedia('(max-width: 700px)').matches;
+  const offset = isMobile ? headerHeight + 14 : headerHeight + 18;
+  const y = panel.getBoundingClientRect().top + window.pageYOffset - offset;
+
+  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+}
+
 
 function calculateScores(){
   const scores = Object.fromEntries(axes.map(a=>[a,0]));

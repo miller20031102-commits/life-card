@@ -32,3 +32,16 @@ a,button,input{-webkit-tap-highlight-color:transparent}button,.primary-btn,.seco
   .modal{align-items:end;padding:0}.modal-panel{width:100%;max-height:88dvh;border-radius:26px 26px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));overscroll-behavior:contain}.modal-panel h2{font-size:28px}.pay-steps div{padding:13px}.order-box{gap:8px}.order-box strong{font-size:18px;letter-spacing:.03em}.unlock-form input{min-height:52px}.toast{bottom:calc(86px + env(safe-area-inset-bottom));max-width:calc(100% - 28px);text-align:center;border-radius:18px}
 }
 @media (max-width:380px){.hero h1{font-size:38px}.brand strong{font-size:14px}.ghost-btn.tiny{font-size:11px}.mobile-quickbar{left:8px;right:8px}.mobile-quickbar .primary-btn,.mobile-quickbar .secondary-btn{font-size:13px}.option-btn{grid-template-columns:34px 1fr;padding:13px}.option-icon{font-size:25px}.question-box h3{font-size:22px}}
+
+
+/* 手機測驗定位修正：點選答案後直接回到題目卡，不被上方說明或 sticky header 遮住 */
+#quizPanel{scroll-margin-top:88px}
+@media (max-width:700px){
+  #quiz{padding-top:42px}
+  #quizPanel{scroll-margin-top:76px}
+  .quiz-shell{gap:14px}
+  .quiz-intro{padding:18px 20px}
+  .quiz-intro h2{font-size:26px}
+  .quiz-intro p{font-size:15px;line-height:1.7}
+  .quiz-intro .mini-note{margin-top:12px;padding:12px 13px}
+}
