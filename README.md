@@ -126,3 +126,22 @@ soldAt 填付款時間
 這版已經能做到「解鎖碼用一次就失效」。
 
 但付款本身仍然是人工確認。如果要全自動收款，需要之後串綠界、藍新、TapPay、Gumroad 或其他支付服務。
+
+
+## 已設定完成
+
+本版已經把 Google Apps Script Web App URL 填入 `script.js`：
+
+```js
+APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQ8TxLBVIQgeTQkBbHeryba07gJWhDpgqpSzROdKgqktHGy3LKou2-QyMu5cUcn1V5/exec'
+```
+
+上傳 GitHub Pages 前，請確認只上傳公開檔案：
+
+- `index.html`
+- `style.css`
+- `script.js`
+- `og-image.png`
+- `README.md`
+
+不要上傳私密解鎖碼 CSV。

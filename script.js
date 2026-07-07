@@ -6,7 +6,7 @@
 */
 const CONFIG = {
   price: 'NT$49',
-  APPS_SCRIPT_URL: '',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQ8TxLBVIQgeTQkBbHeryba07gJWhDpgqpSzROdKgqktHGy3LKou2-QyMu5cUcn1V5/exec',
   PAYMENT_NOTE: '付款方式：請改成你的銀行轉帳 / LINE Pay / 表單連結。付款後傳截圖與訂單編號給站主。',
   brand: '人生副本'
 };
