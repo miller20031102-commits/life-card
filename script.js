@@ -108,7 +108,15 @@ const roles = [
   role('steady-farmer','穩定種田系玩家','R','🌱','#73f2ad',{support:2,warm:2,ambition:1,solo:1},['穩定','慢慢來','耐久'],'你不一定爆衝，但很適合慢慢養成。','每日任務：別人衝刺時，你在累積基本功。','你的強不是瞬間爆發，是能撐很久。','怕自己太普通，忽略了穩定也是一種稀有能力。','本週任務：維持一件小習慣 3 天，不需要完美。'),
   role('chaos-rocket','混亂火箭騎士','SR','🚀','#ff8a5b',{chaos:4,warrior:2,creative:2,social:1},['衝動','好玩','高能量'],'你的人生像火箭，有時飛很高，有時忘記煞車。','瞬間點火：看到有趣的事會直接衝。','你能把低迷場面炸出新路，但也容易炸到自己。','太快答應、太快開始、太慢收尾，是你的三連擊。','本週任務：今天只開一個任務，不要同時點燃三顆火箭。'),
   role('silent-archer','沉默命中弓手','SR','🏹','#9fd8ff',{cool:3,solo:3,ambition:2,overthink:1},['冷靜','觀察','精準'],'你不吵，但通常看得很清楚。','遠距觀察：先看懂局，再決定要不要出手。','你適合在安靜中累積命中率。','太常不說，會讓你的能力被低估。','本週任務：把一個觀察變成一句具體建議。'),
-  role('sunny-shield','陽光防禦盾','R','☀️','#ffd15c',{warm:4,social:2,support:2,avoid:1},['溫暖','好相處','保護色'],'你看起來很陽光，其實也有不想被問的陰影。','暖場護盾：你會讓大家舒服，也會順手保護氣氛。','你能讓陌生人放鬆，像人形小太陽。','太在意大家開不開心，會忘記你自己也可以不開心。','本週任務：今天不用照亮所有人，留一點電給自己。')
+  role('sunny-shield','陽光防禦盾','R','☀️','#ffd15c',{warm:4,social:2,support:2,avoid:1},['溫暖','好相處','保護色'],'你看起來很陽光，其實也有不想被問的陰影。','暖場護盾：你會讓大家舒服，也會順手保護氣氛。','你能讓陌生人放鬆，像人形小太陽。','太在意大家開不開心，會忘記你自己也可以不開心。','本週任務：今天不用照亮所有人，留一點電給自己。'),
+  role('read-receipt-beast','已讀不回召喚獸','SR','📱','#9fd8ff',{overthink:4,avoid:2,romance:2,solo:1},['已讀','小劇場','訊息焦慮'],'你不是不回，你是在腦內排練 12 種回法。','訊息結界：看到訊息後先進入精神讀取條。','越重要的人，越容易讓你不知道怎麼回。','拖太久會讓別人以為你冷掉，其實你只是卡住。','本週任務：今天回一則訊息，不要修稿超過三次。'),
+  role('party-ghost','社恐派對幽靈','R','🪩','#d7b0ff',{social:2,solo:4,avoid:2,warm:1},['會出現','會消失','低電量'],'你可以出門社交，但靈魂常常先提早下班。','短暫現形：一開始很正常，電量掉完就想飄走。','你不是討厭大家，你只是需要回到安靜的補血點。','太常突然消失，朋友會以為自己是不是說錯話。','本週任務：想撤退前，留一句「我先回去充電」。'),
+  role('love-brain-sealer','戀愛腦封印師','SSR','🔒','#ff9eb6',{romance:4,cool:2,avoid:3,overthink:2},['心動','封印','裝冷靜'],'你越心動，越會把自己封印成理性大師。','心動封印術：明明在意，表面卻像在開會。','你很會保護自尊，也很會讓曖昧變成猜謎。','太怕露餡，可能把好感也一起封死。','本週任務：給對方一個明確一點的好感訊號。'),
+  role('human-memo-fairy','人間備忘錄精靈','R','📝','#73f2ad',{support:4,warm:2,overthink:1,cool:1},['細心','記得','照顧型'],'你常記得別人的小事，卻忘記把自己排進行事曆。','細節補給：生日、喜好、情緒變化，你都會默默存檔。','你的溫柔很實用，常讓人覺得被放在心上。','太常幫大家記得，會把自己累成免費客服。','本週任務：今天也幫自己記一件需要被照顧的事。'),
+  role('owl-saver','省電模式貓頭鷹','R','🦉','#62e7ff',{solo:4,cool:2,overthink:2,creative:1},['夜行','省電','安靜觀察'],'你看起來很安靜，其實是在低耗能模式掃描全場。','夜間分析：越晚腦袋越清醒，白天像在省電。','你適合安靜累積，不適合一直被打斷。','太省電會讓機會也以為你不在線。','本週任務：把一個想法在白天也說出來。'),
+  role('cloud-jellyfish','情緒雲朵水母','SR','🫧','#b8f0ff',{warm:3,overthink:4,support:2,avoid:1},['敏感','柔軟','漂浮'],'你的情緒像雲，也像水母，漂亮但很容易被水流帶走。','情緒感應：氣氛一變，你比通知還快收到。','你能感覺很多細節，也能溫柔接住別人。','太容易吸收別人的情緒，會忘記哪個才是自己的。','本週任務：今天把別人的情緒還給別人一次。'),
+  role('laydown-knight','今天先躺平騎士','R','🛌','#ffcf8a',{avoid:2,solo:3,warm:1,overthink:2},['想休息','低耗能','慢慢來'],'你不是放棄人生，你只是今天真的需要回血。','棉被防禦：壓力太大時，先用休息擋一波傷害。','你知道自己需要慢下來，這其實是一種自救能力。','躺太久會把休息變成逃避，起床變得更難。','本週任務：躺可以，但先完成一件 5 分鐘任務。'),
+  role('rebel-imp','反骨小惡魔軍師','SR','😈','#ff7fcd',{creative:3,cool:2,chaos:2,social:2},['反骨','聰明','不按牌理'],'你不是故意唱反調，你只是很難忍受沒道理的規則。','反向破解：別人照流程走，你在找漏洞和捷徑。','你很會把無聊的事情變有梗，也很會看穿假正經。','太快反骨會讓別人先防禦，聽不到你的聰明。','本週任務：今天把一個吐槽改成可執行建議。')
 ];
 
 function opt(icon,title,desc,score){ return {icon,title,desc,score}; }
@@ -350,12 +358,11 @@ function bindEvents(){
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
   document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
   document.querySelectorAll('[data-close-save-image]').forEach(el=>el.addEventListener('click',closeSaveImageModal));
-  $('tryDownloadBtn')?.addEventListener('click',retryImageDownload);
   document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); closeSaveImageModal(); } });
 }
 
 function renderSamples(){
-  const samples = ['love-runaway','restart-hero','warm-assassin','mouth-strategist','passive-cat','hidden-boss','midnight-sorcerer','procrastination-smith'];
+  const samples = ['love-runaway','restart-hero','warm-assassin','mouth-strategist','passive-cat','hidden-boss','midnight-sorcerer','procrastination-smith','read-receipt-beast','party-ghost','love-brain-sealer','human-memo-fairy','owl-saver','cloud-jellyfish','laydown-knight','rebel-imp'];
   $('sampleGrid').innerHTML = samples.map(id=>{
     const r=getRoleById(id);
     return `<article class="sample-card"><div class="sample-emoji">${r.emoji}</div><span class="rarity-badge">${r.rarity}</span><h3>${r.name}</h3><p>${r.line}</p><div class="sample-tags">${r.traits.map(t=>`<span>${t}</span>`).join('')}</div></article>`;
@@ -659,9 +666,12 @@ async function downloadCard(){
   if(!state.currentRole) return toast('請先完成測驗');
   if(typeof html2canvas === 'undefined') return toast('圖片套件還在載入，請再按一次');
 
-  const card = $('resultCard');
-  toast('正在生成 JPG 圖片…');
+  const btn = $('downloadBtn');
+  const originalText = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = '正在產生圖片…'; }
+  hideToast();
 
+  const card = $('resultCard');
   try{
     const sourceCanvas = await html2canvas(card, {
       backgroundColor:'#fff8fb',
@@ -671,7 +681,6 @@ async function downloadCard(){
       logging:false
     });
 
-    // iPhone / App 內建瀏覽器常常不支援 a[download]，所以改成「可預覽、可長按儲存」的 JPG。
     const jpgCanvas = document.createElement('canvas');
     jpgCanvas.width = sourceCanvas.width;
     jpgCanvas.height = sourceCanvas.height;
@@ -685,17 +694,18 @@ async function downloadCard(){
 
     if(jpgCanvas.toBlob){
       jpgCanvas.toBlob(blob=>{
-        hideToast();
         showSaveImageModal(dataUrl, fileName, blob);
         if(!isIOSLike() && !isInAppBrowser()) triggerBlobDownload(blob, fileName);
       }, 'image/jpeg', 0.94);
     }else{
-      hideToast();
       showSaveImageModal(dataUrl, fileName, null);
     }
   }catch(err){
     console.error(err);
-    toast('圖片生成失敗，請再試一次或截圖保存');
+    toast('圖片生成失敗，請再試一次或直接截圖保存');
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = originalText || '下載角色卡 JPG'; }
+    hideToast();
   }
 }
 
@@ -708,12 +718,12 @@ function showSaveImageModal(dataUrl, fileName, blob){
   state.generatedImage = { dataUrl, objectUrl, fileName };
 
   const img = $('saveImagePreview');
-  const openBtn = $('openImageBtn');
-  if(img) img.src = imageUrl;
-  if(openBtn){
-    openBtn.href = imageUrl;
-    openBtn.download = fileName;
+  if(img){
+    img.src = imageUrl;
+    img.title = '點一下嘗試儲存 JPG';
+    img.onclick = retryImageDownload;
   }
+  hideToast();
   $('saveImageModal')?.classList.remove('hidden');
 }
 
@@ -730,7 +740,7 @@ function retryImageDownload(){
   }else{
     triggerUrlDownload(data.dataUrl, data.fileName);
   }
-  toast('如果還是找不到，請長按圖片儲存');
+  toast('已嘗試儲存；如果沒反應，請長按圖片儲存');
 }
 
 function triggerBlobDownload(blob, fileName){

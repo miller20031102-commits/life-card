@@ -73,7 +73,7 @@
     </section>
 
     <section class="section-pad strip-section reveal" aria-label="網站亮點">
-      <div class="strip-card"><strong>免費版</strong><span>產生角色卡、下載 PNG、分享文案</span></div>
+      <div class="strip-card"><strong>免費版</strong><span>產生角色卡、下載 JPG、分享文案</span></div>
       <div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
       <div class="strip-card"><strong>安全解鎖</strong><span>每組解鎖碼僅能使用一次，已解鎖報告會存進卡冊</span></div>
     </section>
@@ -81,7 +81,8 @@
     <section class="section-pad samples-section" id="samples">
       <div class="section-title center reveal">
         <p class="eyebrow">先偷看幾張</p>
-        <h2>結果要讓人想截圖、想發限動、想留言「超像我」</h2>
+        <h2>先看看你可能抽到哪一張可愛人設卡</h2>
+        <p class="section-subtitle">每張卡都有稀有度、技能、弱點和本週任務，像一張專屬你的人生小卡。</p>
       </div>
       <div class="sample-grid" id="sampleGrid"></div>
     </section>
@@ -139,7 +140,7 @@
               <p class="result-summary" id="resultSummary"></p>
             </div>
           </article>
-          <p class="download-tip">下載圖片會把上方卡片存成 JPG，手機比較容易預覽，也可以直接發限動。</p>
+          <p class="download-tip">點「下載角色卡 JPG」後會產生圖片，點圖片即可嘗試儲存到手機。</p>
         </div>
 
         <aside class="result-info">
@@ -268,16 +269,12 @@
     <div class="modal-panel image-save-panel">
       <button class="modal-close" data-close-save-image type="button" aria-label="關閉">×</button>
       <p class="eyebrow">角色卡已生成</p>
-      <h2 id="saveImageTitle">長按圖片儲存到手機</h2>
-      <p class="modal-copy">iPhone 或 Threads / LINE / IG 內建瀏覽器，有時候會擋掉「下載檔案」。這裡直接產生 JPG 圖，長按下方圖片就能儲存或加入照片。</p>
+      <h2 id="saveImageTitle">點圖片儲存到手機</h2>
+      <p class="modal-copy">JPG 圖片已經產生。點下方圖片會嘗試儲存；如果手機沒有反應，再長按圖片選「儲存影像」。</p>
       <div class="save-image-frame">
         <img id="saveImagePreview" alt="人生副本角色卡 JPG 預覽" />
       </div>
-      <div class="save-actions">
-        <a class="primary-btn full" id="openImageBtn" href="#" target="_blank" rel="noopener">打開圖片再儲存</a>
-        <button class="ghost-btn full" id="tryDownloadBtn" type="button">再試一次下載 JPG</button>
-      </div>
-      <p class="ios-save-tip">小提醒：如果你是用 App 內建瀏覽器開網站，最穩的做法是點右下角選單，用 Safari 開啟，再長按圖片儲存。</p>
+      <p class="ios-save-tip">小提醒：點圖片就會嘗試儲存；如果是在 Threads / LINE / IG 內建瀏覽器，沒反應時再長按圖片儲存，或用 Safari 開啟。</p>
     </div>
   </div>
 

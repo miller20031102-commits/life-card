@@ -522,3 +522,7 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   visibility:hidden!important;
   transform:translateX(-50%) translateY(26px) scale(.96)!important;
 }
+
+
+/* ==== Official UX cleanup ==== */
+.section-subtitle{max-width:720px;margin:14px auto 0;color:var(--muted);line-height:1.75;font-size:16px}.save-image-frame img{cursor:pointer}.save-image-frame::after{content:'點圖片儲存 / 沒反應就長按';display:block;text-align:center;margin-top:10px;color:rgba(255,255,255,.72);font-size:13px;font-weight:800}.save-actions{display:none!important}@media(max-width:600px){.section-subtitle{font-size:14px;line-height:1.65}}
