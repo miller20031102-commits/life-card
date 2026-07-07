@@ -216,7 +216,7 @@
         <details open><summary>解鎖碼真的只能用一次嗎？</summary><p>是。正式設定 Google Apps Script 後，使用者輸入解鎖碼，後台會把那組碼標記為 USED，第二次輸入會顯示已使用。</p></details>
         <details><summary>為什麼不用一開始串金流？</summary><p>先用人工收款最省時間。確認真的有人願意買，再串綠界、藍新或 Gumroad 之類的正式付款。</p></details>
         <details><summary>GitHub Pages 可以跑這個嗎？</summary><p>前台可以。一次性解鎖碼狀態要靠 Google Sheet + Apps Script 記錄，因為靜態網站不能保存全站共用狀態。</p></details>
-        <details><summary>使用者換手機還能看報告嗎？</summary><p>第一版解鎖後會存在本機瀏覽器。換手機就不會自動同步。要支援跨裝置，需要會員或 Email 寄送報告。</p></details>
+        <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會永久保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
       </div>
     </section>
   </main>
@@ -233,6 +233,7 @@
       <p class="eyebrow">解鎖付費版</p>
       <h2 id="payTitle">完整角色報告 NT$49</h2>
       <p class="modal-copy">付款後你會拿到一組一次性解鎖碼。輸入後，這組碼會在後台標記為已使用，不能再給別人用。</p>
+      <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
       <div class="pay-steps">
         <div><strong>1</strong><span>轉帳 / LINE Pay / 你指定的收款方式</span></div>
         <div><strong>2</strong><span>把付款截圖與訂單編號傳給站主</span></div>
@@ -246,6 +247,18 @@
       </div>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
       <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製付款回報訊息</button>
+    </div>
+  </div>
+
+
+  <div class="modal hidden" id="savedModal" role="dialog" aria-modal="true" aria-labelledby="savedTitle">
+    <div class="modal-backdrop" data-close-saved></div>
+    <div class="modal-panel saved-panel">
+      <button class="modal-close" data-close-saved type="button" aria-label="關閉">×</button>
+      <p class="eyebrow">我的卡冊</p>
+      <h2 id="savedTitle">選擇你要查看或解鎖的卡</h2>
+      <p class="modal-copy">每張卡都有自己的結果編號。解鎖後，這台手機會永久保留該結果的完整報告查看權。</p>
+      <div class="saved-list" id="savedList"></div>
     </div>
   </div>
 

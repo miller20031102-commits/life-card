@@ -17,12 +17,14 @@
 
 ## 上傳 GitHub Pages
 
-只需要上傳這 3 個檔案：
+只需要上傳這 5 個檔案：
 
 ```txt
 index.html
 style.css
 script.js
+og-image.png
+README.md
 ```
 
 不要把 `admin/private_unlock_codes.csv` 或 `admin/codes_sheet_import.csv` 上傳到 GitHub。
@@ -155,3 +157,15 @@ APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQ8TxLBVIQgeTQkBbHery
 ## 付費報告升級版
 
 這版已把 NT$49 完整報告升級成 10 個區塊：付費總覽、角色核心、戀愛攻略、社交定位、工作與賺錢模式、金錢弱點、隱藏 Boss 攻略、7 日任務、30 天養成、專屬台詞包。每個角色都有更個人化的付費文案，讓使用者解鎖後比較有「值得買」的感覺。
+
+## 卡冊與永久查看權
+
+這版支援「我的卡冊」：
+
+- 使用者完成測驗後，結果會自動保存到本機卡冊
+- 使用者也可以按「收藏到我的卡冊」手動保存
+- 在「我的卡冊」可以選擇任一張卡：查看、解鎖這張、或查看已解鎖完整報告
+- 每張卡有自己的 resultId，付費解鎖會綁定到該 resultId
+- 解鎖成功後，同一台手機 / 同一個瀏覽器會永久保留完整報告查看權
+
+注意：目前是靜態網站版本，永久保存依賴瀏覽器 localStorage。使用者如果清除瀏覽器資料、換手機或換瀏覽器，就不會自動同步。未來要做到跨裝置永久權限，需要加入會員系統、Email 備份或正式資料庫。

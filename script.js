@@ -312,6 +312,11 @@ const rolePremiumNotes = {
 };
 
 const state = { current:0, answers:Array(questions.length).fill(null), scores:{}, currentRole:null, resultId:null };
+const STORAGE_KEYS = {
+  saved: 'lifequest:saved',
+  premiumPrefix: 'lifequest:premium:',
+  unlockedReports: 'lifequest:unlockedReports'
+};
 const $ = (id)=>document.getElementById(id);
 
 document.addEventListener('DOMContentLoaded', init);
@@ -322,7 +327,16 @@ function init(){
   bindEvents();
   setOrderId();
   const savedResult = loadLastResult();
-  if(savedResult){ state.answers = savedResult.answers; state.currentRole = getRoleById(savedResult.roleId); state.resultId = savedResult.resultId; }
+  if(savedResult){
+    state.answers = Array.isArray(savedResult.answers) ? savedResult.answers : Array(questions.length).fill(null);
+    state.currentRole = getRoleById(savedResult.roleId);
+    state.resultId = savedResult.resultId;
+    if(state.currentRole && state.resultId){
+      renderResult(state.currentRole);
+      $('resultSection').classList.remove('hidden');
+      if(hasPremiumAccess(state.resultId)) showPremiumReport();
+    }
+  }
 }
 
 function bindEvents(){
@@ -339,7 +353,8 @@ function bindEvents(){
   $('redeemBtn').addEventListener('click',redeemCode);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePayModal(); });
+  document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); } });
 }
 
 function renderSamples(){
@@ -410,6 +425,7 @@ function generateResult(){
   state.resultId = makeResultId(role.id, state.answers);
   renderResult(role);
   saveLastResult();
+  saveResultToCollection(false);
   $('resultSection').classList.remove('hidden');
   $('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
   if(hasPremiumAccess(state.resultId)) showPremiumReport();
@@ -588,8 +604,29 @@ function sevenDayMissions(role, v, note){
   ];
 }
 
-function hasPremiumAccess(resultId){ return Boolean(localStorage.getItem(`lifequest:premium:${resultId}`)); }
-function grantPremiumAccess(resultId, code){ localStorage.setItem(`lifequest:premium:${resultId}`, JSON.stringify({code:maskCode(code), at:new Date().toISOString()})); }
+function hasPremiumAccess(resultId){
+  if(!resultId) return false;
+  if(localStorage.getItem(`${STORAGE_KEYS.premiumPrefix}${resultId}`)) return true;
+  const reports = getUnlockedReports();
+  return Boolean(reports[resultId]);
+}
+function grantPremiumAccess(resultId, code){
+  if(!resultId || !state.currentRole) return;
+  const data = {
+    resultId,
+    roleId: state.currentRole.id,
+    roleName: state.currentRole.name,
+    rarity: state.currentRole.rarity,
+    answers: [...state.answers],
+    code: maskCode(code),
+    at: new Date().toISOString()
+  };
+  localStorage.setItem(`${STORAGE_KEYS.premiumPrefix}${resultId}`, JSON.stringify(data));
+  const reports = getUnlockedReports();
+  reports[resultId] = data;
+  localStorage.setItem(STORAGE_KEYS.unlockedReports, JSON.stringify(reports));
+  saveResultToCollection(true);
+}
 function maskCode(code){ return code ? code.slice(0,4)+'****'+code.slice(-4) : ''; }
 
 async function downloadCard(){
@@ -610,19 +647,88 @@ function copyShareText(){
   copyText(text,'已複製 Threads 分享文');
   $('shareBox').textContent = '已複製，可以直接貼到 Threads。';
 }
-function saveCurrentCard(){
-  if(!state.currentRole) return;
-  const list = JSON.parse(localStorage.getItem('lifequest:saved')||'[]');
-  const item = {roleId:state.currentRole.id,resultId:state.resultId,at:new Date().toISOString()};
-  if(!list.some(x=>x.resultId===item.resultId)) list.unshift(item);
-  localStorage.setItem('lifequest:saved',JSON.stringify(list.slice(0,20)));
-  toast('已收藏到我的卡冊');
+function getSavedList(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.saved)||'[]')}catch{return []}
 }
+function setSavedList(list){ localStorage.setItem(STORAGE_KEYS.saved, JSON.stringify(list.slice(0,40))); }
+function getUnlockedReports(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.unlockedReports)||'{}')}catch{return {}}
+}
+function saveResultToCollection(showToast=true){
+  if(!state.currentRole || !state.resultId) return;
+  const list = getSavedList();
+  const item = {
+    roleId: state.currentRole.id,
+    roleName: state.currentRole.name,
+    rarity: state.currentRole.rarity,
+    emoji: state.currentRole.emoji,
+    line: state.currentRole.line,
+    resultId: state.resultId,
+    answers: [...state.answers],
+    premium: hasPremiumAccess(state.resultId),
+    at: new Date().toISOString()
+  };
+  const idx = list.findIndex(x=>x.resultId===item.resultId);
+  if(idx >= 0) list[idx] = {...list[idx], ...item, at:list[idx].at || item.at};
+  else list.unshift(item);
+  setSavedList(list);
+  if(showToast) toast(item.premium ? '已保存解鎖報告到我的卡冊' : '已收藏到我的卡冊');
+}
+function saveCurrentCard(){ saveResultToCollection(true); }
 function showSavedCards(){
-  const list = JSON.parse(localStorage.getItem('lifequest:saved')||'[]');
-  if(!list.length) return toast('目前還沒有收藏的卡');
-  const msg = list.slice(0,8).map((x,i)=>`${i+1}. ${getRoleById(x.roleId)?.name || '未知角色'}｜${x.resultId}`).join('\n');
-  alert(`我的卡冊：\n\n${msg}`);
+  renderSavedCards();
+  $('savedModal').classList.remove('hidden');
+}
+function closeSavedModal(){ $('savedModal')?.classList.add('hidden'); }
+function renderSavedCards(){
+  const list = getSavedList();
+  const box = $('savedList');
+  if(!list.length){
+    box.innerHTML = `<div class="empty-saved">目前還沒有卡牌。先完成一次測驗，系統會自動幫你存到卡冊。</div>`;
+    return;
+  }
+  box.innerHTML = list.map(item=>{
+    const role = getRoleById(item.roleId);
+    const unlocked = hasPremiumAccess(item.resultId);
+    const date = item.at ? new Date(item.at).toLocaleDateString('zh-TW') : '';
+    return `<article class="saved-card ${unlocked?'is-unlocked':''}">
+      <div class="saved-emoji">${item.emoji || role?.emoji || '🎴'}</div>
+      <div class="saved-main">
+        <div class="saved-title"><strong>${item.roleName || role?.name || '未知角色'}</strong><span>${item.rarity || role?.rarity || ''}</span></div>
+        <p>${item.line || role?.line || '這張卡是舊版收藏，仍可查看或解鎖。'}</p>
+        <small>${item.resultId}${date ? '｜'+date : ''}</small>
+      </div>
+      <div class="saved-actions">
+        <button class="secondary-btn tiny" type="button" data-view-saved="${item.resultId}">查看</button>
+        ${unlocked ? `<button class="primary-btn tiny" type="button" data-view-report="${item.resultId}">完整報告</button>` : `<button class="primary-btn tiny" type="button" data-unlock-saved="${item.resultId}">解鎖這張</button>`}
+      </div>
+    </article>`;
+  }).join('');
+  box.querySelectorAll('[data-view-saved]').forEach(btn=>btn.addEventListener('click',()=>restoreSavedCard(btn.dataset.viewSaved, {openReport:false})));
+  box.querySelectorAll('[data-view-report]').forEach(btn=>btn.addEventListener('click',()=>restoreSavedCard(btn.dataset.viewReport, {openReport:true})));
+  box.querySelectorAll('[data-unlock-saved]').forEach(btn=>btn.addEventListener('click',()=>{ restoreSavedCard(btn.dataset.unlockSaved, {openReport:false, silent:true}); closeSavedModal(); openPayModal(); }));
+}
+function restoreSavedCard(resultId, opts={}){
+  const item = getSavedList().find(x=>x.resultId===resultId);
+  if(!item) return toast('找不到這張卡');
+  const role = getRoleById(item.roleId);
+  if(!role) return toast('找不到角色資料');
+  state.currentRole = role;
+  state.resultId = item.resultId;
+  state.answers = Array.isArray(item.answers) && item.answers.length === questions.length ? item.answers : synthesizeAnswersFromRole(role);
+  state.scores = calculateScores();
+  renderResult(role);
+  $('resultSection').classList.remove('hidden');
+  if(hasPremiumAccess(state.resultId)){ showPremiumReport(); }
+  else { $('premiumReport').classList.add('hidden'); $('lockedUpsell').classList.remove('hidden'); }
+  saveLastResult();
+  if(!opts.silent) closeSavedModal();
+  if(opts.openReport && hasPremiumAccess(state.resultId)){ setTimeout(()=>$('premiumReport').scrollIntoView({behavior:'smooth',block:'start'}),120); }
+  else setTimeout(()=>$('resultSection').scrollIntoView({behavior:'smooth',block:'start'}),120);
+}
+function synthesizeAnswersFromRole(role){
+  // 舊版收藏沒有 answers 時使用穩定預設，避免報告打不開。
+  return questions.map((q, qi)=> qi % q.options.length);
 }
 function copyPremiumReport(){
   if(!state.currentRole) return;
@@ -632,7 +738,15 @@ function copyPremiumReport(){
 
 function openPayModal(){
   if(!state.currentRole){ location.hash = '#quiz'; toast('先完成測驗，才會知道要解鎖哪份報告'); return; }
+  if(hasPremiumAccess(state.resultId)){
+    showPremiumReport();
+    toast('這張卡已經解鎖，可以永久查看');
+    $('premiumReport').scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
   setOrderId();
+  const target = $('unlockTargetText');
+  if(target) target.textContent = `正在解鎖：${state.currentRole.name}｜${state.currentRole.rarity}｜${state.resultId}`;
   $('payModal').classList.remove('hidden');
   $('unlockCodeInput').focus();
   $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '尚未設定 Apps Script URL：目前無法真正驗證一次性解鎖碼，請先照 README 設定後台。';
@@ -644,7 +758,7 @@ function setOrderId(){
 }
 function copyPaymentInfo(){
   const roleName = state.currentRole ? state.currentRole.name : '尚未完成測驗';
-  const text = `我要解鎖人生副本完整報告\n角色：${roleName}\n訂單編號：${$('orderIdText').textContent}\n金額：${CONFIG.price}\n\n${CONFIG.PAYMENT_NOTE}`;
+  const text = `我要解鎖人生副本完整報告\n角色：${roleName}\n結果編號：${state.resultId || '尚未產生'}\n訂單編號：${$('orderIdText').textContent}\n金額：${CONFIG.price}\n\n${CONFIG.PAYMENT_NOTE}`;
   copyText(text,'已複製付款回報訊息');
 }
 function redeemCode(){
@@ -660,7 +774,7 @@ function redeemCode(){
         grantPremiumAccess(state.resultId, code);
         showPremiumReport();
         closePayModal();
-        toast('解鎖成功，完整報告已開啟');
+        toast('解鎖成功，這張卡已永久保存到卡冊');
         $('premiumReport').scrollIntoView({behavior:'smooth',block:'start'});
       } else {
         setModalMessage(res.message || '解鎖失敗，請確認代碼是否正確。', false);
@@ -691,7 +805,7 @@ function redeemViaJsonp(code, roleId, resultId){
 function setModalMessage(msg,ok){ const el=$('modalMessage'); el.textContent=msg; el.style.color=ok?'var(--green)':'var(--danger)'; }
 function normalizeCode(code){ return String(code||'').trim().toUpperCase().replace(/\s+/g,''); }
 
-function saveLastResult(){ localStorage.setItem('lifequest:lastResult',JSON.stringify({answers:state.answers,roleId:state.currentRole.id,resultId:state.resultId})); }
+function saveLastResult(){ if(!state.currentRole || !state.resultId) return; localStorage.setItem('lifequest:lastResult',JSON.stringify({answers:state.answers,roleId:state.currentRole.id,resultId:state.resultId})); }
 function loadLastResult(){ try{return JSON.parse(localStorage.getItem('lifequest:lastResult')||'null')}catch{return null} }
 function getRoleById(id){ return roles.find(r=>r.id===id); }
 async function copyText(text,msg){
