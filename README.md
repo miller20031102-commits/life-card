@@ -145,3 +145,8 @@ APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQ8TxLBVIQgeTQkBbHery
 - `README.md`
 
 不要上傳私密解鎖碼 CSV。
+
+
+## 手機版優化
+
+這版已加上手機底部快速操作列、iPhone 安全區、輸入框 16px 防縮放、手機版彈窗底部抽屜、測驗選項與結果卡排版優化。主要目標是 GitHub Pages 上手機使用順、按鈕好點、付款解鎖流程不擠。
