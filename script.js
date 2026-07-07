@@ -311,7 +311,7 @@ const rolePremiumNotes = {
   }
 };
 
-const state = { current:0, answers:Array(questions.length).fill(null), scores:{}, currentRole:null, resultId:null };
+const state = { current:0, answers:Array(questions.length).fill(null), scores:{}, currentRole:null, resultId:null, generatedImage:null };
 const STORAGE_KEYS = {
   saved: 'lifequest:saved',
   premiumPrefix: 'lifequest:premium:',
@@ -354,7 +354,9 @@ function bindEvents(){
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
   document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); } });
+  document.querySelectorAll('[data-close-save-image]').forEach(el=>el.addEventListener('click',closeSaveImageModal));
+  $('tryDownloadBtn')?.addEventListener('click',retryImageDownload);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); closeSaveImageModal(); } });
 }
 
 function renderSamples(){
@@ -674,7 +676,7 @@ async function downloadCard(){
       logging:false
     });
 
-    // iPhone 有時候對透明 PNG 支援不好，改成有底色的 JPG，比較容易在手機下載/預覽。
+    // iPhone / App 內建瀏覽器常常不支援 a[download]，所以改成「可預覽、可長按儲存」的 JPG。
     const jpgCanvas = document.createElement('canvas');
     jpgCanvas.width = sourceCanvas.width;
     jpgCanvas.height = sourceCanvas.height;
@@ -684,25 +686,17 @@ async function downloadCard(){
     ctx.drawImage(sourceCanvas,0,0);
 
     const fileName = `${state.currentRole.name}-人生副本角色卡.jpg`;
+    const dataUrl = jpgCanvas.toDataURL('image/jpeg', 0.94);
 
     if(jpgCanvas.toBlob){
       jpgCanvas.toBlob(blob=>{
-        if(!blob){
-          openJpgFallback(jpgCanvas, fileName);
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setTimeout(()=>URL.revokeObjectURL(url), 1200);
-        toast('JPG 已下載，iPhone 可到「檔案 > 下載項目」查看');
+        showSaveImageModal(dataUrl, fileName, blob);
+        if(!isIOSLike() && !isInAppBrowser()) triggerBlobDownload(blob, fileName);
+        toast('JPG 已生成，手機可長按圖片儲存');
       }, 'image/jpeg', 0.94);
     }else{
-      openJpgFallback(jpgCanvas, fileName);
+      showSaveImageModal(dataUrl, fileName, null);
+      toast('JPG 已生成，手機可長按圖片儲存');
     }
   }catch(err){
     console.error(err);
@@ -710,16 +704,64 @@ async function downloadCard(){
   }
 }
 
-function openJpgFallback(canvas, fileName){
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.94);
+function showSaveImageModal(dataUrl, fileName, blob){
+  const old = state.generatedImage;
+  if(old && old.objectUrl) URL.revokeObjectURL(old.objectUrl);
+
+  const objectUrl = blob ? URL.createObjectURL(blob) : '';
+  const imageUrl = objectUrl || dataUrl;
+  state.generatedImage = { dataUrl, objectUrl, fileName };
+
+  const img = $('saveImagePreview');
+  const openBtn = $('openImageBtn');
+  if(img) img.src = imageUrl;
+  if(openBtn){
+    openBtn.href = imageUrl;
+    openBtn.download = fileName;
+  }
+  $('saveImageModal')?.classList.remove('hidden');
+}
+
+function closeSaveImageModal(){
+  $('saveImageModal')?.classList.add('hidden');
+}
+
+function retryImageDownload(){
+  const data = state.generatedImage;
+  if(!data) return toast('請先生成角色卡圖片');
+  if(data.objectUrl){
+    triggerUrlDownload(data.objectUrl, data.fileName);
+  }else{
+    triggerUrlDownload(data.dataUrl, data.fileName);
+  }
+  toast('如果還是找不到，請長按圖片儲存');
+}
+
+function triggerBlobDownload(blob, fileName){
+  if(!blob) return;
+  const url = URL.createObjectURL(blob);
+  triggerUrlDownload(url, fileName);
+  setTimeout(()=>URL.revokeObjectURL(url), 1600);
+}
+
+function triggerUrlDownload(url, fileName){
   const link = document.createElement('a');
   link.download = fileName;
-  link.href = dataUrl;
+  link.href = url;
+  link.rel = 'noopener';
   document.body.appendChild(link);
   link.click();
   link.remove();
-  toast('JPG 已產生，若沒自動存檔請長按圖片儲存');
 }
+
+function isIOSLike(){
+  return /iPad|iPhone|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function isInAppBrowser(){
+  return /Line|Instagram|FBAN|FBAV|Threads|MicroMessenger|GSA|TikTok|Snapchat/i.test(navigator.userAgent);
+}
+
 function copyShareText(){
   if(!state.currentRole) return;
   const r = state.currentRole;

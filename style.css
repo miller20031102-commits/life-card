@@ -400,3 +400,103 @@ a,button,input{-webkit-tap-highlight-color:transparent}button,.primary-btn,.seco
   .premium-sticker-row span{font-size:11px}
   .premium-card-head h3{font-size:19px}
 }
+
+/* iPhone / App 內建瀏覽器儲存圖片用 */
+.image-save-panel{max-width:620px}.save-image-frame{margin:18px 0;padding:12px;border-radius:24px;background:linear-gradient(135deg,rgba(255,209,92,.18),rgba(255,108,171,.14));border:1px solid rgba(255,255,255,.14)}.save-image-frame img{display:block;width:100%;height:auto;border-radius:18px;background:#fff8fb;box-shadow:0 18px 50px rgba(0,0,0,.28);-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default}.save-actions{display:grid;gap:10px}.ios-save-tip{margin:12px 0 0;color:var(--muted);line-height:1.7;font-size:14px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.075);border:1px dashed rgba(255,255,255,.18)}@media(max-width:600px){.image-save-panel h2{font-size:26px}.save-image-frame{padding:9px;border-radius:20px}.save-image-frame img{border-radius:14px}.ios-save-tip{font-size:13px}}
+
+
+/* ==== Cute exported card readability upgrade ==== */
+.result-card{
+  background:
+    radial-gradient(circle at 16% 10%, rgba(255, 234, 246, .98), transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(231, 244, 255, .92), transparent 24%),
+    linear-gradient(180deg, #fffafc 0%, #fff5fb 52%, #fdf1ff 100%);
+  border:1px solid rgba(232, 188, 220, .9);
+  box-shadow:0 22px 64px rgba(255, 140, 186, .16), 0 8px 24px rgba(116, 92, 164, .12);
+  color:#45324f;
+}
+.result-card::after{
+  content:'♡ ✦';
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  font-size:14px;
+  letter-spacing:.22em;
+  color:rgba(185, 132, 177, .55);
+}
+.result-card .card-sheen{
+  inset:auto;
+  left:-8%;
+  right:-8%;
+  top:auto;
+  bottom:-10%;
+  height:120px;
+  background:radial-gradient(circle at 50% 0%, rgba(255, 185, 221, .26), transparent 68%);
+  transform:none;
+}
+.result-card .result-inner{padding:30px 28px 34px}
+.result-card .card-top{color:#9c8ea7}
+.result-card .rarity-badge{
+  background:linear-gradient(135deg, #fff2b8, #ffe3a3);
+  border:1px solid rgba(245, 194, 82, .65);
+  color:#a66a00;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+.result-card .result-avatar{
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255,255,255,.95), rgba(255,255,255,.25) 34%, transparent 35%),
+    linear-gradient(135deg, rgba(211, 176, 255, .98), rgba(255, 170, 209, .98));
+  border:4px solid rgba(255,255,255,.85);
+  box-shadow:0 18px 34px rgba(219, 155, 205, .32);
+}
+.result-card h2{color:#3f2d4d}
+.result-card .role-line{color:#7a6787;font-weight:700}
+.result-card .trait-row span{
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(226, 195, 223, .95);
+  color:#755f7d;
+}
+.result-card .card-divider{background:linear-gradient(90deg, transparent, rgba(196, 163, 209, .7), transparent)}
+.result-card .ability-list div{
+  border:1px solid rgba(226, 202, 229, .95);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.88);
+}
+.result-card .ability-list div:nth-child(1){background:linear-gradient(135deg, #fff4bd, #fff9df)}
+.result-card .ability-list div:nth-child(2){background:linear-gradient(135deg, #ffdfe9, #fff0f6)}
+.result-card .ability-list div:nth-child(3){background:linear-gradient(135deg, #e8f4ff, #f6fbff)}
+.result-card .ability-list div:nth-child(4){background:linear-gradient(135deg, #efe6ff, #fbf7ff)}
+.result-card .ability-list strong{color:#ad6a00;font-size:13px;letter-spacing:.03em}
+.result-card .ability-list span{color:#5a4764;font-weight:700;line-height:1.65}
+.result-card .result-summary{
+  color:#4f3c5f;
+  font-weight:800;
+  margin-top:18px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(255, 243, 201, .75), rgba(255, 228, 241, .78));
+  border:1px solid rgba(236, 203, 226, .95);
+}
+.result-card.rarity-R{background:
+  radial-gradient(circle at 16% 10%, rgba(238, 247, 255, .98), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(245, 235, 255, .92), transparent 24%),
+  linear-gradient(180deg, #fcfdff 0%, #f3f8ff 52%, #f9f2ff 100%);
+}
+.result-card.rarity-SR{background:
+  radial-gradient(circle at 16% 10%, rgba(240, 255, 244, .98), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(255, 243, 231, .92), transparent 24%),
+  linear-gradient(180deg, #fffefb 0%, #f3fff8 54%, #fff7ee 100%);
+}
+.result-card.rarity-SSR{background:
+  radial-gradient(circle at 16% 10%, rgba(249, 237, 255, .98), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(255, 236, 245, .92), transparent 24%),
+  linear-gradient(180deg, #fffafe 0%, #f9f1ff 52%, #fff0f6 100%);
+}
+.result-card.rarity-UR{background:
+  radial-gradient(circle at 16% 10%, rgba(255, 247, 217, .98), transparent 28%),
+  radial-gradient(circle at 88% 18%, rgba(255, 231, 242, .92), transparent 24%),
+  linear-gradient(180deg, #fffdfa 0%, #fff7e8 52%, #fff1f8 100%);
+}
+@media (max-width:600px){
+  .result-card .result-inner{padding:24px 20px 28px}
+  .result-card .result-summary{padding:12px 14px;border-radius:16px}
+}

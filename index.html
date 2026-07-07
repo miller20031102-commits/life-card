@@ -262,6 +262,25 @@
     </div>
   </div>
 
+
+  <div class="modal hidden" id="saveImageModal" role="dialog" aria-modal="true" aria-labelledby="saveImageTitle">
+    <div class="modal-backdrop" data-close-save-image></div>
+    <div class="modal-panel image-save-panel">
+      <button class="modal-close" data-close-save-image type="button" aria-label="關閉">×</button>
+      <p class="eyebrow">角色卡已生成</p>
+      <h2 id="saveImageTitle">長按圖片儲存到手機</h2>
+      <p class="modal-copy">iPhone 或 Threads / LINE / IG 內建瀏覽器，有時候會擋掉「下載檔案」。這裡直接產生 JPG 圖，長按下方圖片就能儲存或加入照片。</p>
+      <div class="save-image-frame">
+        <img id="saveImagePreview" alt="人生副本角色卡 JPG 預覽" />
+      </div>
+      <div class="save-actions">
+        <a class="primary-btn full" id="openImageBtn" href="#" target="_blank" rel="noopener">打開圖片再儲存</a>
+        <button class="ghost-btn full" id="tryDownloadBtn" type="button">再試一次下載 JPG</button>
+      </div>
+      <p class="ios-save-tip">小提醒：如果你是用 App 內建瀏覽器開網站，最穩的做法是點右下角選單，用 Safari 開啟，再長按圖片儲存。</p>
+    </div>
+  </div>
+
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
