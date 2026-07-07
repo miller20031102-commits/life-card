@@ -465,7 +465,7 @@ function renderResult(role){
   $('detailSocial').textContent = role.social;
   $('detailWork').textContent = role.work;
   $('detailBoss').textContent = role.boss;
-  $('premiumTitle').textContent = `${role.name}｜完整角色報告`;
+  $('premiumTitle').textContent = `${role.name}｜完整角色報告 ♡`;
   setOrderId();
 }
 
@@ -475,76 +475,105 @@ function buildPremium(role){
   const topAxes = Object.entries(v).sort((a,b)=>(b[1]||0)-(a[1]||0)).slice(0,4).map(([k])=>axisLabel(k));
   const score = premiumScore(v);
   const tone = getTonePack(role);
+  const miniMood = topAxes.slice(0,3).join(' × ');
   const report = [
     {
-      title:'付費總覽｜你不是一張普通卡',
-      html:`<p class="lead">${note.hook || `${role.name} 的付費版重點，是把免費卡面背後的反差、弱點和升級路線講清楚。`}</p>
-      <div class="premium-kpis">
-        <span><b>${role.rarity}</b><small>稀有度</small></span>
-        <span><b>${score.power}</b><small>爆發力</small></span>
-        <span><b>${score.sensitivity}</b><small>敏銳度</small></span>
-        <span><b>${score.growth}</b><small>升級感</small></span>
+      title:'開箱小卡｜這張卡在說你哪裡',
+      html:`<p class="lead cute-lead">${note.hook || `${role.name} 的付費版不是再講一次卡面，而是把你這張卡背後的反差、可愛雷點和升級路線拆開給你看。`}</p>
+      <div class="premium-sticker-row"><span>✨ ${role.rarity} 稀有度</span><span>🧃 ${miniMood}</span><span>🎮 已收藏報告</span></div>
+      <div class="premium-kpis cute-kpis">
+        <span><b>${role.rarity}</b><small>卡牌稀有度</small></span>
+        <span><b>${score.power}</b><small>爆發能量</small></span>
+        <span><b>${score.sensitivity}</b><small>感受雷達</small></span>
+        <span><b>${score.growth}</b><small>升級潛力</small></span>
       </div>
-      <ul><li>你的主軸：${topAxes.join('、')}</li><li>你的卡面台詞：${role.line}</li><li>這份報告適合收藏、截圖，也適合當作這週的自我升級提醒。</li></ul>`
+      <div class="cute-note"><b>這份報告的重點：</b>不是叫你變成別人，而是讓你更會操作自己這張卡。</div>`
     },
     {
-      title:'角色核心設定｜你真正的反差',
-      html:`<p>${role.name} 的核心不是「${role.traits[0]}」這麼簡單，而是你同時有兩種力量：一種是外面看得見的反應，另一種是你不太會說出口的內在需求。</p>
-      <ul><li><b>外顯設定：</b>${role.traits.join('、')}。</li><li><b>主技能：</b>${role.skill}</li><li><b>被動技能：</b>${role.passive}</li><li><b>真正需求：</b>${tone.need}</li></ul>
-      <p>你最有魅力的地方，是你不是單薄的人設。你有矛盾、有防禦、有可愛的逃跑機制，也有想要變好的部分。</p>`
+      title:'核心人設｜你可愛又麻煩的地方',
+      html:`<p>${role.name} 的可愛之處，是你不是單薄的人設。你有看得見的反應，也有很多不太會說出口的小開關。</p>
+      <ul class="cute-list"><li><b>外顯標籤：</b>${role.traits.join('、')}</li><li><b>主技能：</b>${role.skill}</li><li><b>被動技能：</b>${role.passive}</li><li><b>真正想要：</b>${tone.need}</li></ul>
+      <p class="soft-card">你不是難搞，你只是需要被用正確的方法理解。當你的安全感夠了，你其實會比自己想像的更溫柔、更有行動力。</p>`
     },
     {
-      title:'戀愛攻略｜怎麼靠近你才不會踩雷',
+      title:'戀愛小抄｜靠近你的使用說明書',
       html:`<p>${note.love || role.love}</p>
-      <ul><li><b>你心動時的反應：</b>${tone.loveSignal}</li><li><b>你最容易扣分的點：</b>${tone.loveRisk}</li><li><b>適合你的關係：</b>${tone.bestPartner}</li></ul>
-      <p class="quote">付費版提醒：你不需要變成另一個人，你只需要讓對方更容易讀懂你 10%。</p>`
+      <div class="tiny-cards"><div><b>💌 心動訊號</b><span>${tone.loveSignal}</span></div><div><b>🥲 容易扣分</b><span>${tone.loveRisk}</span></div><div><b>🌷 適合對象</b><span>${tone.bestPartner}</span></div></div>
+      <p class="quote cute-quote">小提醒：你不用變得超會談戀愛，只要讓對方多讀懂你 10%，關係就會順很多。</p>`
     },
     {
-      title:'朋友與社交定位｜你在隊伍裡的位置',
+      title:'朋友模式｜你在群裡的隱藏職位',
       html:`<p>${role.social}</p>
-      <ul><li><b>隊伍定位：</b>${teamRole(v)}</li><li><b>你被需要的原因：</b>${tone.socialValue}</li><li><b>你要避免：</b>${tone.socialWarning}</li></ul>
-      <p>你不是要讓所有人都喜歡你，而是要找到能讓你不用一直演、也不用一直撐的圈子。</p>`
+      <ul class="cute-list"><li><b>隊伍定位：</b>${teamRole(v)}</li><li><b>你被需要的原因：</b>${tone.socialValue}</li><li><b>要小心的地方：</b>${tone.socialWarning}</li></ul>
+      <p class="soft-card">你的社交不是一定要很大聲才算有價值。有些人是輸出，有些人是補血，有些人只是坐在那裡，大家就覺得安心。</p>`
     },
     {
-      title:'工作與賺錢模式｜你要怎麼升級',
+      title:'工作&賺錢｜你的升級路線圖',
       html:`<p>${role.work}</p>
-      <ul><li><b>適合節奏：</b>${workRhythm(v)}</li><li><b>適合任務：</b>${workTask(v)}</li><li><b>最容易卡住：</b>${workTrap(v)}</li></ul>
-      <p>你的成長關鍵不是每天都熱血，而是把人生做成「看得到進度條」的任務。只要你有回饋，你就比較能撐下去。</p>`
+      <div class="tiny-cards"><div><b>⏱ 適合節奏</b><span>${workRhythm(v)}</span></div><div><b>🧩 適合任務</b><span>${workTask(v)}</span></div><div><b>🪤 容易卡住</b><span>${workTrap(v)}</span></div></div>
+      <p>你不一定適合靠熱血撐到底，你比較適合把目標做成「看得到進度條」的小副本。每完成一格，你就會更願意繼續。</p>`
     },
     {
-      title:'金錢弱點｜你最容易在哪裡失血',
+      title:'金錢雷點｜錢包守護咒',
       html:`<p>${note.money || moneyNote(v)}</p>
-      <ul><li><b>高風險時刻：</b>${moneyRiskTime(v)}</li><li><b>購買前先問：</b>${moneyQuestion(v)}</li><li><b>比較值得花：</b>${moneyGoodSpend(v)}</li></ul>
-      <p class="quote">不是叫你不要花錢，是讓每一筆錢更像升級，不像逃避。</p>`
+      <ul class="cute-list"><li><b>高風險時刻：</b>${moneyRiskTime(v)}</li><li><b>購買前先問：</b>${moneyQuestion(v)}</li><li><b>比較值得花：</b>${moneyGoodSpend(v)}</li></ul>
+      <p class="quote cute-quote">不是叫你不要花錢，是讓每一筆錢更像升級裝備，不像情緒補包。</p>`
     },
     {
-      title:'隱藏 Boss 攻略｜打敗最煩的自己',
+      title:'隱藏 Boss｜你最常打輸的那一關',
       html:`<p>${role.boss}</p>
-      <ul><li><b>Boss 技能：</b>${bossSkill(v)}</li><li><b>你常用但沒效的打法：</b>${badBossStrategy(v)}</li><li><b>真正有效的打法：</b>${goodBossStrategy(v)}</li></ul>
-      <p>面對這個 Boss，不要只靠意志力。你要做的是把焦慮變小、把任務變具體、把勝利變得可記錄。</p>`
+      <div class="boss-card"><b>Boss 技能：${bossSkill(v)}</b><span>常見失誤：${badBossStrategy(v)}</span><span>推薦打法：${goodBossStrategy(v)}</span></div>
+      <p>你要打贏的不是整個人生，是今天那個最小、最煩、最容易拖延的一格任務。</p>`
     },
     {
-      title:'7 日升級任務｜照做就有感',
-      html:`<ol class="mission-list">${sevenDayMissions(role, v, note).map((m,i)=>`<li><b>Day ${i+1}</b><span>${m}</span></li>`).join('')}</ol>`
+      title:'7 日小任務｜每天一點點變強',
+      html:`<ol class="mission-list cute-missions">${sevenDayMissions(role, v, note).map((m,i)=>`<li><b>Day ${i+1}</b><span>${m}</span></li>`).join('')}</ol>
+      <p class="soft-card">不用每天大改變。你只要每天完成一個小動作，這張角色卡就會開始慢慢升級。</p>`
     },
     {
-      title:'30 天養成路線｜從好玩變成真的變好',
-      html:`<ul><li><b>第 1 週：認識模式。</b>記錄自己最常出現的反應，不急著改。</li><li><b>第 2 週：降低內耗。</b>把一個大問題拆成每天 15 分鐘的小任務。</li><li><b>第 3 週：練習表達。</b>把「沒事、隨便、都可以」換成比較真實的句子。</li><li><b>第 4 週：做出成果。</b>完成一個能被看見的小作品、小改變或小決定。</li></ul>
-      <p>30 天後，你不一定變成完全不同的人，但你會更知道怎麼操作自己這張卡。</p>`
+      title:'30 天養成地圖｜慢慢把自己養好',
+      html:`<div class="roadmap-cute"><div><b>第 1 週｜觀察自己</b><span>記錄最常出現的反應，不急著責怪自己。</span></div><div><b>第 2 週｜降低內耗</b><span>把大問題拆成每天 15 分鐘的小任務。</span></div><div><b>第 3 週｜練習表達</b><span>把「沒事、隨便、都可以」換成更真實的句子。</span></div><div><b>第 4 週｜做出成果</b><span>完成一個能被看見的小作品、小改變或小決定。</span></div></div>
+      <p>30 天後，你不一定變成完全不同的人，但你會更知道怎麼照顧自己、推動自己，也更懂自己這張卡的玩法。</p>`
     },
     {
-      title:'專屬台詞包｜可以截圖發限動',
-      html:`<ul class="quote-list"><li>「${role.summary}」</li><li>「我不是沒感覺，我只是需要一點安全讀條。」</li><li>「我的人生還沒滿等，但我已經不是新手村的我。」</li><li>「${note.mission || role.quest.replace('本週任務：','')}」</li></ul>
-      <p>這張角色卡不是要限制你，而是給你一個有梗、有畫面、也有一點點真心的自我介紹。</p>`
+      title:'專屬台詞貼紙包｜截圖分享用',
+      html:`<ul class="quote-list sticker-lines"><li>「${role.summary}」</li><li>「我不是沒感覺，我只是需要一點安全讀條。」</li><li>「我的人生還沒滿等，但我已經不是新手村的我。」</li><li>「${note.mission || role.quest.replace('本週任務：','')}」</li></ul>
+      <p class="cute-note">這張角色卡不是要限制你，而是給你一個有梗、有畫面、也有一點點真心的自我介紹。</p>`
     }
   ];
   return report;
 }
 
+const premiumDecor = [
+  {icon:'💎',chip:'稀有總覽',wink:'先看這格，最適合收藏 ♡'},
+  {icon:'🪄',chip:'角色設定',wink:'你的反差魅力都在這裡 ✦'},
+  {icon:'💘',chip:'戀愛雷達',wink:'這段超容易被說「好像我」 ⸝⸝'},
+  {icon:'🫶',chip:'朋友定位',wink:'你在隊伍裡的位置很可愛 ✿'},
+  {icon:'💼',chip:'升級路線',wink:'比較偏實用，會有被懂的感覺 ☼'},
+  {icon:'💸',chip:'花錢提醒',wink:'不是管你花錢，是幫你少失血 ✧'},
+  {icon:'👾',chip:'Boss 攻略',wink:'看完比較知道怎麼對付自己 ᐟ'},
+  {icon:'🗓️',chip:'7日任務',wink:'最有陪伴感的一格 ◡̈'},
+  {icon:'🌷',chip:'30天養成',wink:'不是說教，是溫柔版升級地圖 ♡'},
+  {icon:'📸',chip:'台詞收藏',wink:'這格超適合截圖發限動 ✨'}
+];
+
 function showPremiumReport(){
   const role = state.currentRole;
   if(!role) return;
-  $('premiumGrid').innerHTML = buildPremium(role).map(item=>`<article class="premium-item"><h3>${item.title}</h3>${item.html}</article>`).join('');
+  $('premiumGrid').innerHTML = buildPremium(role).map((item,index)=>{
+    const meta = premiumDecor[index] || {icon:'✨',chip:'完整報告',wink:'這一格也值得收藏 ♡'};
+    return `<article class="premium-item premium-style-${(index % 4) + 1}">
+      <div class="premium-card-head">
+        <span class="premium-icon">${meta.icon}</span>
+        <div class="premium-head-copy">
+          <span class="premium-chip">${meta.chip}</span>
+          <h3>${item.title}</h3>
+        </div>
+      </div>
+      <div class="premium-body">${item.html}</div>
+      <div class="premium-footnote">${meta.wink}</div>
+    </article>`;
+  }).join('');
   $('premiumReport').classList.remove('hidden');
   $('lockedUpsell').classList.add('hidden');
 }
@@ -632,13 +661,64 @@ function maskCode(code){ return code ? code.slice(0,4)+'****'+code.slice(-4) : '
 async function downloadCard(){
   if(!state.currentRole) return toast('請先完成測驗');
   if(typeof html2canvas === 'undefined') return toast('圖片套件還在載入，請再按一次');
+
   const card = $('resultCard');
-  const canvas = await html2canvas(card, {backgroundColor:null,scale:2,useCORS:true});
+  toast('正在生成 JPG 圖片…');
+
+  try{
+    const sourceCanvas = await html2canvas(card, {
+      backgroundColor:'#fff8fb',
+      scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
+      useCORS:true,
+      allowTaint:true,
+      logging:false
+    });
+
+    // iPhone 有時候對透明 PNG 支援不好，改成有底色的 JPG，比較容易在手機下載/預覽。
+    const jpgCanvas = document.createElement('canvas');
+    jpgCanvas.width = sourceCanvas.width;
+    jpgCanvas.height = sourceCanvas.height;
+    const ctx = jpgCanvas.getContext('2d');
+    ctx.fillStyle = '#fff8fb';
+    ctx.fillRect(0,0,jpgCanvas.width,jpgCanvas.height);
+    ctx.drawImage(sourceCanvas,0,0);
+
+    const fileName = `${state.currentRole.name}-人生副本角色卡.jpg`;
+
+    if(jpgCanvas.toBlob){
+      jpgCanvas.toBlob(blob=>{
+        if(!blob){
+          openJpgFallback(jpgCanvas, fileName);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(()=>URL.revokeObjectURL(url), 1200);
+        toast('JPG 已下載，iPhone 可到「檔案 > 下載項目」查看');
+      }, 'image/jpeg', 0.94);
+    }else{
+      openJpgFallback(jpgCanvas, fileName);
+    }
+  }catch(err){
+    console.error(err);
+    toast('圖片生成失敗，請再試一次或截圖保存');
+  }
+}
+
+function openJpgFallback(canvas, fileName){
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.94);
   const link = document.createElement('a');
-  link.download = `${state.currentRole.name}-人生副本角色卡.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.download = fileName;
+  link.href = dataUrl;
+  document.body.appendChild(link);
   link.click();
-  toast('角色卡已下載');
+  link.remove();
+  toast('JPG 已產生，若沒自動存檔請長按圖片儲存');
 }
 function copyShareText(){
   if(!state.currentRole) return;

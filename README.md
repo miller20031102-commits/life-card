@@ -7,7 +7,7 @@
 - 12 題角色測驗
 - 24 種角色卡
 - 免費角色卡結果頁
-- 下載角色卡 PNG
+- 下載角色卡 JPG
 - 複製 Threads 分享文
 - 收藏卡片到本機
 - 付費完整報告區
@@ -23,7 +23,7 @@
 index.html
 style.css
 script.js
-og-image.png
+og-image.jpg
 README.md
 ```
 
@@ -143,7 +143,7 @@ APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQ8TxLBVIQgeTQkBbHery
 - `index.html`
 - `style.css`
 - `script.js`
-- `og-image.png`
+- `og-image.jpg`
 - `README.md`
 
 不要上傳私密解鎖碼 CSV。
@@ -169,3 +169,13 @@ APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxQ8TxLBVIQgeTQkBbHery
 - 解鎖成功後，同一台手機 / 同一個瀏覽器會永久保留完整報告查看權
 
 注意：目前是靜態網站版本，永久保存依賴瀏覽器 localStorage。使用者如果清除瀏覽器資料、換手機或換瀏覽器，就不會自動同步。未來要做到跨裝置永久權限，需要加入會員系統、Email 備份或正式資料庫。
+
+
+- 2026-07 cute premium report refresh：付費完整報告改成更可愛、較不制式的卡片排版，加入符號、章節貼紙與更適合截圖收藏的樣式。
+
+
+## 本版更新：付費報告可愛化
+- 付費完整版排版改成更像收藏卡章節，不再像 AI 報告。
+- 每個章節加入可愛符號、貼紙標籤、小卡片區塊。
+- 手機版付費報告改成更好閱讀的單欄節奏。
+- 解鎖後仍保留卡冊永久查看邏輯。
