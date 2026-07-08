@@ -613,3 +613,16 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   font-size:14px;
 }
 @media(max-width:600px){.bank-box div{grid-template-columns:1fr;gap:4px}.bank-box strong{font-size:16px}}
+
+/* Payment modal: keep the form link visible on desktop and mobile */
+.pay-main-actions{
+  display:grid;
+  gap:10px;
+  margin:16px 0 18px;
+}
+.form-main-btn{
+  text-align:center;
+}
+.unlock-target{
+  white-space:pre-line;
+}

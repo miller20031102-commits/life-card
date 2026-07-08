@@ -244,22 +244,24 @@
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
       <p class="eyebrow">解鎖付費版</p>
       <h2 id="payTitle">完整角色報告 NT$49</h2>
-      <p class="modal-copy">請先確認要解鎖的卡牌，再前往付款回報表單。銀行帳號、轉帳提醒與付款後五碼填寫方式都會寫在表單最上方。</p>
+      <p class="modal-copy">請先確認要解鎖的卡牌，再前往付款回報表單。銀行資訊、轉帳提醒與付款後五碼填寫方式都會寫在表單最上方。</p>
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
-      <div class="pay-steps">
-        <div><strong>1</strong><span>前往付款回報表單，依表單內的銀行帳號轉帳</span></div>
-        <div><strong>2</strong><span>在表單填入結果編號、付款後五碼與聯絡方式</span></div>
-        <div><strong>3</strong><span>客服確認後，回到這裡輸入專屬解鎖碼</span></div>
+      <div class="pay-main-actions">
+        <a class="primary-btn full" id="paymentFormBtn" href="https://forms.gle/ck8NkqScfuUNbysn8" target="_blank" rel="noopener">前往付款回報表單</a>
+        <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製結果編號</button>
       </div>
-      <div class="payment-note form-reminder">📮 付款回報表單內會提供銀行資訊。送出前，請確認已填入「結果編號」、「付款後五碼」與「聯絡方式」。</div>
+      <div class="pay-steps">
+        <div><strong>1</strong><span>到表單查看銀行資訊並完成轉帳</span></div>
+        <div><strong>2</strong><span>在表單填入結果編號、付款後五碼與聯絡方式</span></div>
+        <div><strong>3</strong><span>收到解鎖碼後，回到這裡輸入</span></div>
+      </div>
+      <div class="payment-note form-reminder">📮 表單會在新分頁開啟。送出前，請確認已填入「結果編號」、「付款後五碼」與「聯絡方式」。</div>
       <div class="unlock-form">
-        <label for="unlockCodeInput">輸入解鎖碼</label>
+        <label for="unlockCodeInput">已收到解鎖碼？輸入在這裡</label>
         <input id="unlockCodeInput" type="text" autocomplete="one-time-code" placeholder="例如：LQ-ABCD-1234" />
         <button class="primary-btn full" id="redeemBtn" type="button">驗證並解鎖完整報告</button>
       </div>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
-      <button class="primary-btn full" id="paymentFormBtn" type="button">前往付款回報表單</button>
-      <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製表單填寫資料</button>
     </div>
   </div>
 

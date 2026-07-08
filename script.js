@@ -357,7 +357,6 @@ function bindEvents(){
   on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
   on('copyPayInfoBtn','click',copyPaymentInfo);
-  on('paymentFormBtn','click',openPaymentForm);
   on('redeemBtn','click',redeemCode);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
@@ -910,7 +909,7 @@ function renderSavedCards(){
       </div>
       <div class="saved-actions">
         <button class="secondary-btn tiny" type="button" data-view-saved="${item.resultId}">查看</button>
-        ${unlocked ? `<button class="primary-btn tiny" type="button" data-view-report="${item.resultId}">完整報告</button>` : `<button class="primary-btn tiny" type="button" data-unlock-saved="${item.resultId}">解鎖這張</button>`}
+        ${unlocked ? `<button class="primary-btn tiny" type="button" data-view-report="${item.resultId}">查看完整報告</button>` : `<button class="primary-btn tiny" type="button" data-unlock-saved="${item.resultId}">解鎖這張</button>`}
       </div>
     </article>`;
   }).join('');
@@ -954,14 +953,22 @@ function openPayModal(){
     toast('先完成測驗，才會知道要解鎖哪份報告');
     return;
   }
+
   if(hasPremiumAccess(state.resultId)){
+    closePayModal();
     showPremiumReport();
-    toast('這張卡已經解鎖，可以永久查看');
+    toast('這張卡已經解鎖，可以直接查看完整報告');
     $('premiumReport').scrollIntoView({behavior:'smooth',block:'start'});
     return;
   }
+
   const target = $('unlockTargetText');
-  if(target) target.textContent = `解鎖卡牌：${state.currentRole.name}｜${state.currentRole.rarity}\n結果編號：${state.resultId}`;
+  if(target) target.textContent = `解鎖卡牌：${state.currentRole.name}｜${state.currentRole.rarity}
+結果編號：${state.resultId}`;
+
+  const formBtn = $('paymentFormBtn');
+  if(formBtn) formBtn.href = CONFIG.paymentFormUrl || 'https://forms.gle/ck8NkqScfuUNbysn8';
+
   $('payModal').classList.remove('hidden');
   $('unlockCodeInput').focus();
   $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '目前暫時無法驗證解鎖碼，請稍後再試。';
@@ -970,6 +977,10 @@ function closePayModal(){ $('payModal').classList.add('hidden'); }
 
 function setOrderId(){ return; }
 function copyPaymentInfo(){
+  if(state.resultId && hasPremiumAccess(state.resultId)){
+    toast('這張卡已經解鎖，不需要再付款');
+    return;
+  }
   const roleName = state.currentRole ? `${state.currentRole.name}｜${state.currentRole.rarity}` : '尚未完成測驗';
   const text = `人生副本付款回報資料
 角色：${roleName}
@@ -980,10 +991,15 @@ function copyPaymentInfo(){
 ${CONFIG.paymentFormUrl}
 
 請在表單內填入結果編號、付款後五碼與聯絡方式。`;
-  copyText(text,'已複製表單填寫資料');
+  copyText(text,'已複製結果編號與表單資料');
 }
 
 function openPaymentForm(){
+  if(state.resultId && hasPremiumAccess(state.resultId)){
+    showPremiumReport();
+    toast('這張卡已經解鎖，可以直接查看完整報告');
+    return;
+  }
   const url = String(CONFIG.paymentFormUrl || '').trim();
   if(!url || url.includes('請貼上')){
     toast('付款回報表單暫時無法開啟，請稍後再試');
@@ -995,6 +1011,7 @@ function openPaymentForm(){
 function redeemCode(){
   const code = normalizeCode($('unlockCodeInput').value);
   if(!state.currentRole) return setModalMessage('請先完成測驗。',false);
+  if(hasPremiumAccess(state.resultId)) return setModalMessage('這張卡已經解鎖，不需要再次解鎖。',true);
   if(!code) return setModalMessage('請輸入解鎖碼。',false);
   if(!CONFIG.APPS_SCRIPT_URL) return setModalMessage('目前暫時無法驗證解鎖碼，請稍後再試。',false);
   $('redeemBtn').disabled = true;
