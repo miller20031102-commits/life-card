@@ -626,3 +626,5 @@ body:has(#saveImageModal:not(.hidden)) .toast{
 .unlock-target{
   white-space:pre-line;
 }
+
+.policy-reminder{background:rgba(255,255,255,.07);border-style:dashed;color:var(--muted);font-size:14px;line-height:1.7}

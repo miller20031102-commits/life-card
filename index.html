@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="人生副本：回答 12 題，抽出你的專屬人生角色卡。不是 MBTI，不是星座，是你的遊戲設定。" />
-  <meta name="keywords" content="人生副本,人生角色卡,心理測驗,戀愛測驗,MBTI,角色卡,性格測驗,限動分享" />
+  <meta name="keywords" content="人生副本,人生角色卡,娛樂測驗,戀愛測驗,MBTI,角色卡,人設卡,限動分享" />
   <meta property="og:title" content="人生副本｜你的角色卡販賣機" />
   <meta property="og:description" content="回答 12 題，抽出你的專屬角色卡：稀有度、技能、弱點、戀愛屬性、本週任務一次生成。" />
   <meta property="og:type" content="website" />
@@ -173,7 +173,7 @@
             <p>免費版給你角色卡；付費版把這張卡延伸成完整報告，包含戀愛攻略、朋友定位、金錢弱點與 7 日升級任務。</p>
             <ul>
               <li>一次性解鎖碼，用過就失效</li>
-              <li>解鎖後會保存這份報告</li>
+              <li>同角色解鎖一次即可查看</li>
               <li>適合截圖保存，之後也可以做成實體卡</li>
             </ul>
             <button class="primary-btn full" data-open-pay type="button">解鎖完整報告 NT$49</button>
@@ -183,7 +183,7 @@
 
       <div class="premium-report hidden" id="premiumReport">
         <div class="premium-report-head">
-          <div><p class="eyebrow">付費報告已解鎖</p><h2 id="premiumTitle">你的完整角色報告</h2><p>這是你買下的專屬角色報告，已經綁定這張卡。之後可以回到「我的卡冊」永久查看，也很適合截圖保存 ♡</p></div>
+          <div><p class="eyebrow">付費報告已解鎖</p><h2 id="premiumTitle">你的完整角色報告</h2><p>這是你解鎖的專屬角色報告。之後同角色都能在「我的卡冊」查看，也很適合截圖保存 ♡</p></div>
           <button class="secondary-btn" id="copyPremiumBtn" type="button">複製完整報告</button>
         </div>
         <div class="premium-grid" id="premiumGrid"></div>
@@ -195,12 +195,12 @@
         <div>
           <p class="eyebrow">完整報告版</p>
           <h2>先抽出角色卡，再解鎖完整報告</h2>
-          <p>免費版可以生成角色卡；喜歡哪一張，就可以從「我的卡冊」選那張解鎖完整報告。每張卡的報告會綁定結果編號，解鎖後可以永久查看。</p>
+          <p>免費版可以生成角色卡；喜歡哪一張，就可以從「我的卡冊」選那張解鎖完整報告。同一種角色只要解鎖過一次，之後抽到同角色都能直接查看完整報告，不會重複收費。</p>
         </div>
         <div class="price-box unlock-select-box">
           <span>完整報告</span>
           <strong>NT$49</strong>
-          <p class="price-note">一張卡對應一份完整報告。先從「我的卡冊」選好你想解鎖的那張，再使用解鎖碼。</p>
+          <p class="price-note">同一種角色只需要解鎖一次。先從「我的卡冊」選好想解鎖的角色，再使用解鎖碼。</p>
           <button class="primary-btn full" id="chooseUnlockBtn" type="button">選擇要解鎖的卡</button>
         </div>
       </div>
@@ -226,9 +226,12 @@
       <div class="faq-grid reveal">
         <details open><summary>解鎖碼可以重複使用嗎？</summary><p>每組解鎖碼只能成功解鎖一次。解鎖完成後，這組碼就不能再拿去解鎖其他卡牌。</p></details>
         <details><summary>付款後怎麼拿到解鎖碼？</summary><p>請先選擇要解鎖的卡牌，接著前往付款回報表單。表單內會提供銀行資訊與填寫提醒；確認付款後，會提供一組專屬解鎖碼。</p></details>
-        <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有自己的結果編號。你可以在「我的卡冊」選擇想解鎖的卡牌。</p></details>
+        <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
         <details><summary>每天可以抽幾次？</summary><p>每天可以免費抽 2 次。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看，不會消耗次數。</p></details>
-        <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會永久保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
+        <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
+        <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
+        <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。解鎖碼使用並顯示完整報告後，即視為服務完成；除系統錯誤、重複付款或未收到解鎖碼外，不接受退款。</p></details>
+        <details><summary>付款資料會怎麼使用？</summary><p>付款回報表單只用於確認款項與提供解鎖碼，不會出售或任意提供給第三方。</p></details>
       </div>
     </section>
   </main>
@@ -256,6 +259,7 @@
         <div><strong>3</strong><span>收到解鎖碼後，回到這裡輸入</span></div>
       </div>
       <div class="payment-note form-reminder">📮 表單會在新分頁開啟。送出前，請確認已填入「結果編號」、「付款後五碼」與「聯絡方式」。</div>
+      <div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；解鎖碼使用並顯示完整報告後，即視為服務完成。</div>
       <div class="unlock-form">
         <label for="unlockCodeInput">已收到解鎖碼？輸入在這裡</label>
         <input id="unlockCodeInput" type="text" autocomplete="one-time-code" placeholder="例如：LQ-ABCD-1234" />
@@ -272,7 +276,7 @@
       <button class="modal-close" data-close-saved type="button" aria-label="關閉">×</button>
       <p class="eyebrow">我的卡冊</p>
       <h2 id="savedTitle">選擇你要查看或解鎖的卡</h2>
-      <p class="modal-copy">每張卡都會自動保存到這裡。解鎖後，這台手機會永久保留該結果的完整報告查看權。</p>
+      <p class="modal-copy">每張卡都會自動保存到這裡。同一種角色只要解鎖過一次，這台裝置就會保留該角色的完整報告查看權。</p>
       <div class="saved-list" id="savedList"></div>
     </div>
   </div>
