@@ -225,7 +225,7 @@
       <div class="section-title center reveal"><p class="eyebrow">常見問題</p><h2>使用前可以先看這裡</h2></div>
       <div class="faq-grid reveal">
         <details open><summary>解鎖碼可以重複使用嗎？</summary><p>每組解鎖碼只能成功解鎖一次。解鎖完成後，這組碼就不能再拿去解鎖其他卡牌。</p></details>
-        <details><summary>付款後怎麼拿到解鎖碼？</summary><p>完成付款後，請依頁面指示提供付款資訊與訂單編號。確認後會提供一組專屬解鎖碼。</p></details>
+        <details><summary>付款後怎麼拿到解鎖碼？</summary><p>請先選擇要解鎖的卡牌，接著前往付款回報表單。表單內會寫銀行帳號與注意事項，送出後客服確認款項，會提供一組專屬解鎖碼。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有自己的結果編號。你可以在「我的卡冊」選擇想解鎖的卡牌。</p></details>
         <details><summary>每天可以抽幾次？</summary><p>每天可以免費抽 2 次。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看，不會消耗次數。</p></details>
         <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會永久保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
@@ -244,21 +244,22 @@
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
       <p class="eyebrow">解鎖付費版</p>
       <h2 id="payTitle">完整角色報告 NT$49</h2>
-      <p class="modal-copy">付款後你會拿到一組專屬解鎖碼。解鎖成功後，完整報告會保存到這台裝置的「我的卡冊」。</p>
+      <p class="modal-copy">請先確認要解鎖的卡牌，再前往付款回報表單。銀行帳號、轉帳提醒與付款後五碼填寫方式都會寫在表單最上方。</p>
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
       <div class="pay-steps">
-        <div><strong>1</strong><span>轉帳 / LINE Pay / 你指定的收款方式</span></div>
-        <div><strong>2</strong><span>把付款資訊與訂單編號傳給客服確認</span></div>
-        <div><strong>3</strong><span>收到解鎖碼後，在下方輸入</span></div>
+        <div><strong>1</strong><span>前往付款回報表單，依表單內的銀行帳號轉帳</span></div>
+        <div><strong>2</strong><span>在表單填入結果編號、付款後五碼與聯絡方式</span></div>
+        <div><strong>3</strong><span>客服確認後，回到這裡輸入專屬解鎖碼</span></div>
       </div>
-      <div class="order-box"><span>你的訂單編號</span><strong id="orderIdText">LQ-000000</strong><button class="ghost-btn tiny" id="copyOrderBtn" type="button">複製</button></div>
+      <div class="payment-note form-reminder">📮 銀行帳號會放在付款回報表單裡。送出前，請確認已填入「結果編號」、「付款後五碼」與「聯絡方式」。</div>
       <div class="unlock-form">
         <label for="unlockCodeInput">輸入解鎖碼</label>
         <input id="unlockCodeInput" type="text" autocomplete="one-time-code" placeholder="例如：LQ-ABCD-1234" />
         <button class="primary-btn full" id="redeemBtn" type="button">驗證並解鎖完整報告</button>
       </div>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
-      <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製付款資訊</button>
+      <button class="primary-btn full" id="paymentFormBtn" type="button">前往付款回報表單</button>
+      <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製表單填寫資料</button>
     </div>
   </div>
 

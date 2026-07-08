@@ -2,7 +2,8 @@
 const CONFIG = {
   price: 'NT$49',
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2XTRcqt6Tjiy_ueGJIfd6rkIULHOdvyLYcs4ZSM_gA7ofdmZK3yBpmLU58U9Dd9pDeA/exec',
-  PAYMENT_NOTE: '付款方式：請依頁面公告完成 NT$49 付款，並附上付款資訊與訂單編號；確認後會提供專屬解鎖碼。',
+  paymentFormUrl: 'https://forms.gle/ck8NkqScfuUNbysn8',
+  PAYMENT_NOTE: '請前往付款回報表單查看銀行帳號並完成轉帳。送出表單後，確認款項會提供專屬解鎖碼。',
   brand: '人生副本'
 };
 
@@ -355,8 +356,8 @@ function bindEvents(){
   on('savedBtn','click',showSavedCards);
   on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
-  on('copyOrderBtn','click',()=>copyText($('orderIdText').textContent,'已複製訂單編號'));
   on('copyPayInfoBtn','click',copyPaymentInfo);
+  on('paymentFormBtn','click',openPaymentForm);
   on('redeemBtn','click',redeemCode);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
@@ -967,14 +968,29 @@ function openPayModal(){
   $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '目前暫停線上解鎖，請聯絡客服協助。';
 }
 function closePayModal(){ $('payModal').classList.add('hidden'); }
-function setOrderId(){
-  const id = state.resultId || 'LQ-'+new Date().toISOString().slice(2,10).replaceAll('-','')+'-'+Math.floor(Math.random()*900+100);
-  $('orderIdText').textContent = id;
-}
+
+function setOrderId(){ const el=$('orderIdText'); if(!el) return; el.textContent = `LQ-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(1000+Math.random()*9000)}`; }
 function copyPaymentInfo(){
   const roleName = state.currentRole ? state.currentRole.name : '尚未完成測驗';
-  const text = `我要解鎖人生副本完整報告\n角色：${roleName}\n結果編號：${state.resultId || '尚未產生'}\n訂單編號：${$('orderIdText').textContent}\n金額：${CONFIG.price}\n\n${CONFIG.PAYMENT_NOTE}`;
-  copyText(text,'已複製付款回報訊息');
+  const text = `我要解鎖人生副本完整報告
+角色：${roleName}
+結果編號：${state.resultId || '尚未產生'}
+訂單編號：${$('orderIdText').textContent}
+金額：${CONFIG.price}
+
+請到付款回報表單填入以上資料，並依表單內的銀行帳號完成轉帳。
+送出表單時請附上：付款後五碼、轉帳截圖、聯絡方式。`;
+  copyText(text,'已複製表單填寫資料');
+}
+
+function openPaymentForm(){
+  const url = String(CONFIG.paymentFormUrl || '').trim();
+  if(!url || url.includes('請貼上')){
+    toast('尚未設定付款回報表單連結');
+    return;
+  }
+  copyPaymentInfo();
+  window.open(url, '_blank', 'noopener');
 }
 function redeemCode(){
   const code = normalizeCode($('unlockCodeInput').value);

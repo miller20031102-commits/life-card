@@ -579,3 +579,37 @@ body:has(#saveImageModal:not(.hidden)) .toast{
 .price-note{margin:2px 0 6px;color:var(--muted);font-size:14px;line-height:1.65}
 .saved-card.is-unlocked .saved-title::after{content:'已解鎖';display:inline-flex;align-items:center;margin-left:8px;padding:4px 8px;border-radius:999px;background:rgba(115,242,173,.16);border:1px solid rgba(115,242,173,.32);color:var(--green);font-size:12px;font-weight:900}
 @media(max-width:600px){.price-note{text-align:center;font-size:13px}.unlock-select-box{padding:22px}}
+
+/* Bank transfer payment box */
+.bank-box{
+  display:grid;
+  gap:10px;
+  margin:16px 0 10px;
+  padding:15px;
+  border-radius:20px;
+  background:linear-gradient(135deg,rgba(255,245,203,.16),rgba(255,215,236,.12));
+  border:1px solid rgba(255,255,255,.14);
+}
+.bank-box div{
+  display:grid;
+  grid-template-columns:88px 1fr;
+  align-items:center;
+  gap:10px;
+  padding:9px 10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.08);
+}
+.bank-box span{color:var(--muted);font-size:13px;font-weight:800}
+.bank-box strong{color:#fff;font-size:15px;word-break:break-all}
+.payment-note{
+  margin:10px 0 14px;
+  padding:12px 14px;
+  border-radius:16px;
+  color:var(--muted);
+  background:rgba(255,255,255,.06);
+  border:1px dashed rgba(255,255,255,.16);
+  line-height:1.65;
+  font-size:14px;
+}
+@media(max-width:600px){.bank-box div{grid-template-columns:1fr;gap:4px}.bank-box strong{font-size:16px}}
