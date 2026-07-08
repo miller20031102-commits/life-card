@@ -50,6 +50,7 @@
           <span>⚡ 3 分鐘完成</span>
           <span>🎴 可下載卡圖</span>
           <span>💬 可複製 Threads 文案</span>
+          <span>🎟️ 每日免費 2 次</span>
           <span>💎 49 元完整報告</span>
         </div>
       </div>
@@ -73,7 +74,7 @@
     </section>
 
     <section class="section-pad strip-section reveal" aria-label="網站亮點">
-      <div class="strip-card"><strong>免費版</strong><span>產生角色卡、下載 JPG、分享文案</span></div>
+      <div class="strip-card"><strong>每日免費 2 次</strong><span>每天保留一點神祕感，抽完會自動存進我的卡冊</span></div>
       <div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
       <div class="strip-card"><strong>安全解鎖</strong><span>每組解鎖碼僅能使用一次，已解鎖報告會存進卡冊</span></div>
     </section>
@@ -93,7 +94,12 @@
           <p class="eyebrow">開始進入副本</p>
           <h2>12 題抽出你的角色卡</h2>
           <p>不用想太久，選最像你平常反應的答案。這不是診斷，是娛樂，但文案會故意寫得像在偷看你的人生。</p>
-          <div class="mini-note">你的答案只會用來生成這次結果。解鎖完整報告時，系統只會驗證解鎖碼與結果編號。</div>
+          <div class="mini-note">每日免費抽卡 2 次。卡冊與查看已解鎖報告不受限制。</div>
+          <div class="daily-limit-card" id="dailyLimitCard">
+            <span>🎟️ 今日剩餘抽卡</span>
+            <strong><b id="dailyLeftText">2</b> / 2</strong>
+            <small id="dailyLimitHint">抽完會自動存進卡冊，不用按任何按鈕。</small>
+          </div>
         </aside>
 
         <div class="quiz-panel" id="quizPanel">
@@ -157,7 +163,6 @@
           <div class="action-stack">
             <button class="primary-btn full" id="downloadBtn" type="button">下載角色卡 JPG</button>
             <button class="secondary-btn full" id="shareBtn" type="button">複製 Threads 分享文</button>
-            <button class="ghost-btn full" id="saveCardBtn" type="button">收藏到我的卡冊</button>
             <button class="ghost-btn full" id="againBtn" type="button">重新測一次</button>
           </div>
 
@@ -168,8 +173,8 @@
             <p>免費版給你角色卡；付費版把這張卡延伸成完整報告，包含戀愛攻略、朋友定位、金錢弱點與 7 日升級任務。</p>
             <ul>
               <li>一次性解鎖碼，用過就失效</li>
-              <li>解鎖後本機會保存這份報告</li>
-              <li>適合截圖、收藏、之後做成實體卡</li>
+              <li>解鎖後會保存這份報告</li>
+              <li>適合截圖保存，之後也可以做成實體卡</li>
             </ul>
             <button class="primary-btn full" data-open-pay type="button">解鎖完整報告 NT$49</button>
           </div>
@@ -178,7 +183,7 @@
 
       <div class="premium-report hidden" id="premiumReport">
         <div class="premium-report-head">
-          <div><p class="eyebrow">付費報告已解鎖</p><h2 id="premiumTitle">你的完整角色報告</h2><p>這是你買下的專屬角色報告，已經綁定這張卡。之後可以回到「我的卡冊」永久查看，也很適合截圖收藏 ♡</p></div>
+          <div><p class="eyebrow">付費報告已解鎖</p><h2 id="premiumTitle">你的完整角色報告</h2><p>這是你買下的專屬角色報告，已經綁定這張卡。之後可以回到「我的卡冊」永久查看，也很適合截圖保存 ♡</p></div>
           <button class="secondary-btn" id="copyPremiumBtn" type="button">複製完整報告</button>
         </div>
         <div class="premium-grid" id="premiumGrid"></div>
@@ -188,7 +193,7 @@
     <section class="section-pad premium-section" id="premium">
       <div class="premium-card reveal">
         <div>
-          <p class="eyebrow">完整收藏版</p>
+          <p class="eyebrow">完整報告版</p>
           <h2>先抽出角色卡，再解鎖完整報告</h2>
           <p>免費版可以生成角色卡；喜歡這張卡時，可以用 NT$49 解鎖更完整的戀愛、朋友、工作、金錢與 7 日任務分析。</p>
         </div>
@@ -207,7 +212,7 @@
       <div class="roadmap-grid">
         <article><strong>雙人合卡</strong><span>情侶、曖昧、朋友配對，看看你們是什麼副本組合。</span></article>
         <article><strong>朋友團隊卡</strong><span>開房間一起測，產生隊伍組成，很適合群組分享。</span></article>
-        <article><strong>實體收藏卡</strong><span>把喜歡的角色卡做成可以收藏的實體卡牌。</span></article>
+        <article><strong>實體角色卡</strong><span>把喜歡的角色卡做成可以保存的實體卡牌。</span></article>
       </div>
     </section>
 
@@ -217,6 +222,7 @@
         <details open><summary>解鎖碼可以重複使用嗎？</summary><p>每組解鎖碼只能成功解鎖一次。解鎖完成後，這組碼就不能再拿去解鎖其他卡牌。</p></details>
         <details><summary>付款後怎麼拿到解鎖碼？</summary><p>完成付款後，請依頁面指示提供付款資訊與訂單編號。確認後會提供一組專屬解鎖碼。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有自己的結果編號。你可以在「我的卡冊」選擇想解鎖的卡牌。</p></details>
+        <details><summary>每天可以抽幾次？</summary><p>每天可以免費抽 2 次。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看，不會消耗次數。</p></details>
         <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會永久保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
       </div>
     </section>
@@ -224,7 +230,7 @@
 
   <footer class="site-footer">
     <strong>人生副本</strong>
-    <span>把普通人變成一張值得收藏的角色卡。</span>
+    <span>把普通人變成一張值得保存的角色卡。</span>
   </footer>
 
   <div class="modal hidden" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payTitle">
@@ -258,7 +264,7 @@
       <button class="modal-close" data-close-saved type="button" aria-label="關閉">×</button>
       <p class="eyebrow">我的卡冊</p>
       <h2 id="savedTitle">選擇你要查看或解鎖的卡</h2>
-      <p class="modal-copy">每張卡都有自己的結果編號。解鎖後，這台手機會永久保留該結果的完整報告查看權。</p>
+      <p class="modal-copy">每張卡都會自動保存到這裡。解鎖後，這台手機會永久保留該結果的完整報告查看權。</p>
       <div class="saved-list" id="savedList"></div>
     </div>
   </div>

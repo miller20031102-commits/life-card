@@ -314,11 +314,13 @@ const rolePremiumNotes = {
   }
 };
 
+const DAILY_PLAY_LIMIT = 2;
 const state = { current:0, answers:Array(questions.length).fill(null), scores:{}, currentRole:null, resultId:null, generatedImage:null };
 const STORAGE_KEYS = {
   saved: 'lifequest:saved',
   premiumPrefix: 'lifequest:premium:',
-  unlockedReports: 'lifequest:unlockedReports'
+  unlockedReports: 'lifequest:unlockedReports',
+  dailyPlays: 'lifequest:dailyPlays'
 };
 const $ = (id)=>document.getElementById(id);
 
@@ -329,6 +331,7 @@ function init(){
   renderQuestion();
   bindEvents();
   setOrderId();
+  updateDailyLimitUI();
   const savedResult = loadLastResult();
   if(savedResult){
     state.answers = Array.isArray(savedResult.answers) ? savedResult.answers : Array(questions.length).fill(null);
@@ -343,17 +346,17 @@ function init(){
 }
 
 function bindEvents(){
-  $('prevBtn').addEventListener('click',()=>{ if(state.current>0){ state.current--; renderQuestion(); scrollToQuiz(); }});
-  $('resetBtn').addEventListener('click',resetQuiz);
-  $('againBtn').addEventListener('click',resetQuiz);
-  $('downloadBtn').addEventListener('click',downloadCard);
-  $('shareBtn').addEventListener('click',copyShareText);
-  $('saveCardBtn').addEventListener('click',saveCurrentCard);
-  $('savedBtn').addEventListener('click',showSavedCards);
-  $('copyPremiumBtn').addEventListener('click',copyPremiumReport);
-  $('copyOrderBtn').addEventListener('click',()=>copyText($('orderIdText').textContent,'已複製訂單編號')); hideToast();
-  $('copyPayInfoBtn').addEventListener('click',copyPaymentInfo);
-  $('redeemBtn').addEventListener('click',redeemCode);
+  const on = (id, event, handler) => { const el = $(id); if(el) el.addEventListener(event, handler); };
+  on('prevBtn','click',()=>{ if(state.current>0){ state.current--; renderQuestion(); scrollToQuiz(); }});
+  on('resetBtn','click',resetQuiz);
+  on('againBtn','click',resetQuiz);
+  on('downloadBtn','click',downloadCard);
+  on('shareBtn','click',copyShareText);
+  on('savedBtn','click',showSavedCards);
+  on('copyPremiumBtn','click',copyPremiumReport);
+  on('copyOrderBtn','click',()=>copyText($('orderIdText').textContent,'已複製訂單編號'));
+  on('copyPayInfoBtn','click',copyPaymentInfo);
+  on('redeemBtn','click',redeemCode);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
   document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
@@ -383,6 +386,7 @@ function renderQuestion(){
     </button>`).join('');
   document.querySelectorAll('.option-btn').forEach(btn=>btn.addEventListener('click',()=>selectOption(Number(btn.dataset.index))));
   $('prevBtn').disabled = state.current===0;
+  updateDailyLimitUI();
 }
 function getMood(i){ return ['新手村入口','角色建立中','讀取戀愛屬性','社交電量檢測','戰鬥模式分析','弱點掃描','人生地圖載入','台詞校準','工作模式分析','朋友定位中','升級需求確認','準備結算'][i] || '副本進行中'; }
 function selectOption(index){
@@ -413,6 +417,58 @@ function scrollToQuiz(){
 }
 
 
+function getTodayKey(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function getDailyUsage(){
+  const today = getTodayKey();
+  let data = null;
+  try{ data = JSON.parse(localStorage.getItem(STORAGE_KEYS.dailyPlays) || 'null'); }catch{ data = null; }
+  if(!data || data.date !== today){
+    data = { date: today, count: 0 };
+    localStorage.setItem(STORAGE_KEYS.dailyPlays, JSON.stringify(data));
+  }
+  data.count = Math.max(0, Number(data.count) || 0);
+  return data;
+}
+
+function getDailyRemaining(){
+  const usage = getDailyUsage();
+  return Math.max(0, DAILY_PLAY_LIMIT - usage.count);
+}
+
+function canGenerateToday(){
+  return getDailyRemaining() > 0;
+}
+
+function recordDailyPlay(){
+  const usage = getDailyUsage();
+  usage.count = Math.min(DAILY_PLAY_LIMIT, (Number(usage.count) || 0) + 1);
+  localStorage.setItem(STORAGE_KEYS.dailyPlays, JSON.stringify(usage));
+  updateDailyLimitUI();
+}
+
+function updateDailyLimitUI(){
+  const left = getDailyRemaining();
+  const card = $('dailyLimitCard');
+  const leftText = $('dailyLeftText');
+  const hint = $('dailyLimitHint');
+  if(leftText) leftText.textContent = String(left);
+  if(hint) hint.textContent = left > 0 ? `今天還可以抽 ${left} 次。抽完會自動存進卡冊。` : '今天免費抽卡已用完，明天會自動恢復。卡冊與已解鎖報告仍可查看。';
+  if(card) card.classList.toggle('is-empty', left <= 0);
+}
+
+function showDailyLimitNotice(){
+  toast('今天免費抽卡已用完，明天再來抽新卡 ♡');
+  const hint = $('dailyLimitHint');
+  if(hint) hint.textContent = '今天免費抽卡已用完。你仍然可以查看卡冊、下載已抽到的卡、或閱讀已解鎖報告。';
+}
+
 function calculateScores(){
   const scores = Object.fromEntries(axes.map(a=>[a,0]));
   state.answers.forEach((answerIdx,qIdx)=>{
@@ -423,10 +479,16 @@ function calculateScores(){
   return scores;
 }
 function generateResult(){
+  if(!canGenerateToday()){
+    showDailyLimitNotice();
+    updateDailyLimitUI();
+    return;
+  }
   state.scores = calculateScores();
   const role = findBestRole(state.scores);
   state.currentRole = role;
   state.resultId = makeResultId(role.id, state.answers);
+  recordDailyPlay();
   renderResult(role);
   saveLastResult();
   saveResultToCollection(false);
@@ -484,7 +546,7 @@ function buildPremium(role){
     {
       title:'開箱小卡｜這張卡在說你哪裡',
       html:`<p class="lead cute-lead">${note.hook || `${role.name} 的付費版不是再講一次卡面，而是把你這張卡背後的反差、可愛雷點和升級路線拆開給你看。`}</p>
-      <div class="premium-sticker-row"><span>✨ ${role.rarity} 稀有度</span><span>🧃 ${miniMood}</span><span>🎮 已收藏報告</span></div>
+      <div class="premium-sticker-row"><span>✨ ${role.rarity} 稀有度</span><span>🧃 ${miniMood}</span><span>🎮 已保存報告</span></div>
       <div class="premium-kpis cute-kpis">
         <span><b>${role.rarity}</b><small>卡牌稀有度</small></span>
         <span><b>${score.power}</b><small>爆發能量</small></span>
@@ -549,7 +611,7 @@ function buildPremium(role){
 }
 
 const premiumDecor = [
-  {icon:'💎',chip:'稀有總覽',wink:'先看這格，最適合收藏 ♡'},
+  {icon:'💎',chip:'稀有總覽',wink:'先看這格，最適合保存 ♡'},
   {icon:'🪄',chip:'角色設定',wink:'你的反差魅力都在這裡 ✦'},
   {icon:'💘',chip:'戀愛雷達',wink:'這段超容易被說「好像我」 ⸝⸝'},
   {icon:'🫶',chip:'朋友定位',wink:'你在隊伍裡的位置很可愛 ✿'},
@@ -558,14 +620,14 @@ const premiumDecor = [
   {icon:'👾',chip:'Boss 攻略',wink:'看完比較知道怎麼對付自己 ᐟ'},
   {icon:'🗓️',chip:'7日任務',wink:'最有陪伴感的一格 ◡̈'},
   {icon:'🌷',chip:'30天養成',wink:'不是說教，是溫柔版升級地圖 ♡'},
-  {icon:'📸',chip:'台詞收藏',wink:'這格超適合截圖發限動 ✨'}
+  {icon:'📸',chip:'台詞保存',wink:'這格超適合截圖發限動 ✨'}
 ];
 
 function showPremiumReport(){
   const role = state.currentRole;
   if(!role) return;
   $('premiumGrid').innerHTML = buildPremium(role).map((item,index)=>{
-    const meta = premiumDecor[index] || {icon:'✨',chip:'完整報告',wink:'這一格也值得收藏 ♡'};
+    const meta = premiumDecor[index] || {icon:'✨',chip:'完整報告',wink:'這一格也值得保存 ♡'};
     return `<article class="premium-item premium-style-${(index % 4) + 1}">
       <div class="premium-card-head">
         <span class="premium-icon">${meta.icon}</span>
@@ -800,7 +862,7 @@ function saveResultToCollection(showToast=true){
   if(idx >= 0) list[idx] = {...list[idx], ...item, at:list[idx].at || item.at};
   else list.unshift(item);
   setSavedList(list);
-  if(showToast) toast(item.premium ? '已保存解鎖報告到我的卡冊' : '已收藏到我的卡冊');
+  if(showToast) toast(item.premium ? '已保存解鎖報告到我的卡冊' : '已自動存進我的卡冊');
 }
 function saveCurrentCard(){ saveResultToCollection(true); }
 function showSavedCards(){
@@ -823,7 +885,7 @@ function renderSavedCards(){
       <div class="saved-emoji">${item.emoji || role?.emoji || '🎴'}</div>
       <div class="saved-main">
         <div class="saved-title"><strong>${item.roleName || role?.name || '未知角色'}</strong><span>${item.rarity || role?.rarity || ''}</span></div>
-        <p>${item.line || role?.line || '這張卡是舊版收藏，仍可查看或解鎖。'}</p>
+        <p>${item.line || role?.line || '這張卡是舊版紀錄，仍可查看或解鎖。'}</p>
         <small>${item.resultId}${date ? '｜'+date : ''}</small>
       </div>
       <div class="saved-actions">
@@ -855,7 +917,7 @@ function restoreSavedCard(resultId, opts={}){
   else setTimeout(()=>$('resultSection').scrollIntoView({behavior:'smooth',block:'start'}),120);
 }
 function synthesizeAnswersFromRole(role){
-  // 舊版收藏沒有 answers 時使用穩定預設，避免報告打不開。
+  // 舊版紀錄沒有 answers 時使用穩定預設，避免報告打不開。
   return questions.map((q, qi)=> qi % q.options.length);
 }
 function copyPremiumReport(){

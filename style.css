@@ -526,3 +526,50 @@ body:has(#saveImageModal:not(.hidden)) .toast{
 
 /* ==== Official UX cleanup ==== */
 .section-subtitle{max-width:720px;margin:14px auto 0;color:var(--muted);line-height:1.75;font-size:16px}.save-image-frame img{cursor:pointer}.save-image-frame::after{content:'點圖片儲存 / 沒反應就長按';display:block;text-align:center;margin-top:10px;color:rgba(255,255,255,.72);font-size:13px;font-weight:800}.save-actions{display:none!important}@media(max-width:600px){.section-subtitle{font-size:14px;line-height:1.65}}
+
+
+/* ==== Daily play limit UI ==== */
+.daily-limit-card{
+  margin-top:14px;
+  padding:15px 16px;
+  border-radius:22px;
+  background:linear-gradient(135deg, rgba(255,209,92,.16), rgba(255,108,171,.13));
+  border:1px solid rgba(255,255,255,.14);
+  display:grid;
+  gap:7px;
+  box-shadow:0 14px 34px rgba(0,0,0,.14);
+}
+.daily-limit-card span{
+  color:#ffe8a6;
+  font-weight:900;
+  font-size:14px;
+}
+.daily-limit-card strong{
+  color:#fff;
+  font-size:22px;
+  letter-spacing:.02em;
+}
+.daily-limit-card strong b{
+  font-size:32px;
+  color:var(--gold);
+}
+.daily-limit-card small{
+  color:var(--muted);
+  line-height:1.6;
+}
+.daily-limit-card.is-empty{
+  background:linear-gradient(135deg, rgba(255,119,119,.13), rgba(168,124,255,.13));
+  border-color:rgba(255,119,119,.22);
+}
+.daily-limit-card.is-empty strong b{
+  color:#ff9aa8;
+}
+@media(max-width:700px){
+  .daily-limit-card{
+    margin-top:12px;
+    border-radius:18px;
+    padding:13px 14px;
+  }
+  .daily-limit-card strong{font-size:19px}
+  .daily-limit-card strong b{font-size:27px}
+}
