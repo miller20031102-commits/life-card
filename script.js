@@ -3,7 +3,7 @@ const CONFIG = {
   price: 'NT$49',
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2XTRcqt6Tjiy_ueGJIfd6rkIULHOdvyLYcs4ZSM_gA7ofdmZK3yBpmLU58U9Dd9pDeA/exec',
   paymentFormUrl: 'https://forms.gle/ck8NkqScfuUNbysn8',
-  PAYMENT_NOTE: '請前往付款回報表單查看銀行帳號並完成轉帳。送出表單後，確認款項會提供專屬解鎖碼。',
+  PAYMENT_NOTE: '請前往付款回報表單查看銀行轉帳資訊並完成付款。確認款項後，會提供專屬解鎖碼。',
   brand: '人生副本'
 };
 
@@ -67,7 +67,7 @@ const questions = [
   { title:'你在朋友群裡通常是？', hint:'朋友團隊卡未來會用這個延伸。', options:[
     opt('🧠','軍師，幫大家分析','別人戀愛我比本人還清醒。',{cool:1,support:2,overthink:1}),
     opt('💬','氣氛組，負責有趣','群組冷掉，我會丟梗。',{social:3,creative:1}),
-    opt('🩹','補師，大家有事會找你','我不是客服，但常常被當客服。',{support:3,warm:2}),
+    opt('🩹','補師，大家有事會找你','不是負責所有人，但大家有事常常會想到你。',{support:3,warm:2}),
     opt('👻','偶爾出現，但存在感很強','我不常講話，但一講就中。',{solo:2,cool:1,creative:1})
   ]},
   { title:'你最近最想升級的是？', hint:'這會影響你的本週任務。', options:[
@@ -960,33 +960,33 @@ function openPayModal(){
     $('premiumReport').scrollIntoView({behavior:'smooth',block:'start'});
     return;
   }
-  setOrderId();
   const target = $('unlockTargetText');
-  if(target) target.textContent = `正在解鎖：${state.currentRole.name}｜${state.currentRole.rarity}｜${state.resultId}`;
+  if(target) target.textContent = `解鎖卡牌：${state.currentRole.name}｜${state.currentRole.rarity}\n結果編號：${state.resultId}`;
   $('payModal').classList.remove('hidden');
   $('unlockCodeInput').focus();
-  $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '目前暫停線上解鎖，請聯絡客服協助。';
+  $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '目前暫時無法驗證解鎖碼，請稍後再試。';
 }
 function closePayModal(){ $('payModal').classList.add('hidden'); }
 
-function setOrderId(){ const el=$('orderIdText'); if(!el) return; el.textContent = `LQ-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Math.floor(1000+Math.random()*9000)}`; }
+function setOrderId(){ return; }
 function copyPaymentInfo(){
-  const roleName = state.currentRole ? state.currentRole.name : '尚未完成測驗';
-  const text = `我要解鎖人生副本完整報告
+  const roleName = state.currentRole ? `${state.currentRole.name}｜${state.currentRole.rarity}` : '尚未完成測驗';
+  const text = `人生副本付款回報資料
 角色：${roleName}
 結果編號：${state.resultId || '尚未產生'}
-訂單編號：${$('orderIdText').textContent}
 金額：${CONFIG.price}
 
-請到付款回報表單填入以上資料，並依表單內的銀行帳號完成轉帳。
-送出表單時請附上：付款後五碼、轉帳截圖、聯絡方式。`;
+付款回報表單：
+${CONFIG.paymentFormUrl}
+
+請在表單內填入結果編號、付款後五碼與聯絡方式。`;
   copyText(text,'已複製表單填寫資料');
 }
 
 function openPaymentForm(){
   const url = String(CONFIG.paymentFormUrl || '').trim();
   if(!url || url.includes('請貼上')){
-    toast('尚未設定付款回報表單連結');
+    toast('付款回報表單暫時無法開啟，請稍後再試');
     return;
   }
   copyPaymentInfo();
@@ -996,7 +996,7 @@ function redeemCode(){
   const code = normalizeCode($('unlockCodeInput').value);
   if(!state.currentRole) return setModalMessage('請先完成測驗。',false);
   if(!code) return setModalMessage('請輸入解鎖碼。',false);
-  if(!CONFIG.APPS_SCRIPT_URL) return setModalMessage('目前暫停線上解鎖，請聯絡客服協助。',false);
+  if(!CONFIG.APPS_SCRIPT_URL) return setModalMessage('目前暫時無法驗證解鎖碼，請稍後再試。',false);
   $('redeemBtn').disabled = true;
   setModalMessage('正在驗證解鎖碼...',true);
   redeemViaJsonp(code, state.currentRole.id, state.resultId)
@@ -1011,7 +1011,7 @@ function redeemCode(){
         setModalMessage(res.message || '解鎖失敗，請確認代碼是否正確。', false);
       }
     })
-    .catch(()=>setModalMessage('連線失敗，請稍後再試，或聯絡客服協助。', false))
+    .catch(()=>setModalMessage('連線失敗，請稍後再試。', false))
     .finally(()=>{ $('redeemBtn').disabled = false; });
 }
 function redeemViaJsonp(code, roleId, resultId){
