@@ -573,3 +573,9 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   .daily-limit-card strong{font-size:19px}
   .daily-limit-card strong b{font-size:27px}
 }
+
+/* unlock card chooser polish */
+.unlock-select-box{gap:10px}
+.price-note{margin:2px 0 6px;color:var(--muted);font-size:14px;line-height:1.65}
+.saved-card.is-unlocked .saved-title::after{content:'已解鎖';display:inline-flex;align-items:center;margin-left:8px;padding:4px 8px;border-radius:999px;background:rgba(115,242,173,.16);border:1px solid rgba(115,242,173,.32);color:var(--green);font-size:12px;font-weight:900}
+@media(max-width:600px){.price-note{text-align:center;font-size:13px}.unlock-select-box{padding:22px}}

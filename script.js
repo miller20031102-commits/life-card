@@ -353,6 +353,7 @@ function bindEvents(){
   on('downloadBtn','click',downloadCard);
   on('shareBtn','click',copyShareText);
   on('savedBtn','click',showSavedCards);
+  on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
   on('copyOrderBtn','click',()=>copyText($('orderIdText').textContent,'已複製訂單編號'));
   on('copyPayInfoBtn','click',copyPaymentInfo);
@@ -866,6 +867,24 @@ function saveResultToCollection(showToast=true){
 }
 function saveCurrentCard(){ saveResultToCollection(true); }
 function showSavedCards(){
+  const title = $('savedTitle');
+  if(title) title.textContent = '選擇你要查看或解鎖的卡';
+  const copy = document.querySelector('#savedModal .modal-copy');
+  if(copy) copy.textContent = '每張卡都會自動保存到這裡。解鎖後，這台手機會永久保留該結果的完整報告查看權。';
+  renderSavedCards();
+  $('savedModal').classList.remove('hidden');
+}
+function openUnlockChooser(){
+  const list = getSavedList();
+  if(!list.length){
+    location.hash = '#quiz';
+    toast('先完成一次測驗，抽到卡後才能選擇解鎖');
+    return;
+  }
+  const title = $('savedTitle');
+  if(title) title.textContent = '選擇要解鎖完整報告的卡';
+  const copy = document.querySelector('#savedModal .modal-copy');
+  if(copy) copy.textContent = '完整報告是一張卡解鎖一次。請選擇你最想解鎖的角色卡，解鎖後會永久保存到這台裝置。';
   renderSavedCards();
   $('savedModal').classList.remove('hidden');
 }
@@ -927,7 +946,13 @@ function copyPremiumReport(){
 }
 
 function openPayModal(){
-  if(!state.currentRole){ location.hash = '#quiz'; toast('先完成測驗，才會知道要解鎖哪份報告'); return; }
+  if(!state.currentRole){
+    const list = getSavedList();
+    if(list.length){ openUnlockChooser(); return; }
+    location.hash = '#quiz';
+    toast('先完成測驗，才會知道要解鎖哪份報告');
+    return;
+  }
   if(hasPremiumAccess(state.resultId)){
     showPremiumReport();
     toast('這張卡已經解鎖，可以永久查看');
