@@ -1,24 +1,33 @@
-# 人生副本｜正式版 v12
+# 人生副本｜商業正式版 v13
 
-本版完成一輪從首頁、測驗、卡冊、付款、解鎖、下載到法律文字的偵錯整理。
+本版已補齊：
 
-主要修正：
+- 服務條款
+- 退款政策
+- 隱私權政策
+- 免責聲明
+- 聯絡信箱
+- 商業化頁尾
+- SEO / Open Graph
+- 404 頁面
+- robots.txt
+- sitemap.xml
+- 全站技術文字清理
+- JavaScript 語法檢查
 
-- 每日免費 2 次限制改成一開始答題就會檢查，不會讓使用者答完才被擋。
-- 付款彈窗保留表單連結，桌機與手機都能直接開啟。
-- 同一種角色只要解鎖一次，之後同角色都會直接顯示完整報告，不重複收費。
-- 統一「同角色解鎖一次」的所有文字，避免和「每張卡付費一次」互相矛盾。
-- 加入娛樂性內容聲明、退款規則、付款資料使用說明。
-- 移除對一般使用者不必要的技術字眼。
-- script.js 已通過語法檢查。
+聯絡信箱：
+miller20031102@gmail.com
 
 付款回報表單：
 https://forms.gle/ck8NkqScfuUNbysn8
 
-上傳 GitHub Pages 時請覆蓋：
+上傳 GitHub Pages 時請上傳：
 
 - index.html
 - style.css
 - script.js
 - og-image.png
 - README.md
+- 404.html
+- robots.txt
+- sitemap.xml

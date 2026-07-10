@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:image" content="og-image.png" />
   <meta name="theme-color" content="#100f1f" />
-  <title>人生副本｜你的角色卡販賣機</title>
+  <title>人生副本｜娛樂性角色卡測驗與完整角色報告</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -236,10 +236,25 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <strong>人生副本</strong>
-    <span>把普通人變成一張值得保存的角色卡。</span>
+  
+  <footer class="site-footer commercial-footer">
+    <div class="footer-brand">
+      <strong>人生副本</strong>
+      <span>娛樂性角色卡測驗與個人化數位內容</span>
+    </div>
+    <div class="footer-links">
+      <button type="button" data-policy="terms">服務條款</button>
+      <button type="button" data-policy="refund">退款政策</button>
+      <button type="button" data-policy="privacy">隱私權政策</button>
+      <button type="button" data-policy="disclaimer">免責聲明</button>
+    </div>
+    <div class="footer-contact">
+      <span>聯絡信箱</span>
+      <a href="mailto:miller20031102@gmail.com">miller20031102@gmail.com</a>
+    </div>
+    <small>© 2026 LifeQuest. All rights reserved.</small>
   </footer>
+
 
   <div class="modal hidden" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payTitle">
     <div class="modal-backdrop" data-close-modal></div>
@@ -293,6 +308,17 @@
         <img id="saveImagePreview" alt="人生副本角色卡 JPG 預覽" />
       </div>
       <p class="ios-save-tip">小提醒：點圖片就會嘗試儲存；如果是在 Threads / LINE / IG 內建瀏覽器，沒反應時再長按圖片儲存，或用 Safari 開啟。</p>
+    </div>
+  </div>
+
+  
+  <div class="modal hidden" id="policyModal" role="dialog" aria-modal="true" aria-labelledby="policyTitle">
+    <div class="modal-backdrop" data-close-policy></div>
+    <div class="modal-panel policy-panel">
+      <button class="modal-close" data-close-policy type="button" aria-label="關閉">×</button>
+      <p class="eyebrow">網站資訊</p>
+      <h2 id="policyTitle">政策內容</h2>
+      <div class="policy-content" id="policyContent"></div>
     </div>
   </div>
 

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://miller20031102-commits.github.io/life-card/sitemap.xml

@@ -628,3 +628,39 @@ body:has(#saveImageModal:not(.hidden)) .toast{
 }
 
 .policy-reminder{background:rgba(255,255,255,.07);border-style:dashed;color:var(--muted);font-size:14px;line-height:1.7}
+
+/* ==== 商業正式版 footer / policy ==== */
+.commercial-footer{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr;
+  gap:24px;
+  align-items:start;
+  padding-top:34px;
+}
+.footer-brand{display:grid;gap:8px}
+.footer-brand strong{font-size:22px;color:#fff}
+.footer-brand span,.footer-contact span,.commercial-footer small{color:var(--muted)}
+.footer-links{display:flex;gap:10px;flex-wrap:wrap}
+.footer-links button{
+  border:0;
+  background:transparent;
+  color:#eee;
+  padding:0;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:4px;
+}
+.footer-contact{display:grid;gap:7px}
+.footer-contact a{color:var(--cyan);word-break:break-all}
+.commercial-footer small{grid-column:1/-1;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+
+.policy-panel{width:min(760px,100%)}
+.policy-content{color:var(--muted);line-height:1.8}
+.policy-content h3{color:#fff;margin:22px 0 8px}
+.policy-content p,.policy-content li{line-height:1.8}
+.policy-content ul{padding-left:22px}
+
+@media(max-width:720px){
+  .commercial-footer{grid-template-columns:1fr}
+  .commercial-footer small{grid-column:auto}
+}

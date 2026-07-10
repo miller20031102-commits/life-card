@@ -325,6 +325,71 @@ const STORAGE_KEYS = {
 };
 const $ = (id)=>document.getElementById(id);
 
+
+const POLICY_CONTENT = {
+  terms: {
+    title: '服務條款',
+    html: `
+      <p>歡迎使用「人生副本」。本服務提供娛樂性角色卡測驗與個人化數位內容。</p>
+      <h3>一、服務內容</h3>
+      <p>使用者可免費完成測驗並生成角色卡；部分完整角色報告需付費解鎖。</p>
+      <h3>二、使用規範</h3>
+      <ul>
+        <li>不得破解、轉售、散布或冒用解鎖碼。</li>
+        <li>不得以自動化方式大量操作、攻擊或干擾網站。</li>
+        <li>網站內容可能因優化、維護或版本更新而調整。</li>
+      </ul>
+      <h3>三、聯絡方式</h3>
+      <p>如有付款、解鎖或使用問題，請來信：miller20031102@gmail.com</p>`
+  },
+  refund: {
+    title: '退款政策',
+    html: `
+      <p>完整角色報告屬於數位內容與線上服務。</p>
+      <ul>
+        <li>解鎖碼尚未使用，且尚未顯示完整報告前，如有重複付款或系統異常，可聯絡處理。</li>
+        <li>解鎖碼一經使用並成功顯示完整報告，即視為服務已完成。</li>
+        <li>除系統錯誤、重複付款或未取得已付款內容外，數位內容完成後不接受退款。</li>
+      </ul>
+      <p>退款或付款問題請來信：miller20031102@gmail.com</p>`
+  },
+  privacy: {
+    title: '隱私權政策',
+    html: `
+      <p>我們僅蒐集提供服務所必要的資料。</p>
+      <h3>蒐集資料</h3>
+      <ul>
+        <li>角色結果編號、解鎖狀態與網站內收藏資料。</li>
+        <li>付款回報時由使用者提供的聯絡方式、付款後五碼及必要的付款證明。</li>
+      </ul>
+      <h3>使用目的</h3>
+      <p>資料僅用於付款確認、提供解鎖碼、客服處理與改善服務，不會販售個人資料。</p>
+      <h3>保存方式</h3>
+      <p>角色卡與已解鎖報告主要保存在使用者目前瀏覽器的本機儲存空間；清除瀏覽器資料或更換裝置可能導致本機紀錄消失。</p>
+      <h3>聯絡方式</h3>
+      <p>如需查詢或刪除付款回報資料，請來信：miller20031102@gmail.com</p>`
+  },
+  disclaimer: {
+    title: '免責聲明',
+    html: `
+      <p>本服務為娛樂性角色卡生成與個人化數位內容。</p>
+      <p>測驗結果與完整角色報告僅供娛樂、自我觀察與社群分享參考，不構成心理諮商、醫療診斷、命理保證、法律、投資、就業或人生決策建議。</p>
+      <p>如遇心理、醫療、法律或財務等專業問題，請尋求合格專業人士協助。</p>`
+  }
+};
+
+function openPolicy(type){
+  const data = POLICY_CONTENT[type];
+  if(!data) return;
+  const modal = $('policyModal');
+  $('policyTitle').textContent = data.title;
+  $('policyContent').innerHTML = data.html;
+  modal.classList.remove('hidden');
+}
+function closePolicy(){
+  $('policyModal')?.classList.add('hidden');
+}
+
 document.addEventListener('DOMContentLoaded', init);
 
 function init(){
@@ -362,7 +427,9 @@ function bindEvents(){
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
   document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
   document.querySelectorAll('[data-close-save-image]').forEach(el=>el.addEventListener('click',closeSaveImageModal));
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); closeSaveImageModal(); } });
+    document.querySelectorAll('[data-policy]').forEach(btn=>btn.addEventListener('click',()=>openPolicy(btn.dataset.policy)));
+  document.querySelectorAll('[data-close-policy]').forEach(el=>el.addEventListener('click',closePolicy));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); closeSaveImageModal(); closePolicy(); } });
 }
 
 function renderSamples(){
