@@ -1,36 +1,33 @@
-# 人生副本｜綠界自動付款串接版 v14
+# 人生副本｜正式營運審核版 v15
 
-已完成：
+本版已完成全站付款與使用流程複查。
 
-- 移除 Google 表單付款流程
-- 移除銀行帳號與付款後五碼
-- 移除人工解鎖碼輸入
-- 串接 Cloudflare Worker `/create-payment`
-- 自動送出綠界付款表單
-- 付款返回後輪詢 `/order-status`
-- 付款成功後自動解鎖完整報告
-- 從 D1 同步已購買角色，避免同角色重複付款
+## 網站改善
+- 移除所有舊的解鎖碼、Google 表單與銀行轉帳文字
+- 綠界付款文案與 NT$49 價格統一
+- 新增付款返回延遲時的「重新確認」流程，避免重複付款
+- 頁面從瀏覽器返回時會自動恢復付款按鈕
+- 新增私人備份碼，可在其他裝置同步已購買角色
+- 遠端購買權限會自動補回卡冊
+- 新增 CSP、canonical、絕對 Open Graph 圖片與更嚴格的安全設定
+- 改善 Modal 鍵盤焦點與頁面捲動
+- 更新服務條款、隱私權政策、退款政策與 FAQ
 
-Worker：
-https://lifequest-api.miller20031102.workers.dev
+## Worker v2 改善
+- 正式健康頁不再顯示環境變數名稱
+- 驗證 MerchantID、交易金額、角色與模擬付款狀態
+- 拒絕 SimulatePaid 測試通知取得正式權限
+- 同一通知重送時採冪等處理
+- 角色 ID 改用伺服器白名單與正式角色名稱
+- 限制短時間大量建立付款訂單
+- 排除 ATM／超商代碼等非即時方式，避免「付款後立即解鎖」流程不一致
+- D1 只保存必要付款事件欄位
 
-## 上傳 GitHub Pages
+## 部署
+網站資料夾內 8 個檔案覆蓋 GitHub Pages。
+Worker 資料夾中的 worker.js 覆蓋 Cloudflare lifequest-api 後 Deploy。
 
-請上傳：
+注意：私人備份碼等同卡冊鑰匙，使用者應妥善保存，不要公開。
 
-- index.html
-- style.css
-- script.js
-- og-image.png
-- README.md
-- 404.html
-- robots.txt
-- sitemap.xml
 
-## 目前限制
-
-這一版使用瀏覽器產生的匿名 customerId，所以同一瀏覽器可以自動恢復 D1 解鎖權限；
-換手機、清除瀏覽器資料的跨裝置登入同步尚未完成。
-
-在正式公開前，請先用自己的一筆 NT$49 訂單測試：
-建立付款 → 完成付款 → 返回網站 → 自動解鎖 → D1 orders 狀態變成 PAID。
+詳細檢查結果見完整包內 `AUDIT_REPORT.md`。

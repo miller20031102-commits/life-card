@@ -4,12 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="人生副本：回答 12 題，抽出你的專屬人生角色卡。不是 MBTI，不是星座，是你的遊戲設定。" />
-  <meta name="keywords" content="人生副本,人生角色卡,娛樂測驗,戀愛測驗,MBTI,角色卡,人設卡,限動分享" />
-  <meta property="og:title" content="人生副本｜你的角色卡販賣機" />
+    <meta property="og:title" content="人生副本｜你的角色卡販賣機" />
   <meta property="og:description" content="回答 12 題，抽出你的專屬角色卡：稀有度、技能、弱點、戀愛屬性、本週任務一次生成。" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="og-image.png" />
   <meta name="theme-color" content="#100f1f" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://lifequest-api.miller20031102.workers.dev; form-action https://payment.ecpay.com.tw; object-src 'none'; base-uri 'self'; upgrade-insecure-requests" />
+  <link rel="canonical" href="https://miller20031102-commits.github.io/life-card/" />
+  <meta property="og:url" content="https://miller20031102-commits.github.io/life-card/" />
+  <meta property="og:image" content="https://miller20031102-commits.github.io/life-card/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <title>人生副本｜娛樂性角色卡測驗與完整角色報告</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,7 +80,7 @@
     <section class="section-pad strip-section reveal" aria-label="網站亮點">
       <div class="strip-card"><strong>每日免費 2 次</strong><span>每天保留一點神祕感，抽完會自動存進我的卡冊</span></div>
       <div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
-      <div class="strip-card"><strong>安全解鎖</strong><span>每組解鎖碼僅能使用一次，已解鎖報告會存進卡冊</span></div>
+      <div class="strip-card"><strong>綠界安全付款</strong><span>付款成功自動解鎖；同角色不會重複收費</span></div>
     </section>
 
     <section class="section-pad samples-section" id="samples">
@@ -172,8 +176,8 @@
             <div class="upsell-head"><span>💎 付費版</span><strong>完整角色報告 NT$49</strong></div>
             <p>免費版給你角色卡；付費版把這張卡延伸成完整報告，包含戀愛攻略、朋友定位、金錢弱點與 7 日升級任務。</p>
             <ul>
-              <li>一次性解鎖碼，用過就失效</li>
-              <li>同角色解鎖一次即可查看</li>
+              <li>綠界付款成功後自動解鎖</li>
+              <li>同一種角色只需購買一次</li>
               <li>適合截圖保存，之後也可以做成實體卡</li>
             </ul>
             <button class="primary-btn full" data-open-pay type="button">解鎖完整報告 NT$49</button>
@@ -200,7 +204,7 @@
         <div class="price-box unlock-select-box">
           <span>完整報告</span>
           <strong>NT$49</strong>
-          <p class="price-note">同一種角色只需要解鎖一次。先從「我的卡冊」選好想解鎖的角色，再使用解鎖碼。</p>
+          <p class="price-note">同一種角色只需要購買一次。從「我的卡冊」選好角色後，前往綠界安全付款。</p>
           <button class="primary-btn full" id="chooseUnlockBtn" type="button">選擇要解鎖的卡</button>
         </div>
       </div>
@@ -224,13 +228,13 @@
     <section class="section-pad faq-section" id="faq">
       <div class="section-title center reveal"><p class="eyebrow">常見問題</p><h2>使用前可以先看這裡</h2></div>
       <div class="faq-grid reveal">
-        <details open><summary>解鎖碼可以重複使用嗎？</summary><p>每組解鎖碼只能成功解鎖一次。解鎖完成後，這組碼就不能再拿去解鎖其他卡牌。</p></details>
+        <details open><summary>同一個角色會重複收費嗎？</summary><p>不會。同一個備份碼下，同一種角色只需要購買一次；之後抽到同角色可直接查看完整報告。</p></details>
         <details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
         <details><summary>每天可以抽幾次？</summary><p>每天可以免費抽 2 次。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看，不會消耗次數。</p></details>
-        <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
+        <details><summary>換手機後還能查看嗎？</summary><p>可以先在「我的卡冊」保存私人備份碼，再於新裝置輸入備份碼同步已購買角色。備份碼等同卡冊鑰匙，請勿公開。</p></details>
         <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
-        <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；除系統錯誤、重複付款或未收到解鎖碼外，不接受退款。</p></details>
+        <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；若發生重複扣款、系統錯誤或已付款卻無法取得內容，請來信協助處理。</p></details>
         <details><summary>付款資料會怎麼使用？</summary><p>付款由綠界科技處理，本站只保存訂單編號、角色與解鎖狀態，不會在網站儲存信用卡資料。</p></details>
       </div>
     </section>
@@ -262,14 +266,14 @@
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
       <p class="eyebrow">綠界安全付款</p>
       <h2 id="payTitle">完整角色報告 NT$49</h2>
-      <p class="modal-copy">確認要解鎖的角色後，將前往綠界付款頁。付款成功後會自動返回網站並解鎖完整報告。</p>
+      <p class="modal-copy">確認要購買完整報告的角色後，將前往綠界付款頁。付款成功後會自動返回網站並解鎖完整報告。</p>
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
       <div class="pay-steps">
         <div><strong>1</strong><span>前往綠界選擇可用的付款方式</span></div>
         <div><strong>2</strong><span>完成 NT$49 付款</span></div>
         <div><strong>3</strong><span>返回網站，自動解鎖完整報告</span></div>
       </div>
-      <div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
+      <div class="payment-note policy-reminder">🔒 付款由綠界科技處理，本站不會取得或保存完整信用卡資料。</div><div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
       <button class="primary-btn full" id="payNowBtn" type="button">前往綠界安全付款 NT$49</button>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
     </div>
@@ -281,8 +285,12 @@
     <div class="modal-panel saved-panel">
       <button class="modal-close" data-close-saved type="button" aria-label="關閉">×</button>
       <p class="eyebrow">我的卡冊</p>
-      <h2 id="savedTitle">選擇你要查看或解鎖的卡</h2>
-      <p class="modal-copy">每張卡都會自動保存到這裡。同一種角色只要解鎖過一次，這台裝置就會保留該角色的完整報告查看權。</p>
+      <h2 id="savedTitle">選擇你要查看或購買的卡</h2>
+      <p class="modal-copy">每張卡都會自動保存在這裡。同一種角色只需要購買一次；可用私人備份碼在其他裝置同步已購買角色。</p>
+      <div class="cardbook-tools">
+        <button class="secondary-btn small" id="syncCardsBtn" type="button">重新同步購買紀錄</button>
+        <button class="ghost-btn small" id="backupCodeBtn" type="button">備份／換裝置</button>
+      </div>
       <div class="saved-list" id="savedList"></div>
     </div>
   </div>
@@ -303,6 +311,30 @@
   </div>
 
   
+
+  <div class="modal hidden" id="recoveryModal" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
+    <div class="modal-backdrop" data-close-recovery></div>
+    <div class="modal-panel recovery-panel">
+      <button class="modal-close" data-close-recovery type="button" aria-label="關閉">×</button>
+      <p class="eyebrow">卡冊備份</p>
+      <h2 id="recoveryTitle">保存你的私人備份碼</h2>
+      <p class="modal-copy">備份碼可在換手機或清除瀏覽器資料後，同步已購買角色。它等同卡冊鑰匙，請勿貼在公開場合。</p>
+      <div class="recovery-code-box"><code id="recoveryCodeText"></code><button class="secondary-btn small" id="copyRecoveryBtn" type="button">複製備份碼</button></div>
+      <div class="recovery-restore">
+        <label for="recoveryCodeInput">在新裝置輸入備份碼</label>
+        <input id="recoveryCodeInput" type="text" autocomplete="off" spellcheck="false" placeholder="guest_..." />
+        <button class="primary-btn full" id="restoreRecoveryBtn" type="button">同步我的已購買角色</button>
+        <p class="modal-message" id="recoveryMessage" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="payment-status-bar hidden" id="pendingPaymentBar" role="status" aria-live="polite">
+    <div><strong>付款結果仍在確認</strong><span id="pendingPaymentText">可稍後重新確認，不需要再次付款。</span></div>
+    <button class="primary-btn tiny" id="checkPaymentBtn" type="button">重新確認</button>
+    <button class="ghost-btn tiny" id="dismissPaymentBtn" type="button" aria-label="關閉付款提示">關閉</button>
+  </div>
+
   <div class="modal hidden" id="policyModal" role="dialog" aria-modal="true" aria-labelledby="policyTitle">
     <div class="modal-backdrop" data-close-policy></div>
     <div class="modal-panel policy-panel">

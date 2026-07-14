@@ -322,7 +322,8 @@ const STORAGE_KEYS = {
   dailyPlays: 'lifequest:dailyPlays',
   customerId: 'lifequest:customerId',
   remoteRoleIds: 'lifequest:remoteRoleIds',
-  pendingPayment: 'lifequest:pendingPayment'
+  pendingPayment: 'lifequest:pendingPayment',
+  lastSyncAt: 'lifequest:lastSyncAt'
 };
 const $ = (id)=>document.getElementById(id);
 
@@ -364,11 +365,11 @@ const POLICY_CONTENT = {
         <li>付款時由綠界科技處理的交易資料，以及本站用於核對訂單的結果編號與角色資訊。</li>
       </ul>
       <h3>使用目的</h3>
-      <p>資料僅用於付款確認、提供解鎖碼、客服處理與改善服務，不會販售個人資料。</p>
+      <p>資料僅用於付款確認、同步購買權限、客服處理與改善服務，不會販售個人資料。</p>
       <h3>保存方式</h3>
-      <p>角色卡與已解鎖報告主要保存在使用者目前瀏覽器的本機儲存空間；清除瀏覽器資料或更換裝置可能導致本機紀錄消失。</p>
+      <p>角色卡主要保存在瀏覽器本機；購買權限會記錄於本站後端。使用者可保存私人備份碼，在其他裝置同步已購買角色。</p>
       <h3>聯絡方式</h3>
-      <p>如需查詢或刪除付款回報資料，請來信：miller20031102@gmail.com</p>`
+      <p>如需查詢或刪除付款與購買權限資料，請來信：miller20031102@gmail.com</p>`
   },
   disclaimer: {
     title: '免責聲明',
@@ -385,10 +386,22 @@ function openPolicy(type){
   const modal = $('policyModal');
   $('policyTitle').textContent = data.title;
   $('policyContent').innerHTML = data.html;
-  modal.classList.remove('hidden');
+  openModalElement(modal);
 }
 function closePolicy(){
-  $('policyModal')?.classList.add('hidden');
+  closeModalElement($('policyModal'));
+}
+function openModalElement(modal){
+  if(!modal) return;
+  modal.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+  const focusable = modal.querySelector('button, input, [href], [tabindex]:not([tabindex="-1"])');
+  setTimeout(()=>focusable?.focus(),20);
+}
+function closeModalElement(modal){
+  if(!modal) return;
+  modal.classList.add('hidden');
+  if(!document.querySelector('.modal:not(.hidden)')) document.body.classList.remove('modal-open');
 }
 
 document.addEventListener('DOMContentLoaded', init);
@@ -398,8 +411,9 @@ async function init(){
   renderQuestion();
   bindEvents();
   updateDailyLimitUI();
+  resetPaymentButton();
 
-  await syncEntitlements();
+  await syncEntitlements({mergeCards:true});
 
   const savedResult = loadLastResult();
   if(savedResult){
@@ -407,6 +421,7 @@ async function init(){
     state.currentRole = getRoleById(savedResult.roleId);
     state.resultId = savedResult.resultId;
     if(state.currentRole && state.resultId){
+      state.scores = calculateScores();
       renderResult(state.currentRole);
       $('resultSection').classList.remove('hidden');
       if(hasPremiumAccess(state.resultId)) showPremiumReport();
@@ -414,6 +429,7 @@ async function init(){
   }
 
   await handlePaymentReturn();
+  await resumePendingPayment();
 }
 
 function bindEvents(){
@@ -427,13 +443,21 @@ function bindEvents(){
   on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
   on('payNowBtn','click',startEcpayPayment);
+  on('syncCardsBtn','click',async()=>{ await syncEntitlements({mergeCards:true,showFeedback:true}); renderSavedCards(); });
+  on('backupCodeBtn','click',openRecoveryModal);
+  on('copyRecoveryBtn','click',()=>copyText(getCustomerId(),'已複製私人備份碼'));
+  on('restoreRecoveryBtn','click',restoreFromRecoveryCode);
+  on('checkPaymentBtn','click',()=>resumePendingPayment({force:true}));
+  on('dismissPaymentBtn','click',hidePendingPaymentBar);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
   document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
   document.querySelectorAll('[data-close-save-image]').forEach(el=>el.addEventListener('click',closeSaveImageModal));
     document.querySelectorAll('[data-policy]').forEach(btn=>btn.addEventListener('click',()=>openPolicy(btn.dataset.policy)));
   document.querySelectorAll('[data-close-policy]').forEach(el=>el.addEventListener('click',closePolicy));
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); closeSaveImageModal(); closePolicy(); } });
+  document.querySelectorAll('[data-close-recovery]').forEach(el=>el.addEventListener('click',closeRecoveryModal));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePayModal(); closeSavedModal(); closeSaveImageModal(); closePolicy(); closeRecoveryModal(); } });
+  window.addEventListener('pageshow',()=>{ resetPaymentButton(); resumePendingPayment(); });
 }
 
 function renderSamples(){
@@ -885,11 +909,11 @@ function showSaveImageModal(dataUrl, fileName, blob){
     img.onclick = retryImageDownload;
   }
   hideToast();
-  $('saveImageModal')?.classList.remove('hidden');
+  openModalElement($('saveImageModal'));
 }
 
 function closeSaveImageModal(){
-  $('saveImageModal')?.classList.add('hidden');
+  closeModalElement($('saveImageModal'));
   hideToast();
 }
 
@@ -984,9 +1008,9 @@ function showSavedCards(){
   const title = $('savedTitle');
   if(title) title.textContent = '選擇你要查看或解鎖的卡';
   const copy = document.querySelector('#savedModal .modal-copy');
-  if(copy) copy.textContent = '每張卡都會自動保存到這裡。同一種角色只要解鎖過一次，這台裝置就會保留該角色的完整報告查看權。';
+  if(copy) copy.textContent = '每張卡都會自動保存在這裡。同一種角色只需要購買一次；可用私人備份碼在其他裝置同步已購買角色。';
   renderSavedCards();
-  $('savedModal').classList.remove('hidden');
+  openModalElement($('savedModal'));
 }
 function openUnlockChooser(){
   const list = getSavedList();
@@ -998,11 +1022,11 @@ function openUnlockChooser(){
   const title = $('savedTitle');
   if(title) title.textContent = '選擇要解鎖完整報告的卡';
   const copy = document.querySelector('#savedModal .modal-copy');
-  if(copy) copy.textContent = '同一種角色只要解鎖一次。請選擇想解鎖的角色卡，解鎖後同角色都能在這台裝置查看完整報告。';
+  if(copy) copy.textContent = '同一種角色只需購買一次。請選擇想購買完整報告的角色卡。';
   renderSavedCards();
-  $('savedModal').classList.remove('hidden');
+  openModalElement($('savedModal'));
 }
-function closeSavedModal(){ $('savedModal')?.classList.add('hidden'); }
+function closeSavedModal(){ closeModalElement($('savedModal')); }
 function renderSavedCards(){
   const list = getSavedList();
   const box = $('savedList');
@@ -1084,17 +1108,15 @@ function openPayModal(){
 
   const target = $('unlockTargetText');
   if(target){
-    target.textContent = `解鎖卡牌：${state.currentRole.name}｜${state.currentRole.rarity}
+    target.textContent = `購買角色：${state.currentRole.name}｜${state.currentRole.rarity}
 結果編號：${state.resultId}`;
   }
 
   setModalMessage('', true);
-  $('payModal').classList.remove('hidden');
+  openModalElement($('payModal'));
 }
 
-function closePayModal(){
-  $('payModal')?.classList.add('hidden');
-}
+function closePayModal(){ closeModalElement($('payModal')); }
 
 function getCustomerId(){
   let id = localStorage.getItem(STORAGE_KEYS.customerId);
@@ -1109,23 +1131,96 @@ function getCustomerId(){
   return id;
 }
 
-async function syncEntitlements(){
+async function syncEntitlements(opts={}){
   try{
     const customerId = getCustomerId();
-    const response = await fetch(
-      `${CONFIG.WORKER_URL}/entitlements?customerId=${encodeURIComponent(customerId)}`,
-      {cache:'no-store'}
-    );
+    const data = await fetchJsonWithTimeout(`${CONFIG.WORKER_URL}/entitlements`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({customerId})
+    },12000);
 
-    if(!response.ok) return;
-
-    const data = await response.json();
-    if(!data.ok || !Array.isArray(data.entitlements)) return;
+    if(!data.ok) throw new Error(data.message || '同步服務暫時無法使用');
+    if(!data.ok || !Array.isArray(data.entitlements)) throw new Error('同步資料格式錯誤');
 
     const roleIds = [...new Set(data.entitlements.map(item=>item.role_id).filter(Boolean))];
     localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify(roleIds));
+    localStorage.setItem(STORAGE_KEYS.lastSyncAt,new Date().toISOString());
+
+    if(opts.mergeCards) mergeRemoteEntitlements(data.entitlements);
+    if(opts.showFeedback) toast(`已同步 ${roleIds.length} 個已購買角色`);
+    return data.entitlements;
   }catch(error){
     console.warn('entitlements sync failed',error);
+    if(opts.showFeedback) toast('目前無法同步，請稍後再試');
+    if(opts.throwOnError) throw error;
+    return [];
+  }
+}
+
+function mergeRemoteEntitlements(entitlements){
+  const list = getSavedList();
+  let changed = false;
+
+  entitlements.forEach(item=>{
+    const role = getRoleById(item.role_id);
+    if(!role) return;
+
+    const existing = list.find(card=>card.roleId===role.id);
+    if(existing){
+      existing.premium = true;
+      if(!existing.resultId && item.source_result_id) existing.resultId = item.source_result_id;
+      return;
+    }
+
+    list.unshift({
+      roleId:role.id, roleName:role.name, rarity:role.rarity, emoji:role.emoji,
+      line:role.line, resultId:item.source_result_id || `REMOTE-${role.id}`,
+      answers:synthesizeAnswersFromRole(role), premium:true,
+      at:item.granted_at || new Date().toISOString(), remote:true
+    });
+    changed = true;
+  });
+
+  if(changed || entitlements.length) setSavedList(list);
+}
+
+function openRecoveryModal(){
+  const code = getCustomerId();
+  $('recoveryCodeText').textContent = code;
+  $('recoveryCodeInput').value = '';
+  setRecoveryMessage('',true);
+  openModalElement($('recoveryModal'));
+}
+function closeRecoveryModal(){ closeModalElement($('recoveryModal')); }
+function setRecoveryMessage(message,ok){
+  const el=$('recoveryMessage'); if(!el) return;
+  el.textContent=message; el.style.color=ok?'var(--green)':'var(--danger)';
+}
+async function restoreFromRecoveryCode(){
+  const code=String($('recoveryCodeInput').value||'').trim();
+  if(!/^guest_[A-Za-z0-9_-]{12,80}$/.test(code)){
+    setRecoveryMessage('備份碼格式不正確，請完整貼上。',false); return;
+  }
+  const button=$('restoreRecoveryBtn'); button.disabled=true; button.textContent='正在同步…';
+  const previous=getCustomerId();
+  try{
+    localStorage.setItem(STORAGE_KEYS.customerId,code);
+    localStorage.removeItem(STORAGE_KEYS.remoteRoleIds);
+    const entitlements=await syncEntitlements({mergeCards:true,throwOnError:true});
+    if(!entitlements.length){
+      localStorage.setItem(STORAGE_KEYS.customerId,previous);
+      await syncEntitlements({mergeCards:true});
+      throw new Error('這組備份碼目前沒有已購買紀錄');
+    }
+    renderSavedCards();
+    $('recoveryCodeText').textContent=code;
+    setRecoveryMessage(`同步完成，共找到 ${entitlements.length} 個已購買角色。`,true);
+    toast('卡冊購買紀錄已同步');
+  }catch(error){
+    setRecoveryMessage(error.message||'同步失敗，請稍後再試。',false);
+  }finally{
+    button.disabled=false; button.textContent='同步我的已購買角色';
   }
 }
 
@@ -1147,11 +1242,12 @@ async function startEcpayPayment(){
     button.disabled = true;
     button.textContent = '正在前往綠界…';
   }
+  hidePendingPaymentBar();
   setModalMessage('正在建立安全付款頁面…',true);
 
   try{
     const customerId = getCustomerId();
-    const response = await fetch(`${CONFIG.WORKER_URL}/create-payment`,{
+    const data = await fetchJsonWithTimeout(`${CONFIG.WORKER_URL}/create-payment`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -1160,11 +1256,9 @@ async function startEcpayPayment(){
         roleId:state.currentRole.id,
         roleName:state.currentRole.name
       })
-    });
+    },15000);
 
-    const data = await response.json();
-
-    if(!response.ok || !data.ok){
+    if(!data.ok){
       throw new Error(data.message || '建立付款失敗');
     }
 
@@ -1192,11 +1286,26 @@ async function startEcpayPayment(){
 
     submitPaymentForm(data.action,data.fields);
   }catch(error){
-    setModalMessage(error.message || '付款服務暫時無法使用，請稍後再試。',false);
+    setModalMessage(error.name==='AbortError' ? '付款服務連線逾時，請稍後再試。' : (error.message || '付款服務暫時無法使用，請稍後再試。'),false);
     if(button){
       button.disabled = false;
       button.textContent = '前往綠界安全付款 NT$49';
     }
+  }
+}
+
+async function fetchJsonWithTimeout(url,options={},timeoutMs=12000){
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const response=await fetch(url,{...options,cache:'no-store',signal:controller.signal});
+    let data;
+    try{ data=await response.json(); }
+    catch{ throw new Error('服務回傳格式錯誤'); }
+    if(!response.ok) throw new Error(data.message || `服務錯誤 (${response.status})`);
+    return data;
+  }finally{
+    clearTimeout(timeout);
   }
 }
 
@@ -1224,39 +1333,31 @@ async function handlePaymentReturn(){
   const tradeNo = url.searchParams.get('tradeNo');
 
   if(payment === 'cancelled'){
-    toast('付款尚未完成');
+    resetPaymentButton();
+    toast('付款尚未完成，不會產生扣款');
     clearPaymentQuery();
+    showPendingPaymentBar();
     return;
   }
 
   if(payment === 'invalid'){
-    toast('付款結果驗證失敗，請聯絡客服');
+    resetPaymentButton();
+    toast('付款返回資料驗證失敗，請聯絡客服');
     clearPaymentQuery();
     return;
   }
 
   if(payment !== 'return' || !tradeNo) return;
 
-  toast('正在確認付款結果…');
-
-  const pending = getPendingPayment();
-  const customerId = pending?.customerId || getCustomerId();
-
-  try{
-    const order = await pollOrderStatus(tradeNo,customerId);
-    if(!order?.paid){
-      toast('付款仍在確認中，稍後重新開啟網站即可');
-      return;
-    }
-
-    applyPaidOrder(order.order);
-    localStorage.removeItem(STORAGE_KEYS.pendingPayment);
-    clearPaymentQuery();
-    toast('付款成功，完整報告已解鎖');
-  }catch(error){
-    console.warn(error);
-    toast('付款結果仍在確認中，稍後重新整理即可');
+  const pending=getPendingPayment();
+  if(pending && pending.tradeNo!==tradeNo){
+    pending.tradeNo=tradeNo;
+    localStorage.setItem(STORAGE_KEYS.pendingPayment,JSON.stringify(pending));
   }
+
+  clearPaymentQuery();
+  toast('正在確認付款結果…');
+  await confirmPendingPayment({tradeNo,attempts:20});
 }
 
 function getPendingPayment(){
@@ -1264,22 +1365,68 @@ function getPendingPayment(){
   catch{return null}
 }
 
-async function pollOrderStatus(tradeNo,customerId){
-  for(let attempt=0; attempt<10; attempt+=1){
-    const response = await fetch(
-      `${CONFIG.WORKER_URL}/order-status?tradeNo=${encodeURIComponent(tradeNo)}&customerId=${encodeURIComponent(customerId)}`,
-      {cache:'no-store'}
-    );
-
-    if(response.ok){
-      const data = await response.json();
-      if(data.ok && data.paid) return data;
-    }
-
-    await new Promise(resolve=>setTimeout(resolve,1500));
+async function resumePendingPayment(opts={}){
+  const pending=getPendingPayment();
+  if(!pending?.tradeNo) return;
+  const age=Date.now()-new Date(pending.createdAt||0).getTime();
+  if(age>24*60*60*1000){
+    localStorage.removeItem(STORAGE_KEYS.pendingPayment); hidePendingPaymentBar(); return;
   }
+  if(!opts.force && age<3000) return;
+  showPendingPaymentBar('正在確認付款結果…');
+  await confirmPendingPayment({tradeNo:pending.tradeNo,attempts:opts.force?12:2});
+}
 
+async function confirmPendingPayment({tradeNo,attempts}){
+  const pending=getPendingPayment();
+  const customerId=pending?.customerId||getCustomerId();
+  try{
+    const data=await pollOrderStatus(tradeNo,customerId,attempts);
+    if(data?.paid){
+      applyPaidOrder(data.order);
+      localStorage.removeItem(STORAGE_KEYS.pendingPayment);
+      hidePendingPaymentBar(); resetPaymentButton();
+      toast('付款成功，完整報告已解鎖');
+      return true;
+    }
+    showPendingPaymentBar('尚未收到付款成功通知；請勿重複付款，可稍後重新確認。');
+    resetPaymentButton();
+    return false;
+  }catch(error){
+    console.warn(error);
+    showPendingPaymentBar('目前無法確認付款，請稍後再試；請勿重複付款。');
+    resetPaymentButton();
+    return false;
+  }
+}
+
+async function pollOrderStatus(tradeNo,customerId,attempts=10){
+  for(let attempt=0; attempt<attempts; attempt+=1){
+    try{
+      const data=await fetchJsonWithTimeout(`${CONFIG.WORKER_URL}/order-status`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({tradeNo,customerId})
+      },10000);
+      if(data.ok && data.paid) return data;
+      if(data.ok && ['FAILED','EXPIRED'].includes(data.order?.status)) return data;
+    }catch(error){
+      if(attempt===attempts-1) throw error;
+    }
+    if(attempt<attempts-1) await new Promise(resolve=>setTimeout(resolve,1500));
+  }
   return null;
+}
+
+function showPendingPaymentBar(message){
+  const bar=$('pendingPaymentBar'); if(!bar) return;
+  if(message) $('pendingPaymentText').textContent=message;
+  bar.classList.remove('hidden');
+}
+function hidePendingPaymentBar(){ $('pendingPaymentBar')?.classList.add('hidden'); }
+function resetPaymentButton(){
+  const button=$('payNowBtn'); if(!button) return;
+  button.disabled=false; button.textContent='前往綠界安全付款 NT$49';
 }
 
 function applyPaidOrder(order){
