@@ -755,18 +755,132 @@ function generateResult(){
   // 保持 isGenerating=true，直到使用者按「重新測一次」建立新場次。
   state.answerLocked = false;
 }
-function findBestRole(scores){
-  let best = roles[0], bestScore = -Infinity;
-  for(const r of roles){
-    let total = 0;
-    for(const axis of axes){ total += (scores[axis]||0) * (r.vector[axis]||0); }
-    total += rarityBonus(r.rarity);
-    const noise = seededRandom(JSON.stringify(state.answers)+r.id) * 0.35;
-    if(total + noise > bestScore){ bestScore = total + noise; best = r; }
+const ROLE_SIGNATURE_RULES = {
+  'warm-assassin': { picks:[[0,2,.045],[4,0,.035],[11,0,.025]] },
+  'love-runaway': { picks:[[1,0,.08],[7,1,.035],[3,3,.02]], combos:[{picks:[[1,0],[7,1]],bonus:.12}] },
+  'battery-hunter': { picks:[[0,1,.035],[2,2,.06],[3,2,.065]], combos:[{picks:[[0,1],[3,2]],bonus:.14}] },
+  'restart-hero': { picks:[[2,3,.04],[6,2,.06],[7,2,.045],[11,2,.035]] },
+  'emotion-wizard': { picks:[[4,3,.06],[5,0,.04],[7,0,.04]] },
+  'happy-clown': { picks:[[0,1,.05],[6,3,.05],[7,3,.07],[9,1,.04]] },
+  'midnight-sorcerer': { picks:[[1,2,.045],[2,0,.055],[7,0,.045],[3,2,.02]] },
+  'procrastination-smith': { picks:[[2,1,.08],[8,2,.075],[11,3,.03]] },
+  'quiet-knight': { picks:[[4,1,.07],[3,2,.03],[11,0,.035]] },
+  'warm-guardian': { picks:[[0,3,.065],[4,0,.04],[9,2,.055]], combos:[{picks:[[0,3],[4,0]],bonus:.13}] },
+  'doubt-summoner': { picks:[[2,0,.06],[4,3,.065],[5,0,.06]] },
+  'healer-friend': { picks:[[0,3,.07],[9,2,.09],[5,1,.02]], combos:[{picks:[[0,3],[9,2]],bonus:.14}] },
+  'vanish-ninja': { picks:[[3,3,.085],[7,1,.05],[2,2,.025]] },
+  'burnout-warrior': { picks:[[2,3,.07],[6,2,.055],[8,1,.045],[10,0,.035]] },
+  'love-ghost': { picks:[[1,0,.045],[3,3,.065],[7,1,.05],[10,1,.035]], combos:[{picks:[[1,0],[3,3]],bonus:.13}] },
+  'quiet-ambition': { picks:[[5,2,.08],[6,2,.05],[10,0,.045],[11,0,.03]] },
+  'passive-cat': { picks:[[3,1,.05],[3,3,.055],[9,3,.06],[11,1,.035]], combos:[{picks:[[3,3],[9,3]],bonus:.18}] },
+  'mouth-strategist': { picks:[[9,0,.09],[4,2,.065],[0,1,.035]], combos:[{picks:[[4,2],[9,0]],bonus:.15}] },
+  'glass-tank': { picks:[[5,1,.085],[2,3,.04],[7,0,.04]] },
+  'hidden-boss': { picks:[[5,2,.06],[6,2,.05],[7,2,.055],[11,2,.035]] },
+  'wandering-maker': { picks:[[2,1,.055],[6,1,.055],[8,2,.07],[11,3,.045]] },
+  'steady-farmer': { picks:[[8,3,.09],[10,3,.07],[11,1,.025]], combos:[{picks:[[8,3],[10,3]],bonus:.15}] },
+  'chaos-rocket': { picks:[[1,3,.04],[2,1,.07],[6,3,.055],[8,1,.045]] },
+  'silent-archer': { picks:[[0,2,.045],[4,2,.06],[8,0,.05],[9,3,.045],[11,0,.035]] },
+  'sunny-shield': { picks:[[3,0,.06],[9,1,.065],[11,1,.055],[0,0,.035]], combos:[{picks:[[3,0],[9,1]],bonus:.12}] },
+  'read-receipt-beast': { picks:[[1,2,.075],[2,0,.055],[5,0,.04]], combos:[{picks:[[1,2],[2,0]],bonus:.20},{picks:[[1,2],[5,0]],bonus:.08}] },
+  'party-ghost': { picks:[[0,1,.045],[3,2,.07],[9,1,.04],[2,2,.035]], combos:[{picks:[[0,1],[3,2]],bonus:.18},{picks:[[3,2],[9,1]],bonus:.10}] },
+  'love-brain-sealer': { picks:[[1,0,.055],[4,0,.065],[11,0,.035],[10,1,.03]], combos:[{picks:[[1,0],[4,0]],bonus:.13}] },
+  'human-memo-fairy': { picks:[[0,3,.06],[9,0,.06],[9,2,.055],[8,3,.04]], combos:[{picks:[[0,3],[9,0]],bonus:.14}] },
+  'owl-saver': { picks:[[2,2,.07],[3,2,.08],[9,3,.04],[11,0,.035]] },
+  'cloud-jellyfish': { picks:[[4,3,.075],[5,1,.055],[7,0,.045],[11,1,.035]] },
+  'laydown-knight': { picks:[[2,2,.075],[6,0,.05],[10,3,.075],[8,3,.025]], combos:[{picks:[[2,2],[10,3]],bonus:.16}] },
+  'rebel-imp': { picks:[[0,1,.04],[4,2,.06],[6,3,.04],[8,2,.055],[9,0,.05],[11,3,.035]] }
+};
+
+const QUIZ_MATCH_STATS = buildQuizMatchStats();
+
+function buildQuizMatchStats(){
+  const user = {};
+  const role = {};
+
+  for(const axis of axes){
+    let mean = 0;
+    let variance = 0;
+
+    for(const question of questions){
+      const values = question.options.map(option=>Number(option.score[axis] || 0));
+      const questionMean = values.reduce((sum,value)=>sum+value,0) / values.length;
+      mean += questionMean;
+      variance += values.reduce((sum,value)=>sum+((value-questionMean) ** 2),0) / values.length;
+    }
+
+    const roleValues = roles.map(item=>Number(item.vector[axis] || 0));
+    const roleMean = roleValues.reduce((sum,value)=>sum+value,0) / roleValues.length;
+    const roleVariance = roleValues.reduce((sum,value)=>sum+((value-roleMean) ** 2),0) / roleValues.length;
+
+    user[axis] = { mean, std:Math.sqrt(variance) || 1 };
+    role[axis] = { mean:roleMean, std:Math.sqrt(roleVariance) || 1 };
   }
+
+  return { user, role };
+}
+
+function getRoleSignatureBonus(roleId,answers){
+  const rules = ROLE_SIGNATURE_RULES[roleId];
+  if(!rules || !Array.isArray(answers)) return 0;
+
+  let bonus = 0;
+
+  for(const [questionIndex,optionIndex,value] of (rules.picks || [])){
+    if(answers[questionIndex] === optionIndex) bonus += value;
+  }
+
+  for(const combo of (rules.combos || [])){
+    const matched = combo.picks.every(([questionIndex,optionIndex])=>answers[questionIndex] === optionIndex);
+    if(matched) bonus += combo.bonus;
+  }
+
+  return bonus;
+}
+
+function findBestRole(scores){
+  const userProfile = {};
+  let userNormSquared = 0;
+
+  for(const axis of axes){
+    const stat = QUIZ_MATCH_STATS.user[axis];
+    const standardized = ((scores[axis] || 0) - stat.mean) / stat.std;
+    userProfile[axis] = standardized;
+    userNormSquared += standardized * standardized;
+  }
+
+  const userNorm = Math.sqrt(userNormSquared) || 1;
+  let best = roles[0];
+  let bestScore = -Infinity;
+
+  for(const currentRole of roles){
+    let dot = 0;
+    let roleNormSquared = 0;
+
+    for(const axis of axes){
+      const stat = QUIZ_MATCH_STATS.role[axis];
+      const standardizedRole = ((currentRole.vector[axis] || 0) - stat.mean) / stat.std;
+      dot += userProfile[axis] * standardizedRole;
+      roleNormSquared += standardizedRole * standardizedRole;
+    }
+
+    const roleNorm = Math.sqrt(roleNormSquared) || 1;
+    const similarity = dot / (userNorm * roleNorm);
+    const signature = getRoleSignatureBonus(currentRole.id,state.answers);
+
+    // 只用極小值處理完全同分，不再讓稀有度或角色向量大小左右人格結果。
+    const tieBreaker = seededRandom(JSON.stringify(state.answers)+currentRole.id) * 0.0000001;
+    const total = similarity + signature + tieBreaker;
+
+    if(total > bestScore){
+      bestScore = total;
+      best = currentRole;
+    }
+  }
+
   return best;
 }
-function rarityBonus(rarity){ return {R:0,SR:.4,SSR:.7,UR:.85}[rarity] || 0; }
+
+function rarityBonus(rarity){ return 0; }
 function seededRandom(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24); } return ((h>>>0)%1000)/1000; }
 function makeResultId(roleId, answers){ return `LQR-${hashString(roleId+'|'+answers.join('-')).toString(36).toUpperCase()}`; }
 function hashString(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0; } return Math.abs(h); }
