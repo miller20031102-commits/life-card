@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15.5" />
+  <link rel="stylesheet" href="style.css?v=15.6" />
 </head>
 <body>
   <div class="bg-noise" aria-hidden="true"></div>
@@ -54,7 +54,7 @@
           <span>⚡ 3 分鐘完成</span>
           <span>🎴 可下載卡圖</span>
           <span>💬 可複製 Threads 文案</span>
-          <span>🎟️ 每日免費 2 次</span>
+          <span>🎟️ 免費無限抽卡</span>
           <span>💎 49 元完整報告</span>
         </div>
       </div>
@@ -78,7 +78,7 @@
     </section>
 
     <section class="section-pad strip-section reveal" aria-label="網站亮點">
-      <div class="strip-card"><strong>每日免費 2 次</strong><span>每天保留一點神祕感，抽完會自動存進我的卡冊</span></div>
+      <div class="strip-card"><strong>免費無限抽卡</strong><span>想重測幾次都可以，每次結果都會自動存進我的卡冊</span></div>
       <div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
       <div class="strip-card"><strong>綠界安全付款</strong><span>付款成功自動解鎖；同角色不會重複收費</span></div>
     </section>
@@ -98,11 +98,11 @@
           <p class="eyebrow">開始進入副本</p>
           <h2>12 題抽出你的角色卡</h2>
           <p>不用想太久，選最像你平常反應的答案。這不是診斷，是娛樂，但文案會故意寫得像在偷看你的人生。</p>
-          <div class="mini-note">每日免費抽卡 2 次。卡冊與查看已解鎖報告不受限制。</div>
-          <div class="daily-limit-card" id="dailyLimitCard">
-            <span>🎟️ 今日剩餘抽卡</span>
-            <strong><b id="dailyLeftText">2</b> / 2</strong>
-            <small id="dailyLimitHint">完成一張新角色卡才會扣 1 次，台灣時間 00:00 自動重置。</small>
+          <div class="mini-note">免費無限抽卡。想換答案重測幾次都可以，卡片會自動存進卡冊。</div>
+          <div class="daily-limit-card unlimited-play-card">
+            <span>🎟️ 免費無限抽卡</span>
+            <strong>不限次數</strong>
+            <small>完成後可以立刻重新測驗，不用等到隔天。</small>
           </div>
         </aside>
 
@@ -231,7 +231,7 @@
         <details open><summary>同一個角色會重複收費嗎？</summary><p>不會。同一個備份碼下，同一種角色只需要購買一次；之後抽到同角色可直接查看完整報告。</p></details>
         <details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
-        <details><summary>每天可以抽幾次？</summary><p>每天可以免費抽 2 次。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看，不會消耗次數。</p></details>
+        <details><summary>可以抽幾次？</summary><p>不限次數，隨時都可以重新測驗。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看。</p></details>
         <details><summary>換手機後還能查看嗎？</summary><p>可以先在「我的卡冊」保存私人備份碼，再於新裝置輸入備份碼同步已購買角色。備份碼等同卡冊鑰匙，請勿公開。</p></details>
         <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
         <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；若發生重複扣款、系統錯誤或已付款卻無法取得內容，請來信協助處理。</p></details>
@@ -348,6 +348,6 @@
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="script.js?v=15.5" defer></script>
+  <script src="script.js?v=15.6" defer></script>
 </body>
 </html>

@@ -671,3 +671,8 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   cursor:wait;
 }
 \n\n/* v15 production audit */\nbody.modal-open{overflow:hidden}\n.cardbook-tools{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}\n.recovery-panel{width:min(680px,100%)}\n.recovery-code-box{display:grid;gap:10px;padding:16px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(255,255,255,.06)}\n.recovery-code-box code{display:block;overflow-wrap:anywhere;font-size:13px;color:var(--cyan);line-height:1.6}\n.recovery-restore{display:grid;gap:10px;margin-top:18px}\n.recovery-restore label{font-weight:800}\n.recovery-restore input{width:100%;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(5,5,18,.55);color:#fff;font:inherit}\n.payment-status-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:1000;width:min(720px,calc(100% - 24px));display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(255,209,92,.4);border-radius:20px;background:rgba(19,17,38,.96);box-shadow:0 18px 50px rgba(0,0,0,.4);backdrop-filter:blur(16px)}\n.payment-status-bar>div{display:grid;gap:3px;flex:1}.payment-status-bar span{color:var(--muted);font-size:13px}\n.payment-status-bar.hidden{display:none}\n@media(max-width:640px){.payment-status-bar{align-items:stretch;flex-wrap:wrap}.payment-status-bar>div{flex-basis:100%}.cardbook-tools>*{flex:1}}\n
+/* v15.6 無限抽卡 */
+.unlimited-play-card strong{
+  font-size:clamp(22px,4vw,32px);
+  color:var(--gold);
+}

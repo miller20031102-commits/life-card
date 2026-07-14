@@ -362,7 +362,6 @@ const rolePremiumNotes = {
 
 };
 
-const DAILY_PLAY_LIMIT = 2;
 const state = {
   current: 0,
   answers: Array(questions.length).fill(null),
@@ -370,7 +369,6 @@ const state = {
   currentRole: null,
   resultId: null,
   generatedImage: null,
-  quizSessionId: makePlaySessionId(),
   answerLocked: false,
   isGenerating: false
 };
@@ -378,7 +376,6 @@ const STORAGE_KEYS = {
   saved: 'lifequest:saved',
   premiumPrefix: 'lifequest:premium:',
   unlockedReports: 'lifequest:unlockedReports',
-  dailyPlays: 'lifequest:dailyPlays:v2',
   customerId: 'lifequest:customerId',
   remoteRoleIds: 'lifequest:remoteRoleIds',
   pendingPayment: 'lifequest:pendingPayment',
@@ -469,7 +466,6 @@ async function init(){
   renderSamples();
   renderQuestion();
   bindEvents();
-  updateDailyLimitUI();
   resetPaymentButton();
 
   await syncEntitlements({mergeCards:true});
@@ -541,18 +537,10 @@ function renderQuestion(){
     </button>`).join('');
   document.querySelectorAll('.option-btn').forEach(btn=>btn.addEventListener('click',()=>selectOption(Number(btn.dataset.index))));
   $('prevBtn').disabled = state.current===0;
-  updateDailyLimitUI();
 }
 function getMood(i){ return ['新手村入口','角色建立中','讀取戀愛屬性','社交電量檢測','戰鬥模式分析','弱點掃描','人生地圖載入','台詞校準','工作模式分析','朋友定位中','升級需求確認','準備結算'][i] || '副本進行中'; }
 function selectOption(index){
   if(state.answerLocked || state.isGenerating) return;
-
-  // 進入測驗時先確認額度；完成最後一題時 generateResult() 會再檢查一次。
-  if(state.current === 0 && !canGenerateToday()){
-    showDailyLimitNotice();
-    updateDailyLimitUI();
-    return;
-  }
 
   state.answerLocked = true;
   document.querySelectorAll('.option-btn').forEach(btn=>{ btn.disabled = true; });
@@ -573,7 +561,6 @@ function resetQuiz(){
   state.answers = Array(questions.length).fill(null);
   state.currentRole = null;
   state.resultId = null;
-  state.quizSessionId = makePlaySessionId();
   state.answerLocked = false;
   state.isGenerating = false;
 
@@ -601,107 +588,6 @@ function scrollToQuiz(){
 }
 
 
-function makePlaySessionId(){
-  const random = crypto.randomUUID
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  return `play_${String(random).replace(/[^A-Za-z0-9_-]/g,'').slice(0,64)}`;
-}
-
-function getTodayKey(){
-  // 每日次數固定依台灣時間重置，不受手機或電腦時區設定影響。
-  const parts = new Intl.DateTimeFormat('en-CA',{
-    timeZone:'Asia/Taipei',
-    year:'numeric',
-    month:'2-digit',
-    day:'2-digit'
-  }).formatToParts(new Date());
-
-  const get = type => parts.find(part=>part.type===type)?.value || '';
-  return `${get('year')}-${get('month')}-${get('day')}`;
-}
-
-function getDailyUsage(){
-  const today = getTodayKey();
-  let data = null;
-
-  try{
-    data = JSON.parse(localStorage.getItem(STORAGE_KEYS.dailyPlays) || 'null');
-  }catch{
-    data = null;
-  }
-
-  if(!data || data.date !== today || !Array.isArray(data.sessions)){
-    data = { version:2, date:today, sessions:[] };
-  }
-
-  // 去除重複場次，並限制最多只保留每日額度數量。
-  data.sessions = [...new Set(
-    data.sessions
-      .filter(value=>typeof value==='string' && value.length>0)
-  )].slice(0,DAILY_PLAY_LIMIT);
-
-  try{
-    localStorage.setItem(STORAGE_KEYS.dailyPlays,JSON.stringify(data));
-  }catch(error){
-    console.warn('daily usage save failed',error);
-  }
-
-  return data;
-}
-
-function getDailyRemaining(){
-  const usage = getDailyUsage();
-  return Math.max(0,DAILY_PLAY_LIMIT-usage.sessions.length);
-}
-
-function canGenerateToday(){
-  return getDailyRemaining()>0;
-}
-
-function recordDailyPlay(sessionId){
-  const usage = getDailyUsage();
-  const safeSessionId = String(sessionId || '').trim();
-
-  if(!safeSessionId) return false;
-
-  // 同一場測驗即使快速連點或程式被重複觸發，也只能扣一次。
-  if(usage.sessions.includes(safeSessionId)){
-    return false;
-  }
-
-  if(usage.sessions.length>=DAILY_PLAY_LIMIT){
-    return false;
-  }
-
-  usage.sessions.push(safeSessionId);
-
-  try{
-    localStorage.setItem(STORAGE_KEYS.dailyPlays,JSON.stringify(usage));
-  }catch(error){
-    console.warn('daily usage save failed',error);
-  }
-
-  updateDailyLimitUI();
-  return true;
-}
-
-function updateDailyLimitUI(){
-  const left = getDailyRemaining();
-  const card = $('dailyLimitCard');
-  const leftText = $('dailyLeftText');
-  const hint = $('dailyLimitHint');
-  if(leftText) leftText.textContent = String(left);
-  if(hint) hint.textContent = left > 0 ? `今天還可以抽 ${left} 次。完成一張新角色卡才會扣 1 次，台灣時間 00:00 重置。` : '今天免費抽卡已用完，台灣時間 00:00 會自動恢復。卡冊與已解鎖報告仍可查看。';
-  if(card) card.classList.toggle('is-empty', left <= 0);
-}
-
-function showDailyLimitNotice(){
-  toast('今天免費抽卡已用完，明天再來抽新卡 ♡');
-  const hint = $('dailyLimitHint');
-  if(hint) hint.textContent = '今天免費抽卡已用完。你仍然可以查看卡冊、下載已抽到的卡、或閱讀已解鎖報告。';
-}
-
 function calculateScores(){
   const scores = Object.fromEntries(axes.map(a=>[a,0]));
   state.answers.forEach((answerIdx,qIdx)=>{
@@ -715,35 +601,10 @@ function generateResult(){
   if(state.isGenerating) return;
   state.isGenerating = true;
 
-  if(!canGenerateToday()){
-    state.isGenerating = false;
-    state.answerLocked = false;
-    showDailyLimitNotice();
-    updateDailyLimitUI();
-    return;
-  }
-
   state.scores = calculateScores();
   const role = findBestRole(state.scores);
   state.currentRole = role;
   state.resultId = makeResultId(role.id,state.answers);
-
-  const recorded = recordDailyPlay(state.quizSessionId);
-  if(!recorded){
-    state.isGenerating = false;
-    state.answerLocked = false;
-
-    // 已有同場結果時直接顯示，不再重複扣次數。
-    if(state.currentRole && state.resultId){
-      renderResult(role);
-      saveLastResult();
-      saveResultToCollection(false);
-      $('resultSection').classList.remove('hidden');
-      $('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
-      if(hasPremiumAccess(state.resultId)) showPremiumReport();
-    }
-    return;
-  }
 
   renderResult(role);
   saveLastResult();
@@ -752,7 +613,7 @@ function generateResult(){
   $('resultSection').scrollIntoView({behavior:'smooth',block:'start'});
   if(hasPremiumAccess(state.resultId)) showPremiumReport();
 
-  // 保持 isGenerating=true，直到使用者按「重新測一次」建立新場次。
+  // 保持鎖定直到使用者按「重新測一次」，避免最後一題被重複結算。
   state.answerLocked = false;
 }
 const ROLE_SIGNATURE_RULES = {
