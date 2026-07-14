@@ -311,6 +311,55 @@ const rolePremiumNotes = {
     money:'你容易為了聚會、禮物、氣氛、大家開心而花錢。請把自己的感受也列入預算。',
     mission:'今天不用照亮所有人，留一點電給自己。'
   }
+  ,'read-receipt-beast': {
+    hook:'你不是故意冷淡，而是越重要的訊息越容易讓你卡住。這份報告會幫你把「想回好一點」變成「先真實地回出去」。',
+    love:'你心動時會反覆修稿，怕太熱情、怕太敷衍，也怕一句話改變關係。最適合你的不是猜謎高手，而是願意直接確認、容許你慢半拍的人。',
+    money:'你容易在等待回覆、覺得尷尬或想轉移注意力時滑購物頁。先把那則訊息回完，再決定那筆東西是不是真的需要。',
+    mission:'挑一則卡住的訊息，用三句以內回覆；不准修稿超過三次。'
+  },
+  'party-ghost': {
+    hook:'你不是討厭聚會，你只是靈魂比身體更早顯示低電量。這份報告會教你體面撤退，而不是撐到整個人消失。',
+    love:'你需要一個不把安靜解讀成冷淡的人。最舒服的關係，是可以一起出門，也允許你提早回家，不用用耗盡自己證明在乎。',
+    money:'聚會中你可能因為不好意思掃興而跟著續攤、叫車、加點。先替自己設定離場時間與預算，離開不是失禮，是電量管理。',
+    mission:'下一次想離場時，清楚說「我今天電量到了，先回去充電」。'
+  },
+  'love-brain-sealer': {
+    hook:'你的理性不是沒有感情，而是心動後臨時加蓋的保護殼。這份報告會幫你保留分寸，也不把好感封到對方完全看不見。',
+    love:'你常把曖昧處理得像專案會議：分析很多、證據很多、明示很少。真正有效的是給出一個可辨識的好感訊號，而不是期待對方破解全部暗號。',
+    money:'心動時你可能在外表、禮物或約會細節上偷偷加碼，卻不肯直接表達。先確認這筆花費是在享受關係，還是在替沉默付費。',
+    mission:'給喜歡或重視的人一個明確但不過量的訊號，例如主動約一次或直接稱讚一次。'
+  },
+  'human-memo-fairy': {
+    hook:'你把別人的生日、喜好與小情緒都存得很好，卻常把自己的需求設成稍後提醒。這份報告會把你也放回照顧清單。',
+    love:'你表達喜歡的方式是記得細節、預先準備、替對方補位。適合你的人會珍惜這份細心，也會反過來記得你的疲累與偏好。',
+    money:'你容易在禮物、人情與替大家準備上超支。送得剛好比送得最多更長久，先設定每月「照顧別人預算」。',
+    mission:'今天替自己安排一件你平常只會替別人記得的事。'
+  },
+  'owl-saver': {
+    hook:'你不是沒有反應，而是在低耗能模式裡默默掃描。這份報告會幫你把夜裡想通的事，在白天也留下可被看見的輸出。',
+    love:'你需要安靜、穩定、不逼迫即時回應的關係。你真正要練習的，是讓對方知道你仍在線，而不是讓沉默替你回答。',
+    money:'深夜是你研究與下單的高峰時段。任何晚上突然很想買的東西，先加入清單，隔天白天再做第二次判斷。',
+    mission:'把一個只在深夜想過的計畫，白天傳給一個人或做出第一步。'
+  },
+  'cloud-jellyfish': {
+    hook:'你很柔軟，也很容易被環境的水流帶走。這份報告不是要你變遲鈍，而是建立一層能分辨「這是誰的情緒」的薄膜。',
+    love:'你很容易感受到對方的變化，也容易因此調整自己。適合你的人會願意說清楚，不讓你長期靠感應猜答案。',
+    money:'情緒低氣壓時，你可能透過療癒小物、食物或送禮讓氣氛變好。先問：這筆消費是在照顧我，還是在替別人的情緒買單？',
+    mission:'今天感到氣氛不對時，先說「我注意到你有點不同，需要聊嗎？」而不是直接怪自己。'
+  },
+  'laydown-knight': {
+    hook:'你不是放棄人生，而是系統正在要求回血。這份報告會幫你分清楚真正休息與用躺平延後焦慮的差別。',
+    love:'你在低電量時最怕被要求立刻振作。適合你的關係會容許你休息，但也能溫柔地陪你完成一個小動作，不讓你困在棉被副本。',
+    money:'累的時候你容易用外送、影音訂閱或隨手購物換取最低成本的快樂。保留舒適預算，但不要讓所有疲累都自動連到付款。',
+    mission:'先完成一件五分鐘任務，再安心休息二十分鐘，不邊躺邊責怪自己。'
+  },
+  'rebel-imp': {
+    hook:'你不是為反對而反對，而是對沒道理的規則特別敏感。這份報告會把你的反骨從情緒輸出，升級成真正能改變事情的提案。',
+    love:'你會被有想法、有個性、不盲從的人吸引，但關係不是辯論賽。當你想吐槽時，先讓對方知道你站在他這邊。',
+    money:'新奇、小眾、反主流的東西很容易打中你。買之前問：我是真的喜歡，還是只是不想跟大家一樣？',
+    mission:'把今天最想吐槽的一件事，改寫成包含問題、原因與一個解法的三句提案。'
+  }
+
 };
 
 const DAILY_PLAY_LIMIT = 2;
@@ -744,6 +793,36 @@ function renderResult(role){
   $('premiumTitle').textContent = `${role.name}｜完整角色報告 ♡`;
 }
 
+
+function roleContradiction(role){
+  return `${role.line} 你的核心反差是「${role.traits[0]}」和「${role.traits[1]}」同時存在：外面的人先看見前者，真正熟的人才會發現後者。`;
+}
+function roleSocialSignature(role){
+  return `你的群體價值不是固定職稱，而是「${role.skill}」：當別人卡住時，你最自然的反應就是啟動這個能力。`;
+}
+function roleWorkSignature(role){
+  return `最能代表你的工作優勢是「${role.skill}」；最需要管理的工作風險則是「${role.weakness}」`;
+}
+function roleBossName(role){
+  return `${role.traits[2] || role.traits[0]}反向關卡`;
+}
+function roleRoadmap(role,note){
+  return [
+    {title:'第 1 週｜辨認觸發點', text:`記錄「${role.weakness}」通常在什麼人、什麼時間、什麼情境出現。只記錄，不急著批評。`},
+    {title:'第 2 週｜主動使用技能', text:`每天刻意使用一次「${role.skill}」，但只用在真正重要的地方，不把能力浪費在討好所有人。`},
+    {title:'第 3 週｜讓別人讀懂你', text:`練習把「${role.passive}」背後的真實需求說成一句清楚的話，減少別人只能猜。`},
+    {title:'第 4 週｜留下升級證據', text:`完成並保存一個具體成果：${note.mission || role.quest.replace('本週任務：','')}。重點不是完美，是留下你真的做過的證據。`}
+  ];
+}
+function roleQuotes(role,note){
+  return [
+    role.line,
+    role.summary,
+    `我的主技能不是缺點：${role.skill}`,
+    `這週我要做的事：${note.mission || role.quest.replace('本週任務：','')}`
+  ];
+}
+
 function buildPremium(role){
   const note = rolePremiumNotes[role.id] || {};
   const v = role.vector || {};
@@ -766,9 +845,9 @@ function buildPremium(role){
     },
     {
       title:'核心人設｜你可愛又麻煩的地方',
-      html:`<p>${role.name} 的可愛之處，是你不是單薄的人設。你有看得見的反應，也有很多不太會說出口的小開關。</p>
+      html:`<p>${roleContradiction(role)}</p>
       <ul class="cute-list"><li><b>外顯標籤：</b>${role.traits.join('、')}</li><li><b>主技能：</b>${role.skill}</li><li><b>被動技能：</b>${role.passive}</li><li><b>真正想要：</b>${tone.need}</li></ul>
-      <p class="soft-card">你不是難搞，你只是需要被用正確的方法理解。當你的安全感夠了，你其實會比自己想像的更溫柔、更有行動力。</p>`
+      <p class="soft-card"><b>角色指紋：</b>${role.skill}｜${role.passive}｜${role.weakness}</p>`
     },
     {
       title:'戀愛小抄｜靠近你的使用說明書',
@@ -780,13 +859,13 @@ function buildPremium(role){
       title:'朋友模式｜你在群裡的隱藏職位',
       html:`<p>${role.social}</p>
       <ul class="cute-list"><li><b>隊伍定位：</b>${teamRole(v)}</li><li><b>你被需要的原因：</b>${tone.socialValue}</li><li><b>要小心的地方：</b>${tone.socialWarning}</li></ul>
-      <p class="soft-card">你的社交不是一定要很大聲才算有價值。有些人是輸出，有些人是補血，有些人只是坐在那裡，大家就覺得安心。</p>`
+      <p class="soft-card">${roleSocialSignature(role)}</p>`
     },
     {
       title:'工作&賺錢｜你的升級路線圖',
       html:`<p>${role.work}</p>
       <div class="tiny-cards"><div><b>⏱ 適合節奏</b><span>${workRhythm(v)}</span></div><div><b>🧩 適合任務</b><span>${workTask(v)}</span></div><div><b>🪤 容易卡住</b><span>${workTrap(v)}</span></div></div>
-      <p>你不一定適合靠熱血撐到底，你比較適合把目標做成「看得到進度條」的小副本。每完成一格，你就會更願意繼續。</p>`
+      <p class="soft-card">${roleWorkSignature(role)}</p>`
     },
     {
       title:'金錢雷點｜錢包守護咒',
@@ -797,8 +876,8 @@ function buildPremium(role){
     {
       title:'隱藏 Boss｜你最常打輸的那一關',
       html:`<p>${role.boss}</p>
-      <div class="boss-card"><b>Boss 技能：${bossSkill(v)}</b><span>常見失誤：${badBossStrategy(v)}</span><span>推薦打法：${goodBossStrategy(v)}</span></div>
-      <p>你要打贏的不是整個人生，是今天那個最小、最煩、最容易拖延的一格任務。</p>`
+      <div class="boss-card"><b>${roleBossName(role)}｜${bossSkill(v)}</b><span>常見失誤：${badBossStrategy(v)}</span><span>推薦打法：${goodBossStrategy(v)}</span></div>
+      <p class="soft-card"><b>本角色破關條件：</b>${note.mission || role.quest.replace('本週任務：','')}</p>`
     },
     {
       title:'7 日小任務｜每天一點點變強',
@@ -807,12 +886,12 @@ function buildPremium(role){
     },
     {
       title:'30 天養成地圖｜慢慢把自己養好',
-      html:`<div class="roadmap-cute"><div><b>第 1 週｜觀察自己</b><span>記錄最常出現的反應，不急著責怪自己。</span></div><div><b>第 2 週｜降低內耗</b><span>把大問題拆成每天 15 分鐘的小任務。</span></div><div><b>第 3 週｜練習表達</b><span>把「沒事、隨便、都可以」換成更真實的句子。</span></div><div><b>第 4 週｜做出成果</b><span>完成一個能被看見的小作品、小改變或小決定。</span></div></div>
-      <p>30 天後，你不一定變成完全不同的人，但你會更知道怎麼照顧自己、推動自己，也更懂自己這張卡的玩法。</p>`
+      html:`<div class="roadmap-cute">${roleRoadmap(role,note).map(step=>`<div><b>${step.title}</b><span>${step.text}</span></div>`).join('')}</div>
+      <p>這不是所有角色都共用的養成表；四週內容直接取自你的主技能、被動、弱點與專屬任務。</p>`
     },
     {
       title:'專屬台詞貼紙包｜截圖分享用',
-      html:`<ul class="quote-list sticker-lines"><li>「${role.summary}」</li><li>「我不是沒感覺，我只是需要一點安全讀條。」</li><li>「我的人生還沒滿等，但我已經不是新手村的我。」</li><li>「${note.mission || role.quest.replace('本週任務：','')}」</li></ul>
+      html:`<ul class="quote-list sticker-lines">${roleQuotes(role,note).map(line=>`<li>「${line}」</li>`).join('')}</ul>
       <p class="cute-note">這張角色卡不是要限制你，而是給你一個有梗、有畫面、也有一點點真心的自我介紹。</p>`
     }
   ];
@@ -898,13 +977,13 @@ function badBossStrategy(v){ return (v.overthink||0)>=3 ? '一直想通、一直
 function goodBossStrategy(v){ return (v.overthink||0)>=3 ? '把腦內問題寫成下一個具體動作。' : (v.avoid||0)>=3 ? '只前進 10%，不要逼自己一次全裸真心。' : (v.chaos||0)>=3 ? '限制同時任務數，把收尾當成主線。' : '每天留下一個可被看見的小證據。'; }
 function sevenDayMissions(role, v, note){
   return [
-    `寫下你的角色名：${role.name}，再寫一句你最想保留的能力。`,
-    `做一件拖很久、但 15 分鐘內能開始的小事。`,
-    (v.romance||0)>=3 ? '傳一則比平常真誠 10% 的訊息。' : '主動聯絡一個你其實有點想念的人。',
-    (v.solo||0)>=3 ? '安排一段不愧疚的關機時間。' : '整理一個讓你最煩的小角落。',
-    (v.support||0)>=3 ? '拒絕一件超出你電量的請求。' : '拒絕一個會讓你內耗的小誘惑。',
-    `完成你的專屬任務：${note.mission || role.quest.replace('本週任務：','')}`,
-    '截圖或複製一句你最有感的台詞，當作下週提醒。'
+    `角色盤點：寫下「${role.name}」最像你的地方，以及一個你不同意的地方。`,
+    `技能實戰：今天刻意使用一次「${role.skill}」。`,
+    `關係練習：${note.love || role.love}`,
+    `被動覺察：當「${role.passive}」出現時，記下當時你真正需要什麼。`,
+    `弱點拆招：針對「${role.weakness}」做一個比平常早 10% 的行動。`,
+    `專屬任務：${note.mission || role.quest.replace('本週任務：','')}`,
+    `保存證據：寫下這週最像升級的一刻，並選一句專屬台詞留在手機裡。`
   ];
 }
 
