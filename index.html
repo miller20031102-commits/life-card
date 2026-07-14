@@ -225,13 +225,13 @@
       <div class="section-title center reveal"><p class="eyebrow">常見問題</p><h2>使用前可以先看這裡</h2></div>
       <div class="faq-grid reveal">
         <details open><summary>解鎖碼可以重複使用嗎？</summary><p>每組解鎖碼只能成功解鎖一次。解鎖完成後，這組碼就不能再拿去解鎖其他卡牌。</p></details>
-        <details><summary>付款後怎麼拿到解鎖碼？</summary><p>請先選擇要解鎖的卡牌，接著前往付款回報表單。表單內會提供銀行資訊與填寫提醒；確認付款後，會提供一組專屬解鎖碼。</p></details>
+        <details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
         <details><summary>每天可以抽幾次？</summary><p>每天可以免費抽 2 次。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看，不會消耗次數。</p></details>
         <details><summary>解鎖後可以永久查看嗎？</summary><p>可以。同一台手機、同一個瀏覽器會保存解鎖權限與報告。只要不要清除瀏覽器資料，就能在「我的卡冊」重新查看已解鎖報告。換手機或清除資料需要之後升級會員 / Email 備份版。</p></details>
         <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
-        <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。解鎖碼使用並顯示完整報告後，即視為服務完成；除系統錯誤、重複付款或未收到解鎖碼外，不接受退款。</p></details>
-        <details><summary>付款資料會怎麼使用？</summary><p>付款回報表單只用於確認款項與提供解鎖碼，不會出售或任意提供給第三方。</p></details>
+        <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；除系統錯誤、重複付款或未收到解鎖碼外，不接受退款。</p></details>
+        <details><summary>付款資料會怎麼使用？</summary><p>付款由綠界科技處理，本站只保存訂單編號、角色與解鎖狀態，不會在網站儲存信用卡資料。</p></details>
       </div>
     </section>
   </main>
@@ -260,26 +260,17 @@
     <div class="modal-backdrop" data-close-modal></div>
     <div class="modal-panel">
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
-      <p class="eyebrow">解鎖付費版</p>
+      <p class="eyebrow">綠界安全付款</p>
       <h2 id="payTitle">完整角色報告 NT$49</h2>
-      <p class="modal-copy">請先確認要解鎖的卡牌，再前往付款回報表單。銀行資訊、轉帳提醒與付款後五碼填寫方式都會寫在表單最上方。</p>
+      <p class="modal-copy">確認要解鎖的角色後，將前往綠界付款頁。付款成功後會自動返回網站並解鎖完整報告。</p>
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
-      <div class="pay-main-actions">
-        <a class="primary-btn full" id="paymentFormBtn" href="https://forms.gle/ck8NkqScfuUNbysn8" target="_blank" rel="noopener">前往付款回報表單</a>
-        <button class="secondary-btn full" id="copyPayInfoBtn" type="button">複製結果編號</button>
-      </div>
       <div class="pay-steps">
-        <div><strong>1</strong><span>到表單查看銀行資訊並完成轉帳</span></div>
-        <div><strong>2</strong><span>在表單填入結果編號、付款後五碼與聯絡方式</span></div>
-        <div><strong>3</strong><span>收到解鎖碼後，回到這裡輸入</span></div>
+        <div><strong>1</strong><span>前往綠界選擇可用的付款方式</span></div>
+        <div><strong>2</strong><span>完成 NT$49 付款</span></div>
+        <div><strong>3</strong><span>返回網站，自動解鎖完整報告</span></div>
       </div>
-      <div class="payment-note form-reminder">📮 表單會在新分頁開啟。送出前，請確認已填入「結果編號」、「付款後五碼」與「聯絡方式」。</div>
-      <div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；解鎖碼使用並顯示完整報告後，即視為服務完成。</div>
-      <div class="unlock-form">
-        <label for="unlockCodeInput">已收到解鎖碼？輸入在這裡</label>
-        <input id="unlockCodeInput" type="text" autocomplete="one-time-code" placeholder="例如：LQ-ABCD-1234" />
-        <button class="primary-btn full" id="redeemBtn" type="button">驗證並解鎖完整報告</button>
-      </div>
+      <div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
+      <button class="primary-btn full" id="payNowBtn" type="button">前往綠界安全付款 NT$49</button>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
     </div>
   </div>

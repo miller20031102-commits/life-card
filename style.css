@@ -664,3 +664,9 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   .commercial-footer{grid-template-columns:1fr}
   .commercial-footer small{grid-column:auto}
 }
+
+/* 綠界付款 */
+#payNowBtn[disabled]{
+  opacity:.68;
+  cursor:wait;
+}

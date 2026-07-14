@@ -1,27 +1,22 @@
-# 人生副本｜商業正式版 v13
+# 人生副本｜綠界自動付款串接版 v14
 
-本版已補齊：
+已完成：
 
-- 服務條款
-- 退款政策
-- 隱私權政策
-- 免責聲明
-- 聯絡信箱
-- 商業化頁尾
-- SEO / Open Graph
-- 404 頁面
-- robots.txt
-- sitemap.xml
-- 全站技術文字清理
-- JavaScript 語法檢查
+- 移除 Google 表單付款流程
+- 移除銀行帳號與付款後五碼
+- 移除人工解鎖碼輸入
+- 串接 Cloudflare Worker `/create-payment`
+- 自動送出綠界付款表單
+- 付款返回後輪詢 `/order-status`
+- 付款成功後自動解鎖完整報告
+- 從 D1 同步已購買角色，避免同角色重複付款
 
-聯絡信箱：
-miller20031102@gmail.com
+Worker：
+https://lifequest-api.miller20031102.workers.dev
 
-付款回報表單：
-https://forms.gle/ck8NkqScfuUNbysn8
+## 上傳 GitHub Pages
 
-上傳 GitHub Pages 時請上傳：
+請上傳：
 
 - index.html
 - style.css
@@ -31,3 +26,11 @@ https://forms.gle/ck8NkqScfuUNbysn8
 - 404.html
 - robots.txt
 - sitemap.xml
+
+## 目前限制
+
+這一版使用瀏覽器產生的匿名 customerId，所以同一瀏覽器可以自動恢復 D1 解鎖權限；
+換手機、清除瀏覽器資料的跨裝置登入同步尚未完成。
+
+在正式公開前，請先用自己的一筆 NT$49 訂單測試：
+建立付款 → 完成付款 → 返回網站 → 自動解鎖 → D1 orders 狀態變成 PAID。

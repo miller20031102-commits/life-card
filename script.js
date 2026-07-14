@@ -1,9 +1,7 @@
 /* 人生副本｜角色卡販賣機 */
 const CONFIG = {
   price: 'NT$49',
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2XTRcqt6Tjiy_ueGJIfd6rkIULHOdvyLYcs4ZSM_gA7ofdmZK3yBpmLU58U9Dd9pDeA/exec',
-  paymentFormUrl: 'https://forms.gle/ck8NkqScfuUNbysn8',
-  PAYMENT_NOTE: '請前往付款回報表單查看銀行轉帳資訊並完成付款。確認款項後，會提供專屬解鎖碼。',
+  WORKER_URL: 'https://lifequest-api.miller20031102.workers.dev',
   brand: '人生副本'
 };
 
@@ -321,7 +319,10 @@ const STORAGE_KEYS = {
   saved: 'lifequest:saved',
   premiumPrefix: 'lifequest:premium:',
   unlockedReports: 'lifequest:unlockedReports',
-  dailyPlays: 'lifequest:dailyPlays'
+  dailyPlays: 'lifequest:dailyPlays',
+  customerId: 'lifequest:customerId',
+  remoteRoleIds: 'lifequest:remoteRoleIds',
+  pendingPayment: 'lifequest:pendingPayment'
 };
 const $ = (id)=>document.getElementById(id);
 
@@ -335,7 +336,7 @@ const POLICY_CONTENT = {
       <p>使用者可免費完成測驗並生成角色卡；部分完整角色報告需付費解鎖。</p>
       <h3>二、使用規範</h3>
       <ul>
-        <li>不得破解、轉售、散布或冒用解鎖碼。</li>
+        <li>不得破解、轉售、散布、冒用付款或解鎖權限。</li>
         <li>不得以自動化方式大量操作、攻擊或干擾網站。</li>
         <li>網站內容可能因優化、維護或版本更新而調整。</li>
       </ul>
@@ -347,8 +348,8 @@ const POLICY_CONTENT = {
     html: `
       <p>完整角色報告屬於數位內容與線上服務。</p>
       <ul>
-        <li>解鎖碼尚未使用，且尚未顯示完整報告前，如有重複付款或系統異常，可聯絡處理。</li>
-        <li>解鎖碼一經使用並成功顯示完整報告，即視為服務已完成。</li>
+        <li>付款完成前，如遇重複扣款、系統異常或未取得已付款內容，可聯絡處理。</li>
+        <li>付款成功並顯示完整報告後，即視為服務已完成。</li>
         <li>除系統錯誤、重複付款或未取得已付款內容外，數位內容完成後不接受退款。</li>
       </ul>
       <p>退款或付款問題請來信：miller20031102@gmail.com</p>`
@@ -360,7 +361,7 @@ const POLICY_CONTENT = {
       <h3>蒐集資料</h3>
       <ul>
         <li>角色結果編號、解鎖狀態與網站內收藏資料。</li>
-        <li>付款回報時由使用者提供的聯絡方式、付款後五碼及必要的付款證明。</li>
+        <li>付款時由綠界科技處理的交易資料，以及本站用於核對訂單的結果編號與角色資訊。</li>
       </ul>
       <h3>使用目的</h3>
       <p>資料僅用於付款確認、提供解鎖碼、客服處理與改善服務，不會販售個人資料。</p>
@@ -392,12 +393,14 @@ function closePolicy(){
 
 document.addEventListener('DOMContentLoaded', init);
 
-function init(){
+async function init(){
   renderSamples();
   renderQuestion();
   bindEvents();
-  setOrderId();
   updateDailyLimitUI();
+
+  await syncEntitlements();
+
   const savedResult = loadLastResult();
   if(savedResult){
     state.answers = Array.isArray(savedResult.answers) ? savedResult.answers : Array(questions.length).fill(null);
@@ -409,6 +412,8 @@ function init(){
       if(hasPremiumAccess(state.resultId)) showPremiumReport();
     }
   }
+
+  await handlePaymentReturn();
 }
 
 function bindEvents(){
@@ -421,8 +426,7 @@ function bindEvents(){
   on('savedBtn','click',showSavedCards);
   on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
-  on('copyPayInfoBtn','click',copyPaymentInfo);
-  on('redeemBtn','click',redeemCode);
+  on('payNowBtn','click',startEcpayPayment);
   document.querySelectorAll('[data-open-pay]').forEach(btn=>btn.addEventListener('click',openPayModal));
   document.querySelectorAll('[data-close-modal]').forEach(el=>el.addEventListener('click',closePayModal));
   document.querySelectorAll('[data-close-saved]').forEach(el=>el.addEventListener('click',closeSavedModal));
@@ -605,7 +609,6 @@ function renderResult(role){
   $('detailWork').textContent = role.work;
   $('detailBoss').textContent = role.boss;
   $('premiumTitle').textContent = `${role.name}｜完整角色報告 ♡`;
-  setOrderId();
 }
 
 function buildPremium(role){
@@ -782,7 +785,7 @@ function hasPremiumAccess(resultId){
   const roleId = saved?.roleId || state.currentRole?.id;
   return hasRolePremiumAccess(roleId);
 }
-function grantPremiumAccess(resultId, code){
+function grantPremiumAccess(resultId, code='ECPAY'){
   if(!resultId || !state.currentRole) return;
   const data = {
     resultId,
@@ -790,7 +793,7 @@ function grantPremiumAccess(resultId, code){
     roleName: state.currentRole.name,
     rarity: state.currentRole.rarity,
     answers: [...state.answers],
-    code: maskCode(code),
+    code: code === 'ECPAY' ? 'ECPAY' : maskCode(code),
     at: new Date().toISOString()
   };
   localStorage.setItem(`${STORAGE_KEYS.premiumPrefix}${resultId}`, JSON.stringify(data));
@@ -944,9 +947,13 @@ function getUnlockedRoleIds(){
   const reports = getUnlockedReports();
   return new Set(Object.values(reports).map(item=>item && item.roleId).filter(Boolean));
 }
+function getRemoteRoleIds(){
+  try{return new Set(JSON.parse(localStorage.getItem(STORAGE_KEYS.remoteRoleIds)||'[]'))}
+  catch{return new Set()}
+}
 function hasRolePremiumAccess(roleId){
   if(!roleId) return false;
-  return getUnlockedRoleIds().has(roleId);
+  return getUnlockedRoleIds().has(roleId) || getRemoteRoleIds().has(roleId);
 }
 function findUnlockedResultByRole(roleId){
   const reports = getUnlockedReports();
@@ -1066,7 +1073,6 @@ function openPayModal(){
 
   if(hasPremiumAccess(state.resultId)){
     closePayModal();
-    // 同一個角色只要解鎖過一次，之後同角色卡片都直接給完整報告，不重複收費。
     if(!localStorage.getItem(`${STORAGE_KEYS.premiumPrefix}${state.resultId}`)){
       grantRoleAccessToCurrentResult();
     }
@@ -1077,93 +1083,242 @@ function openPayModal(){
   }
 
   const target = $('unlockTargetText');
-  if(target) target.textContent = `解鎖卡牌：${state.currentRole.name}｜${state.currentRole.rarity}
+  if(target){
+    target.textContent = `解鎖卡牌：${state.currentRole.name}｜${state.currentRole.rarity}
 結果編號：${state.resultId}`;
+  }
 
-  const formBtn = $('paymentFormBtn');
-  if(formBtn) formBtn.href = CONFIG.paymentFormUrl || 'https://forms.gle/ck8NkqScfuUNbysn8';
-
+  setModalMessage('', true);
   $('payModal').classList.remove('hidden');
-  if(window.matchMedia('(min-width: 760px)').matches) $('unlockCodeInput').focus();
-  $('modalMessage').textContent = CONFIG.APPS_SCRIPT_URL ? '' : '目前暫時無法驗證解鎖碼，請稍後再試。';
 }
-function closePayModal(){ $('payModal').classList.add('hidden'); }
 
-function setOrderId(){ return; }
-function copyPaymentInfo(){
-  if(state.resultId && hasPremiumAccess(state.resultId)){
-    toast('這個角色已經解鎖，不需要再付款');
+function closePayModal(){
+  $('payModal')?.classList.add('hidden');
+}
+
+function getCustomerId(){
+  let id = localStorage.getItem(STORAGE_KEYS.customerId);
+  if(id) return id;
+
+  const random = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`)
+    .replace(/[^A-Za-z0-9_-]/g,'')
+    .slice(0,48);
+
+  id = `guest_${random}`;
+  localStorage.setItem(STORAGE_KEYS.customerId,id);
+  return id;
+}
+
+async function syncEntitlements(){
+  try{
+    const customerId = getCustomerId();
+    const response = await fetch(
+      `${CONFIG.WORKER_URL}/entitlements?customerId=${encodeURIComponent(customerId)}`,
+      {cache:'no-store'}
+    );
+
+    if(!response.ok) return;
+
+    const data = await response.json();
+    if(!data.ok || !Array.isArray(data.entitlements)) return;
+
+    const roleIds = [...new Set(data.entitlements.map(item=>item.role_id).filter(Boolean))];
+    localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify(roleIds));
+  }catch(error){
+    console.warn('entitlements sync failed',error);
+  }
+}
+
+async function startEcpayPayment(){
+  if(!state.currentRole || !state.resultId){
+    setModalMessage('請先完成測驗並選擇要解鎖的卡牌。',false);
     return;
   }
-  const roleName = state.currentRole ? `${state.currentRole.name}｜${state.currentRole.rarity}` : '尚未完成測驗';
-  const text = `人生副本付款回報資料
-角色：${roleName}
-結果編號：${state.resultId || '尚未產生'}
-金額：${CONFIG.price}
 
-付款回報表單：
-${CONFIG.paymentFormUrl}
-
-請在表單內填入結果編號、付款後五碼與聯絡方式。`;
-  copyText(text,'已複製結果編號與表單資料');
-}
-
-function openPaymentForm(){
-  if(state.resultId && hasPremiumAccess(state.resultId)){
+  if(hasPremiumAccess(state.resultId)){
+    closePayModal();
     showPremiumReport();
-    toast('這個角色已經解鎖，可以直接查看完整報告');
+    toast('這個角色已經解鎖');
     return;
   }
-  const url = String(CONFIG.paymentFormUrl || '').trim();
-  if(!url || url.includes('請貼上')){
-    toast('付款回報表單暫時無法開啟，請稍後再試');
-    return;
+
+  const button = $('payNowBtn');
+  if(button){
+    button.disabled = true;
+    button.textContent = '正在前往綠界…';
   }
-  copyPaymentInfo();
-  window.open(url, '_blank', 'noopener');
+  setModalMessage('正在建立安全付款頁面…',true);
+
+  try{
+    const customerId = getCustomerId();
+    const response = await fetch(`${CONFIG.WORKER_URL}/create-payment`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        customerId,
+        resultId:state.resultId,
+        roleId:state.currentRole.id,
+        roleName:state.currentRole.name
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      throw new Error(data.message || '建立付款失敗');
+    }
+
+    if(data.alreadyOwned){
+      const remote = getRemoteRoleIds();
+      remote.add(state.currentRole.id);
+      localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify([...remote]));
+      grantRoleAccessToCurrentResult();
+      closePayModal();
+      showPremiumReport();
+      toast('這個角色已經解鎖');
+      return;
+    }
+
+    localStorage.setItem(
+      STORAGE_KEYS.pendingPayment,
+      JSON.stringify({
+        tradeNo:data.tradeNo,
+        customerId,
+        resultId:state.resultId,
+        roleId:state.currentRole.id,
+        createdAt:new Date().toISOString()
+      })
+    );
+
+    submitPaymentForm(data.action,data.fields);
+  }catch(error){
+    setModalMessage(error.message || '付款服務暫時無法使用，請稍後再試。',false);
+    if(button){
+      button.disabled = false;
+      button.textContent = '前往綠界安全付款 NT$49';
+    }
+  }
 }
-function redeemCode(){
-  const code = normalizeCode($('unlockCodeInput').value);
-  if(!state.currentRole) return setModalMessage('請先完成測驗。',false);
-  if(hasPremiumAccess(state.resultId)) return setModalMessage('這個角色已經解鎖，不需要再次解鎖。',true);
-  if(!code) return setModalMessage('請輸入解鎖碼。',false);
-  if(!CONFIG.APPS_SCRIPT_URL) return setModalMessage('目前暫時無法驗證解鎖碼，請稍後再試。',false);
-  $('redeemBtn').disabled = true;
-  setModalMessage('正在驗證解鎖碼...',true);
-  redeemViaJsonp(code, state.currentRole.id, state.resultId)
-    .then(res=>{
-      if(res.ok){
-        grantPremiumAccess(state.resultId, code);
-        showPremiumReport();
-        closePayModal();
-        toast('解鎖成功，這個角色已保存到卡冊');
-        $('premiumReport').scrollIntoView({behavior:'smooth',block:'start'});
-      } else {
-        setModalMessage(res.message || '解鎖失敗，請確認代碼是否正確。', false);
-      }
-    })
-    .catch(()=>setModalMessage('連線失敗，請稍後再試。', false))
-    .finally(()=>{ $('redeemBtn').disabled = false; });
-}
-function redeemViaJsonp(code, roleId, resultId){
-  return new Promise((resolve,reject)=>{
-    const cb = 'lifequest_cb_' + Math.random().toString(36).slice(2);
-    const script = document.createElement('script');
-    const url = new URL(CONFIG.APPS_SCRIPT_URL);
-    url.searchParams.set('action','redeem');
-    url.searchParams.set('code',code);
-    url.searchParams.set('roleId',roleId);
-    url.searchParams.set('resultId',resultId);
-    url.searchParams.set('callback',cb);
-    url.searchParams.set('ts',String(Date.now()));
-    const cleanup = ()=>{ delete window[cb]; script.remove(); clearTimeout(timer); };
-    const timer = setTimeout(()=>{ cleanup(); reject(new Error('timeout')); },12000);
-    window[cb] = (data)=>{ cleanup(); resolve(data); };
-    script.onerror = ()=>{ cleanup(); reject(new Error('script error')); };
-    script.src = url.toString();
-    document.body.appendChild(script);
+
+function submitPaymentForm(action,fields){
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = action;
+  form.style.display = 'none';
+
+  Object.entries(fields || {}).forEach(([name,value])=>{
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = String(value);
+    form.appendChild(input);
   });
+
+  document.body.appendChild(form);
+  form.submit();
 }
+
+async function handlePaymentReturn(){
+  const url = new URL(location.href);
+  const payment = url.searchParams.get('payment');
+  const tradeNo = url.searchParams.get('tradeNo');
+
+  if(payment === 'cancelled'){
+    toast('付款尚未完成');
+    clearPaymentQuery();
+    return;
+  }
+
+  if(payment === 'invalid'){
+    toast('付款結果驗證失敗，請聯絡客服');
+    clearPaymentQuery();
+    return;
+  }
+
+  if(payment !== 'return' || !tradeNo) return;
+
+  toast('正在確認付款結果…');
+
+  const pending = getPendingPayment();
+  const customerId = pending?.customerId || getCustomerId();
+
+  try{
+    const order = await pollOrderStatus(tradeNo,customerId);
+    if(!order?.paid){
+      toast('付款仍在確認中，稍後重新開啟網站即可');
+      return;
+    }
+
+    applyPaidOrder(order.order);
+    localStorage.removeItem(STORAGE_KEYS.pendingPayment);
+    clearPaymentQuery();
+    toast('付款成功，完整報告已解鎖');
+  }catch(error){
+    console.warn(error);
+    toast('付款結果仍在確認中，稍後重新整理即可');
+  }
+}
+
+function getPendingPayment(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.pendingPayment)||'null')}
+  catch{return null}
+}
+
+async function pollOrderStatus(tradeNo,customerId){
+  for(let attempt=0; attempt<10; attempt+=1){
+    const response = await fetch(
+      `${CONFIG.WORKER_URL}/order-status?tradeNo=${encodeURIComponent(tradeNo)}&customerId=${encodeURIComponent(customerId)}`,
+      {cache:'no-store'}
+    );
+
+    if(response.ok){
+      const data = await response.json();
+      if(data.ok && data.paid) return data;
+    }
+
+    await new Promise(resolve=>setTimeout(resolve,1500));
+  }
+
+  return null;
+}
+
+function applyPaidOrder(order){
+  if(!order) return;
+
+  const remote = getRemoteRoleIds();
+  remote.add(order.role_id);
+  localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify([...remote]));
+
+  const saved = getSavedList().find(item=>item.resultId===order.result_id)
+    || getSavedList().find(item=>item.roleId===order.role_id);
+
+  const role = getRoleById(order.role_id);
+  if(!role) return;
+
+  state.currentRole = role;
+  state.resultId = saved?.resultId || order.result_id;
+  state.answers = Array.isArray(saved?.answers) && saved.answers.length===questions.length
+    ? saved.answers
+    : synthesizeAnswersFromRole(role);
+  state.scores = calculateScores();
+
+  grantPremiumAccess(state.resultId,'ECPAY');
+  renderResult(role);
+  $('resultSection').classList.remove('hidden');
+  showPremiumReport();
+  saveLastResult();
+
+  setTimeout(
+    ()=>$('premiumReport').scrollIntoView({behavior:'smooth',block:'start'}),
+    150
+  );
+}
+
+function clearPaymentQuery(){
+  const clean = `${location.origin}${location.pathname}${location.hash || ''}`;
+  history.replaceState({},document.title,clean);
+}
+
 function setModalMessage(msg,ok){ const el=$('modalMessage'); el.textContent=msg; el.style.color=ok?'var(--green)':'var(--danger)'; }
 function normalizeCode(code){ return String(code||'').trim().toUpperCase().replace(/\s+/g,''); }
 
