@@ -766,6 +766,35 @@ function renderResult(role){
   $('detailWork').textContent = role.work;
   $('detailBoss').textContent = role.boss;
   $('premiumTitle').textContent = `${role.name}｜完整角色報告 ♡`;
+  updatePremiumUpsell(role);
+}
+
+function firstSentence(text, maxLength=90){
+  const clean = String(text || '').replace(/\s+/g,' ').trim();
+  const match = clean.match(/^.*?[。！？!?]/);
+  const sentence = match ? match[0] : clean;
+  return sentence.length > maxLength ? `${sentence.slice(0,maxLength).trim()}…` : sentence;
+}
+
+function updatePremiumUpsell(role){
+  if(!role) return;
+
+  const note = rolePremiumNotes[role.id] || {};
+  const tone = getTonePack(role);
+  const mission = note.mission || role.quest.replace('本週任務：','');
+
+  const setText = (id,text)=>{
+    const node = $(id);
+    if(node) node.textContent = text;
+  };
+
+  setText('upsellRoleBadge', `${role.emoji} ${role.name}｜${role.rarity}`);
+  setText('upsellHeadline', `這張「${role.name}」卡，真正有料的是後面的 10 個章節`);
+  setText('upsellTeaser', firstSentence(note.hook || roleContradiction(role), 110));
+  setText('upsellLovePreview', `你最容易卡在：${tone.loveRisk}`);
+  setText('upsellBossPreview', `完整拆解「${roleBossName(role)}」，以及這張卡真正的破關條件。`);
+  setText('upsellMissionPreview', mission);
+  setText('upsellCtaRole', role.name);
 }
 
 
@@ -1210,7 +1239,7 @@ function renderSavedCards(){
       </div>
       <div class="saved-actions">
         <button class="secondary-btn tiny" type="button" data-view-saved="${item.resultId}">查看</button>
-        ${unlocked ? `<button class="primary-btn tiny" type="button" data-view-report="${item.resultId}">查看完整報告</button>` : `<button class="primary-btn tiny" type="button" data-unlock-saved="${item.resultId}">解鎖這張</button>`}
+        ${unlocked ? `<button class="primary-btn tiny" type="button" data-view-report="${item.resultId}">查看完整報告</button>` : `<button class="primary-btn tiny" type="button" data-unlock-saved="${item.resultId}">完整報告 · NT$49</button>`}
       </div>
     </article>`;
   }).join('');
@@ -1274,6 +1303,12 @@ function openPayModal(){
     target.textContent = `購買角色：${state.currentRole.name}｜${state.currentRole.rarity}
 結果編號：${state.resultId}`;
   }
+
+  const note = rolePremiumNotes[state.currentRole.id] || {};
+  const payHeading = $('payRoleHeading');
+  const payTeaser = $('payRoleTeaser');
+  if(payHeading) payHeading.textContent = `${state.currentRole.emoji} ${state.currentRole.name}｜${state.currentRole.rarity}`;
+  if(payTeaser) payTeaser.textContent = firstSentence(note.hook || roleContradiction(state.currentRole), 105);
 
   setModalMessage('', true);
   openModalElement($('payModal'));

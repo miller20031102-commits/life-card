@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15.6" />
+  <link rel="stylesheet" href="style.css?v=15.7" />
 </head>
 <body>
   <div class="bg-noise" aria-hidden="true"></div>
@@ -55,7 +55,7 @@
           <span>🎴 可下載卡圖</span>
           <span>💬 可複製 Threads 文案</span>
           <span>🎟️ 免費無限抽卡</span>
-          <span>💎 49 元完整報告</span>
+          <span>💎 10 章專屬報告 NT$49</span>
         </div>
       </div>
 
@@ -172,15 +172,58 @@
 
           <div class="share-box" id="shareBox" aria-live="polite"></div>
 
-          <div class="locked-upsell" id="lockedUpsell">
-            <div class="upsell-head"><span>💎 付費版</span><strong>完整角色報告 NT$49</strong></div>
-            <p>免費版給你角色卡；付費版把這張卡延伸成完整報告，包含戀愛攻略、朋友定位、金錢弱點與 7 日升級任務。</p>
-            <ul>
-              <li>綠界付款成功後自動解鎖</li>
-              <li>同一種角色只需購買一次</li>
-              <li>適合截圖保存，之後也可以做成實體卡</li>
-            </ul>
-            <button class="primary-btn full" data-open-pay type="button">解鎖完整報告 NT$49</button>
+          <div class="locked-upsell premium-conversion-card" id="lockedUpsell">
+            <div class="upsell-glow" aria-hidden="true"></div>
+
+            <div class="upsell-topline">
+              <span class="premium-pill">💎 這張卡還有隱藏內容</span>
+              <span class="one-time-price">一次解鎖 NT$49</span>
+            </div>
+
+            <div class="upsell-role-badge" id="upsellRoleBadge">🎴 你的角色｜稀有度</div>
+            <h3 id="upsellHeadline">你的角色卡只是序章</h3>
+            <p class="upsell-intro">免費版告訴你「你是哪張卡」；完整報告會告訴你，這張卡在戀愛、朋友、工作、金錢和人生卡關時，究竟是怎麼運作的。</p>
+
+            <div class="upsell-personal-preview">
+              <div class="preview-label"><span>先偷看一小段</span><b>角色專屬內容</b></div>
+              <p id="upsellTeaser">正在讀取這張角色的專屬解析⋯</p>
+            </div>
+
+            <div class="upsell-value-grid" aria-label="完整報告內容">
+              <div><strong>10</strong><span>個完整章節</span></div>
+              <div><strong>7＋30</strong><span>天升級路線</span></div>
+              <div><strong>1 次</strong><span>同角色不重複付費</span></div>
+            </div>
+
+            <div class="locked-preview-list">
+              <article>
+                <span class="preview-icon">💘</span>
+                <div><strong>戀愛攻略</strong><p id="upsellLovePreview">看懂你在靠近、退後和心動時最容易卡住的地方。</p></div>
+                <span class="preview-lock">🔒</span>
+              </article>
+              <article>
+                <span class="preview-icon">👾</span>
+                <div><strong>隱藏 Boss 攻略</strong><p id="upsellBossPreview">找出你的核心關卡，以及真正適合你的破關方式。</p></div>
+                <span class="preview-lock">🔒</span>
+              </article>
+              <article>
+                <span class="preview-icon">🗓️</span>
+                <div><strong>7 日任務＋30 天養成</strong><p id="upsellMissionPreview">不是空泛雞湯，而是依照這張卡設計的小任務。</p></div>
+                <span class="preview-lock">🔒</span>
+              </article>
+            </div>
+
+            <button class="primary-btn full premium-cta" data-open-pay type="button">
+              <span>解鎖「<b id="upsellCtaRole">這張角色</b>」完整報告</span>
+              <small>NT$49・綠界安全付款</small>
+            </button>
+
+            <div class="upsell-trust-row">
+              <span>✓ 付款成功自動顯示</span>
+              <span>✓ 同角色之後都能再看</span>
+              <span>✓ 不是訂閱制</span>
+            </div>
+            <p class="upsell-safe-note">點擊後會先確認角色與付款資訊，不會在這一步直接扣款。</p>
           </div>
         </aside>
       </div>
@@ -195,24 +238,33 @@
     </section>
 
     <section class="section-pad premium-section" id="premium">
-      <div class="premium-card reveal">
-        <div>
+      <div class="premium-card premium-sales-card reveal">
+        <div class="premium-sales-copy">
           <p class="eyebrow">完整報告版</p>
-          <h2>先抽出角色卡，再解鎖完整報告</h2>
-          <p>免費版可以生成角色卡；喜歡哪一張，就可以從「我的卡冊」選那張解鎖完整報告。同一種角色只要解鎖過一次，之後抽到同角色都能直接查看完整報告，不會重複收費。</p>
+          <h2>不是把免費版寫長，<br>是把你的角色拆成一份攻略。</h2>
+          <p>每張角色都有自己的核心反差、戀愛訊號、社交位置、工作優勢、金錢雷點、Boss 攻略與升級任務。內容會直接引用這張卡的技能、被動與弱點，不是只替換角色名稱。</p>
+          <div class="premium-proof-strip">
+            <span>33 種角色各自內容</span>
+            <span>10 個完整章節</span>
+            <span>可複製、截圖與重複查看</span>
+          </div>
         </div>
-        <div class="price-box unlock-select-box">
-          <span>完整報告</span>
-          <strong>NT$49</strong>
-          <p class="price-note">同一種角色只需要購買一次。從「我的卡冊」選好角色後，前往綠界安全付款。</p>
-          <button class="primary-btn full" id="chooseUnlockBtn" type="button">選擇要解鎖的卡</button>
+        <div class="price-box unlock-select-box premium-price-box">
+          <span class="price-kicker">一次解鎖・不是訂閱</span>
+          <strong><small>NT$</small>49</strong>
+          <p class="price-note">選一張你最有感的角色卡解鎖。同一種角色只需要購買一次，付款完成後自動顯示完整報告。</p>
+          <button class="primary-btn full" id="chooseUnlockBtn" type="button">從卡冊選一張完整解鎖</button>
+          <small class="price-trust">綠界安全付款｜本站不保存完整信用卡資料</small>
         </div>
       </div>
-      <div class="premium-feature-grid reveal">
-        <article><span>💘</span><h3>戀愛攻略</h3><p>分析你在曖昧、交往、冷掉時最常卡住的點。</p></article>
-        <article><span>👥</span><h3>朋友定位</h3><p>你在群體裡是輸出、補師、軍師、吉祥物還是隱藏 Boss。</p></article>
-        <article><span>💸</span><h3>金錢弱點</h3><p>提醒你最容易衝動花錢、逃避現實或亂買療癒感的時刻。</p></article>
-        <article><span>⚔️</span><h3>7 日升級任務</h3><p>每天一個小任務，讓角色真的有升級感。</p></article>
+
+      <div class="premium-feature-grid premium-feature-grid-six reveal">
+        <article><span>🪄</span><h3>角色核心反差</h3><p>看懂別人先看到的你，和真正熟悉後才會發現的你。</p></article>
+        <article><span>💘</span><h3>戀愛攻略</h3><p>拆解你的心動訊號、關係盲點與最適合的溝通方式。</p></article>
+        <article><span>👥</span><h3>朋友與社交定位</h3><p>你在群體裡的自然能力，以及最容易被消耗的情境。</p></article>
+        <article><span>💼</span><h3>工作與金錢模式</h3><p>你的優勢、工作陷阱、衝動消費時刻與值得投資的方向。</p></article>
+        <article><span>👾</span><h3>隱藏 Boss 攻略</h3><p>替你的核心弱點命名，並給出真正可執行的破關條件。</p></article>
+        <article><span>🗓️</span><h3>7 日＋30 天升級</h3><p>從一週小任務到四週養成地圖，把角色設定變成行動。</p></article>
       </div>
     </section>
 
@@ -265,8 +317,17 @@
     <div class="modal-panel">
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
       <p class="eyebrow">綠界安全付款</p>
-      <h2 id="payTitle">完整角色報告 NT$49</h2>
-      <p class="modal-copy">確認要購買完整報告的角色後，將前往綠界付款頁。付款成功後會自動返回網站並解鎖完整報告。</p>
+      <h2 id="payTitle">解鎖這張角色的完整攻略</h2>
+      <p class="modal-copy">你將解鎖這張角色專屬的 10 個章節。付款成功後會自動返回網站並立即顯示完整內容。</p>
+      <div class="pay-role-preview">
+        <strong id="payRoleHeading">正在確認角色卡</strong>
+        <p id="payRoleTeaser">戀愛、社交、工作、金錢與升級任務會依這張卡的技能和弱點產生。</p>
+      </div>
+      <div class="pay-value-summary">
+        <span><b>10 章</b>角色專屬解析</span>
+        <span><b>一次</b>同角色不重複付費</span>
+        <span><b>自動</b>付款成功立即解鎖</span>
+      </div>
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
       <div class="pay-steps">
         <div><strong>1</strong><span>前往綠界選擇可用的付款方式</span></div>
@@ -274,7 +335,7 @@
         <div><strong>3</strong><span>返回網站，自動解鎖完整報告</span></div>
       </div>
       <div class="payment-note policy-reminder">🔒 付款由綠界科技處理，本站不會取得或保存完整信用卡資料。</div><div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
-      <button class="primary-btn full" id="payNowBtn" type="button">前往綠界安全付款 NT$49</button>
+      <button class="primary-btn full pay-confirm-btn" id="payNowBtn" type="button">前往綠界安全付款｜NT$49</button>
       <div class="modal-message" id="modalMessage" aria-live="polite"></div>
     </div>
   </div>
@@ -348,6 +409,6 @@
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="script.js?v=15.6" defer></script>
+  <script src="script.js?v=15.7" defer></script>
 </body>
 </html>
