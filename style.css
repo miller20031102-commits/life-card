@@ -1194,106 +1194,108 @@ body:has(#saveImageModal:not(.hidden)) .toast{
 }
 
 
-/* v15.9｜付款品牌符號 */
-.payment-logo-row{
+/* =========================================================
+   v15.9｜內建支付 SVG 圖示
+   ========================================================= */
+.payment-icons{
   display:flex;
   align-items:center;
   flex-wrap:wrap;
   gap:8px;
+  margin-top:12px;
 }
-.payment-logo{
+.pay-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:34px;
+  line-height:0;
+  filter:drop-shadow(0 5px 12px rgba(0,0,0,.18));
+}
+.pay-icon svg{
   display:block;
+  height:32px;
   width:auto;
-  height:36px;
-  max-width:112px;
-  border-radius:8px;
-  filter:drop-shadow(0 5px 12px rgba(0,0,0,.13));
-  transition:transform .18s ease,filter .18s ease;
 }
-.payment-logo:hover{
-  transform:translateY(-1px);
-  filter:drop-shadow(0 7px 15px rgba(0,0,0,.18));
+.hero-payment-icons .pay-icon{height:35px}
+.hero-payment-icons .pay-icon svg{height:33px}
+.compact-payment-trust{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
 }
-.payment-logo[src*="ecpay"]{max-width:124px}
-.payment-logo-compact{
+.compact-payment-trust > span{
+  color:rgba(255,255,255,.58);
+  font-size:10px;
+  font-weight:900;
+}
+.compact-icons{
+  justify-content:center;
+  margin-top:0;
+  gap:5px;
+}
+.compact-icons .pay-icon{
+  height:25px;
+}
+.compact-icons .pay-icon svg{
+  height:24px;
+}
+.price-payment-icons{
+  justify-content:center;
+  margin-top:5px;
+  gap:6px;
+}
+.price-payment-icons .pay-icon{
   height:27px;
-  max-width:78px;
-  border-radius:6px;
 }
-.payment-logo-compact[src*="mastercard"]{max-width:88px}
-.compact-logo-row span{margin-right:2px}
-.modal-brand-row .payment-logo{
-  height:31px;
-  max-width:91px;
+.price-payment-icons .pay-icon svg{
+  height:26px;
 }
-.hero-payment-trust .payment-logo-row{margin-top:13px}
-.mini-payment-brand-row{gap:6px;margin-top:6px}
-.compact-payment-trust{gap:6px}
+.modal-brand-row{
+  margin-top:10px;
+  gap:6px;
+}
+.modal-brand-row .pay-icon{
+  height:29px;
+}
+.modal-brand-row .pay-icon svg{
+  height:28px;
+}
+
+/* 隱藏 v15.8 舊文字徽章樣式殘留 */
+.payment-brand-row,
+.mini-payment-brand-row{
+  display:none!important;
+}
 
 @media(max-width:600px){
-  .payment-logo{height:30px;max-width:91px}
-  .payment-logo[src*="ecpay"]{max-width:104px}
-  .payment-logo-compact{height:24px;max-width:69px}
-  .payment-logo-compact[src*="mastercard"]{max-width:78px}
-  .modal-brand-row .payment-logo{height:27px;max-width:78px}
+  .payment-icons{
+    gap:6px;
+  }
+  .hero-payment-icons .pay-icon svg{
+    height:29px;
+  }
+  .compact-icons .pay-icon svg{
+    height:22px;
+  }
+  .price-payment-icons .pay-icon svg,
+  .modal-brand-row .pay-icon svg{
+    height:25px;
+  }
 }
 
 
 /* =========================================================
-   v16.0｜首頁自然化
-   首頁先吸引使用者測驗，付款資訊只出現在有購買意圖的位置
+   v16.0｜自然導購調整
+   首頁不主動展示付款品牌，支付圖示只保留在付款確認視窗
    ========================================================= */
-
-.hero .trust-row{
-  margin-top:4px;
-}
-.hero .trust-row span{
-  background:rgba(255,255,255,.055);
-}
-
-/* 首頁已移除付款品牌卡，避免第一眼過度商業化 */
-.hero-payment-trust{
+.hero-payment-trust,
+.price-payment-icons,
+.compact-icons{
   display:none!important;
 }
-
-/* 完整報告中段只保留一行付款安心說明 */
-.price-payment-note{
-  margin-top:5px;
-  padding:8px 10px;
-  border-radius:12px;
-  color:rgba(255,255,255,.64);
-  background:rgba(255,255,255,.055);
-  border:1px solid rgba(255,255,255,.09);
-  font-size:10px;
-  font-weight:800;
-  line-height:1.45;
-  text-align:center;
-}
-
-/* 結果頁付款品牌圖示保持低調，不搶過內容與 CTA */
-.premium-conversion-card .compact-logo-row{
-  margin-top:11px;
-  opacity:.82;
-}
-.premium-conversion-card .payment-logo-compact{
-  height:24px;
-  max-width:72px;
-}
-.premium-conversion-card .payment-logo-compact[src*="mastercard"]{
-  max-width:82px;
-}
-
-/* 最後付款確認視窗才完整顯示付款品牌 */
-.modal-payment-methods{
-  margin-top:14px;
-}
-
-@media(max-width:600px){
-  .hero .trust-row{
-    gap:7px;
-  }
-  .hero .trust-row span{
-    padding:8px 10px;
-    font-size:11px;
-  }
+.modal-payment-methods .payment-icons{
+  display:flex!important;
 }
