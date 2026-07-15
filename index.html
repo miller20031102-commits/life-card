@@ -1,414 +1,393 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="人生副本：回答 12 題，抽出你的專屬人生角色卡。不是 MBTI，不是星座，是你的遊戲設定。" />
-    <meta property="og:title" content="人生副本｜你的角色卡販賣機" />
-  <meta property="og:description" content="回答 12 題，抽出你的專屬角色卡：稀有度、技能、弱點、戀愛屬性、本週任務一次生成。" />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#100f1f" />
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://lifequest-api.miller20031102.workers.dev; form-action https://payment.ecpay.com.tw; object-src 'none'; base-uri 'self'; upgrade-insecure-requests" />
-  <link rel="canonical" href="https://miller20031102-commits.github.io/life-card/" />
-  <meta property="og:url" content="https://miller20031102-commits.github.io/life-card/" />
-  <meta property="og:image" content="https://miller20031102-commits.github.io/life-card/og-image.png" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <title>人生副本｜娛樂性角色卡測驗與完整角色報告</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=15.7" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="人生副本：回答 12 題，抽出你的專屬人生角色卡。不是 MBTI，不是星座，是你的遊戲設定。" name="description"/>
+<meta content="人生副本｜你的角色卡販賣機" property="og:title"/>
+<meta content="回答 12 題，抽出你的專屬角色卡：稀有度、技能、弱點、戀愛屬性、本週任務一次生成。" property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="#100f1f" name="theme-color"/>
+<meta content="strict-origin-when-cross-origin" name="referrer"/>
+<meta content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://lifequest-api.miller20031102.workers.dev; form-action https://payment.ecpay.com.tw; object-src 'none'; base-uri 'self'; upgrade-insecure-requests" http-equiv="Content-Security-Policy"/>
+<link href="https://miller20031102-commits.github.io/life-card/" rel="canonical"/>
+<meta content="https://miller20031102-commits.github.io/life-card/" property="og:url"/>
+<meta content="https://miller20031102-commits.github.io/life-card/og-image.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<title>人生副本｜娛樂性角色卡測驗與完整角色報告</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="style.css?v=16.0" rel="stylesheet"/>
 </head>
 <body>
-  <div class="bg-noise" aria-hidden="true"></div>
-  <div class="orb orb-a" aria-hidden="true"></div>
-  <div class="orb orb-b" aria-hidden="true"></div>
-  <div class="orb orb-c" aria-hidden="true"></div>
+<div aria-hidden="true" class="bg-noise"></div>
+<div aria-hidden="true" class="orb orb-a"></div>
+<div aria-hidden="true" class="orb orb-b"></div>
+<div aria-hidden="true" class="orb orb-c"></div>
+<header class="site-header">
+<a aria-label="人生副本首頁" class="brand" href="#top">
+<span class="brand-mark">副</span>
+<span class="brand-copy"><strong>人生副本</strong><small>角色卡販賣機</small></span>
+</a>
+<nav aria-label="主要選單" class="nav-links">
+<a href="#samples">範例</a>
+<a href="#quiz">測驗</a>
+<a href="#premium">付費版</a>
+<a href="#faq">說明</a>
+</nav>
+<button class="ghost-btn tiny" id="savedBtn" type="button">我的卡冊</button>
+</header>
+<main id="top">
+<section class="hero section-pad">
+<div class="hero-copy reveal">
+<p class="eyebrow">不是 MBTI，不是星座，是你的遊戲設定</p>
+<h1>進入人生副本，<br/><span>抽出你的角色卡。</span></h1>
+<p class="hero-text">回答 12 題，生成專屬你的遊戲角色卡。稀有度、主技能、致命弱點、戀愛屬性、社交定位和本週任務一次出爐。</p>
+<div class="hero-actions">
+<a class="primary-btn" href="#quiz">開始抽我的卡</a>
+<a class="secondary-btn" href="#samples">先看範例</a>
+</div>
+<div class="trust-row">
+<span>⚡ 3 分鐘完成</span>
+<span>🎴 可下載卡圖</span>
+<span>💬 可複製 Threads 文案</span>
+<span>🎟️ 免費無限抽卡</span>
+<span>✨ 33 種角色結果</span>
+</div>
+</div>
+<div aria-label="角色卡預覽" class="hero-stage reveal">
+<div class="float-chip chip-a">本週任務 +1</div>
+<div class="float-chip chip-b">UR?</div>
+<article class="display-card hero-card rarity-SSR">
+<div class="card-sheen"></div>
+<div class="card-top"><span class="rarity-badge">SSR</span><span>#042</span></div>
+<div class="avatar">🧙‍♂️</div>
+<h2>戀愛逃跑法師</h2>
+<p>越喜歡越冷淡，越在意越裝沒差。</p>
+<div class="mini-stats">
+<span>主技能：已讀後小劇場</span>
+<span>弱點：怕自己太認真</span>
+<span>任務：不要裝沒事</span>
+</div>
+</article>
+</div>
+</section>
+<section aria-label="網站亮點" class="section-pad strip-section reveal">
+<div class="strip-card"><strong>免費無限抽卡</strong><span>想重測幾次都可以，每次結果都會自動存進我的卡冊</span></div>
+<div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
+<div class="strip-card"><strong>免費測驗不綁卡</strong><span>先無限抽角色卡，喜歡結果再自行選擇是否解鎖完整報告</span></div>
+</section>
+<section class="section-pad samples-section" id="samples">
+<div class="section-title center reveal">
+<p class="eyebrow">先偷看幾張</p>
+<h2>先看看你可能抽到哪一張可愛人設卡</h2>
+<p class="section-subtitle">每張卡都有稀有度、技能、弱點和本週任務，像一張專屬你的人生小卡。</p>
+</div>
+<div class="sample-grid" id="sampleGrid"></div>
+</section>
+<section class="section-pad quiz-section" id="quiz">
+<div class="quiz-shell reveal">
+<aside class="quiz-intro">
+<p class="eyebrow">開始進入副本</p>
+<h2>12 題抽出你的角色卡</h2>
+<p>不用想太久，選最像你平常反應的答案。這不是診斷，是娛樂，但文案會故意寫得像在偷看你的人生。</p>
+<div class="mini-note">免費無限抽卡。想換答案重測幾次都可以，卡片會自動存進卡冊。</div>
+<div class="daily-limit-card unlimited-play-card">
+<span>🎟️ 免費無限抽卡</span>
+<strong>不限次數</strong>
+<small>完成後可以立刻重新測驗，不用等到隔天。</small>
+</div>
+</aside>
+<div class="quiz-panel" id="quizPanel">
+<div class="progress-wrap">
+<div class="progress-meta"><span id="progressText">第 1 / 12 題</span><span id="progressMood">新手村入口</span></div>
+<div class="progress-track"><div id="progressBar"></div></div>
+</div>
+<div class="question-box">
+<h3 id="questionTitle">題目載入中</h3>
+<p id="questionHint"></p>
+<div class="options-grid" id="optionsGrid"></div>
+</div>
+<div class="quiz-controls">
+<button class="secondary-btn small" id="prevBtn" type="button">上一題</button>
+<button class="ghost-btn small" id="resetBtn" type="button">重新開始</button>
+</div>
+</div>
+</div>
+</section>
+<section class="section-pad result-section hidden" id="resultSection">
+<div class="section-title center">
+<p class="eyebrow">副本結算</p>
+<h2>你的角色卡生成完成</h2>
+</div>
+<div class="result-layout">
+<div class="export-column">
+<article class="result-card" id="resultCard">
+<div class="card-sheen"></div>
+<div class="result-inner">
+<div class="card-top"><span class="rarity-badge" id="resultRarity">SR</span><span id="resultCode">#000</span></div>
+<div class="result-avatar" id="resultEmoji">🛡️</div>
+<h2 id="resultName">角色名稱</h2>
+<p class="role-line" id="resultLine">一句話描述</p>
+<div class="trait-row" id="traitRow"></div>
+<div class="card-divider"></div>
+<div class="ability-list">
+<div><strong>主技能</strong><span id="resultSkill"></span></div>
+<div><strong>被動技能</strong><span id="resultPassive"></span></div>
+<div><strong>致命弱點</strong><span id="resultWeakness"></span></div>
+<div><strong>本週任務</strong><span id="resultQuest"></span></div>
+</div>
+<p class="result-summary" id="resultSummary"></p>
+</div>
+</article>
+<p class="download-tip">點「下載角色卡 JPG」後會產生圖片，點圖片即可嘗試儲存到手機。</p>
+</div>
+<aside class="result-info">
+<div class="info-card">
+<h3>免費版解析</h3>
+<div class="detail-list">
+<div><strong>戀愛屬性</strong><p id="detailLove"></p></div>
+<div><strong>社交定位</strong><p id="detailSocial"></p></div>
+<div><strong>工作模式</strong><p id="detailWork"></p></div>
+<div><strong>隱藏 Boss</strong><p id="detailBoss"></p></div>
+</div>
+</div>
+<div class="action-stack">
+<button class="primary-btn full" id="downloadBtn" type="button">下載角色卡 JPG</button>
+<button class="secondary-btn full" id="shareBtn" type="button">複製 Threads 分享文</button>
+<button class="ghost-btn full" id="againBtn" type="button">重新測一次</button>
+</div>
+<div aria-live="polite" class="share-box" id="shareBox"></div>
+<div class="locked-upsell premium-conversion-card" id="lockedUpsell">
+<div aria-hidden="true" class="upsell-glow"></div>
+<div class="upsell-topline">
+<span class="premium-pill">💎 這張卡還有隱藏內容</span>
+<span class="one-time-price">一次解鎖 NT$49</span>
+</div>
+<div class="upsell-role-badge" id="upsellRoleBadge">🎴 你的角色｜稀有度</div>
+<h3 id="upsellHeadline">你的角色卡只是序章</h3>
+<p class="upsell-intro">免費版告訴你「你是哪張卡」；完整報告會告訴你，這張卡在戀愛、朋友、工作、金錢和人生卡關時，究竟是怎麼運作的。</p>
+<div class="upsell-personal-preview">
+<div class="preview-label"><span>先偷看一小段</span><b>角色專屬內容</b></div>
+<p id="upsellTeaser">正在讀取這張角色的專屬解析⋯</p>
+</div>
+<div aria-label="完整報告內容" class="upsell-value-grid">
+<div><strong>10</strong><span>個完整章節</span></div>
+<div><strong>7＋30</strong><span>天升級路線</span></div>
+<div><strong>1 次</strong><span>同角色不重複付費</span></div>
+</div>
+<div class="locked-preview-list">
+<article>
+<span class="preview-icon">💘</span>
+<div><strong>戀愛攻略</strong><p id="upsellLovePreview">看懂你在靠近、退後和心動時最容易卡住的地方。</p></div>
+<span class="preview-lock">🔒</span>
+</article>
+<article>
+<span class="preview-icon">👾</span>
+<div><strong>隱藏 Boss 攻略</strong><p id="upsellBossPreview">找出你的核心關卡，以及真正適合你的破關方式。</p></div>
+<span class="preview-lock">🔒</span>
+</article>
+<article>
+<span class="preview-icon">🗓️</span>
+<div><strong>7 日任務＋30 天養成</strong><p id="upsellMissionPreview">不是空泛雞湯，而是依照這張卡設計的小任務。</p></div>
+<span class="preview-lock">🔒</span>
+</article>
+</div>
+<button class="primary-btn full premium-cta" data-open-pay="" type="button">
+<span>解鎖「<b id="upsellCtaRole">這張角色</b>」完整報告</span>
+<small>NT$49・綠界安全付款</small>
+</button>
+<div class="upsell-trust-row">
+<span>✓ 付款成功自動顯示</span>
+<span>✓ 同角色之後都能再看</span>
+<span>✓ 不是訂閱制</span>
+</div>
+<div aria-label="付款方式" class="compact-payment-trust payment-logo-row compact-logo-row">
 
-  <header class="site-header">
-    <a class="brand" href="#top" aria-label="人生副本首頁">
-      <span class="brand-mark">副</span>
-      <span class="brand-copy"><strong>人生副本</strong><small>角色卡販賣機</small></span>
-    </a>
-    <nav class="nav-links" aria-label="主要選單">
-      <a href="#samples">範例</a>
-      <a href="#quiz">測驗</a>
-      <a href="#premium">付費版</a>
-      <a href="#faq">說明</a>
-    </nav>
-    <button class="ghost-btn tiny" id="savedBtn" type="button">我的卡冊</button>
-  </header>
-
-  <main id="top">
-    <section class="hero section-pad">
-      <div class="hero-copy reveal">
-        <p class="eyebrow">不是 MBTI，不是星座，是你的遊戲設定</p>
-        <h1>進入人生副本，<br><span>抽出你的角色卡。</span></h1>
-        <p class="hero-text">回答 12 題，生成專屬你的遊戲角色卡。稀有度、主技能、致命弱點、戀愛屬性、社交定位和本週任務一次出爐。</p>
-        <div class="hero-actions">
-          <a class="primary-btn" href="#quiz">開始抽我的卡</a>
-          <a class="secondary-btn" href="#samples">先看範例</a>
-        </div>
-        <div class="trust-row">
-          <span>⚡ 3 分鐘完成</span>
-          <span>🎴 可下載卡圖</span>
-          <span>💬 可複製 Threads 文案</span>
-          <span>🎟️ 免費無限抽卡</span>
-          <span>💎 10 章專屬報告 NT$49</span>
-        </div>
-      </div>
-
-      <div class="hero-stage reveal" aria-label="角色卡預覽">
-        <div class="float-chip chip-a">本週任務 +1</div>
-        <div class="float-chip chip-b">UR?</div>
-        <article class="display-card hero-card rarity-SSR">
-          <div class="card-sheen"></div>
-          <div class="card-top"><span class="rarity-badge">SSR</span><span>#042</span></div>
-          <div class="avatar">🧙‍♂️</div>
-          <h2>戀愛逃跑法師</h2>
-          <p>越喜歡越冷淡，越在意越裝沒差。</p>
-          <div class="mini-stats">
-            <span>主技能：已讀後小劇場</span>
-            <span>弱點：怕自己太認真</span>
-            <span>任務：不要裝沒事</span>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="section-pad strip-section reveal" aria-label="網站亮點">
-      <div class="strip-card"><strong>免費無限抽卡</strong><span>想重測幾次都可以，每次結果都會自動存進我的卡冊</span></div>
-      <div class="strip-card"><strong>完整報告</strong><span>戀愛攻略、社交定位、金錢弱點、7 日任務</span></div>
-      <div class="strip-card"><strong>綠界安全付款</strong><span>付款成功自動解鎖；同角色不會重複收費</span></div>
-    </section>
-
-    <section class="section-pad samples-section" id="samples">
-      <div class="section-title center reveal">
-        <p class="eyebrow">先偷看幾張</p>
-        <h2>先看看你可能抽到哪一張可愛人設卡</h2>
-        <p class="section-subtitle">每張卡都有稀有度、技能、弱點和本週任務，像一張專屬你的人生小卡。</p>
-      </div>
-      <div class="sample-grid" id="sampleGrid"></div>
-    </section>
-
-    <section class="section-pad quiz-section" id="quiz">
-      <div class="quiz-shell reveal">
-        <aside class="quiz-intro">
-          <p class="eyebrow">開始進入副本</p>
-          <h2>12 題抽出你的角色卡</h2>
-          <p>不用想太久，選最像你平常反應的答案。這不是診斷，是娛樂，但文案會故意寫得像在偷看你的人生。</p>
-          <div class="mini-note">免費無限抽卡。想換答案重測幾次都可以，卡片會自動存進卡冊。</div>
-          <div class="daily-limit-card unlimited-play-card">
-            <span>🎟️ 免費無限抽卡</span>
-            <strong>不限次數</strong>
-            <small>完成後可以立刻重新測驗，不用等到隔天。</small>
-          </div>
-        </aside>
-
-        <div class="quiz-panel" id="quizPanel">
-          <div class="progress-wrap">
-            <div class="progress-meta"><span id="progressText">第 1 / 12 題</span><span id="progressMood">新手村入口</span></div>
-            <div class="progress-track"><div id="progressBar"></div></div>
-          </div>
-          <div class="question-box">
-            <h3 id="questionTitle">題目載入中</h3>
-            <p id="questionHint"></p>
-            <div class="options-grid" id="optionsGrid"></div>
-          </div>
-          <div class="quiz-controls">
-            <button class="secondary-btn small" id="prevBtn" type="button">上一題</button>
-            <button class="ghost-btn small" id="resetBtn" type="button">重新開始</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section-pad result-section hidden" id="resultSection">
-      <div class="section-title center">
-        <p class="eyebrow">副本結算</p>
-        <h2>你的角色卡生成完成</h2>
-      </div>
-
-      <div class="result-layout">
-        <div class="export-column">
-          <article class="result-card" id="resultCard">
-            <div class="card-sheen"></div>
-            <div class="result-inner">
-              <div class="card-top"><span class="rarity-badge" id="resultRarity">SR</span><span id="resultCode">#000</span></div>
-              <div class="result-avatar" id="resultEmoji">🛡️</div>
-              <h2 id="resultName">角色名稱</h2>
-              <p class="role-line" id="resultLine">一句話描述</p>
-              <div class="trait-row" id="traitRow"></div>
-              <div class="card-divider"></div>
-              <div class="ability-list">
-                <div><strong>主技能</strong><span id="resultSkill"></span></div>
-                <div><strong>被動技能</strong><span id="resultPassive"></span></div>
-                <div><strong>致命弱點</strong><span id="resultWeakness"></span></div>
-                <div><strong>本週任務</strong><span id="resultQuest"></span></div>
-              </div>
-              <p class="result-summary" id="resultSummary"></p>
-            </div>
-          </article>
-          <p class="download-tip">點「下載角色卡 JPG」後會產生圖片，點圖片即可嘗試儲存到手機。</p>
-        </div>
-
-        <aside class="result-info">
-          <div class="info-card">
-            <h3>免費版解析</h3>
-            <div class="detail-list">
-              <div><strong>戀愛屬性</strong><p id="detailLove"></p></div>
-              <div><strong>社交定位</strong><p id="detailSocial"></p></div>
-              <div><strong>工作模式</strong><p id="detailWork"></p></div>
-              <div><strong>隱藏 Boss</strong><p id="detailBoss"></p></div>
-            </div>
-          </div>
-
-          <div class="action-stack">
-            <button class="primary-btn full" id="downloadBtn" type="button">下載角色卡 JPG</button>
-            <button class="secondary-btn full" id="shareBtn" type="button">複製 Threads 分享文</button>
-            <button class="ghost-btn full" id="againBtn" type="button">重新測一次</button>
-          </div>
-
-          <div class="share-box" id="shareBox" aria-live="polite"></div>
-
-          <div class="locked-upsell premium-conversion-card" id="lockedUpsell">
-            <div class="upsell-glow" aria-hidden="true"></div>
-
-            <div class="upsell-topline">
-              <span class="premium-pill">💎 這張卡還有隱藏內容</span>
-              <span class="one-time-price">一次解鎖 NT$49</span>
-            </div>
-
-            <div class="upsell-role-badge" id="upsellRoleBadge">🎴 你的角色｜稀有度</div>
-            <h3 id="upsellHeadline">你的角色卡只是序章</h3>
-            <p class="upsell-intro">免費版告訴你「你是哪張卡」；完整報告會告訴你，這張卡在戀愛、朋友、工作、金錢和人生卡關時，究竟是怎麼運作的。</p>
-
-            <div class="upsell-personal-preview">
-              <div class="preview-label"><span>先偷看一小段</span><b>角色專屬內容</b></div>
-              <p id="upsellTeaser">正在讀取這張角色的專屬解析⋯</p>
-            </div>
-
-            <div class="upsell-value-grid" aria-label="完整報告內容">
-              <div><strong>10</strong><span>個完整章節</span></div>
-              <div><strong>7＋30</strong><span>天升級路線</span></div>
-              <div><strong>1 次</strong><span>同角色不重複付費</span></div>
-            </div>
-
-            <div class="locked-preview-list">
-              <article>
-                <span class="preview-icon">💘</span>
-                <div><strong>戀愛攻略</strong><p id="upsellLovePreview">看懂你在靠近、退後和心動時最容易卡住的地方。</p></div>
-                <span class="preview-lock">🔒</span>
-              </article>
-              <article>
-                <span class="preview-icon">👾</span>
-                <div><strong>隱藏 Boss 攻略</strong><p id="upsellBossPreview">找出你的核心關卡，以及真正適合你的破關方式。</p></div>
-                <span class="preview-lock">🔒</span>
-              </article>
-              <article>
-                <span class="preview-icon">🗓️</span>
-                <div><strong>7 日任務＋30 天養成</strong><p id="upsellMissionPreview">不是空泛雞湯，而是依照這張卡設計的小任務。</p></div>
-                <span class="preview-lock">🔒</span>
-              </article>
-            </div>
-
-            <button class="primary-btn full premium-cta" data-open-pay type="button">
-              <span>解鎖「<b id="upsellCtaRole">這張角色</b>」完整報告</span>
-              <small>NT$49・綠界安全付款</small>
-            </button>
-
-            <div class="upsell-trust-row">
-              <span>✓ 付款成功自動顯示</span>
-              <span>✓ 同角色之後都能再看</span>
-              <span>✓ 不是訂閱制</span>
-            </div>
-            <p class="upsell-safe-note">點擊後會先確認角色與付款資訊，不會在這一步直接扣款。</p>
-          </div>
-        </aside>
-      </div>
-
-      <div class="premium-report hidden" id="premiumReport">
-        <div class="premium-report-head">
-          <div><p class="eyebrow">付費報告已解鎖</p><h2 id="premiumTitle">你的完整角色報告</h2><p>這是你解鎖的專屬角色報告。之後同角色都能在「我的卡冊」查看，也很適合截圖保存 ♡</p></div>
-          <button class="secondary-btn" id="copyPremiumBtn" type="button">複製完整報告</button>
-        </div>
-        <div class="premium-grid" id="premiumGrid"></div>
-      </div>
-    </section>
-
-    <section class="section-pad premium-section" id="premium">
-      <div class="premium-card premium-sales-card reveal">
-        <div class="premium-sales-copy">
-          <p class="eyebrow">完整報告版</p>
-          <h2>不是把免費版寫長，<br>是把你的角色拆成一份攻略。</h2>
-          <p>每張角色都有自己的核心反差、戀愛訊號、社交位置、工作優勢、金錢雷點、Boss 攻略與升級任務。內容會直接引用這張卡的技能、被動與弱點，不是只替換角色名稱。</p>
-          <div class="premium-proof-strip">
-            <span>33 種角色各自內容</span>
-            <span>10 個完整章節</span>
-            <span>可複製、截圖與重複查看</span>
-          </div>
-        </div>
-        <div class="price-box unlock-select-box premium-price-box">
-          <span class="price-kicker">一次解鎖・不是訂閱</span>
-          <strong><small>NT$</small>49</strong>
-          <p class="price-note">選一張你最有感的角色卡解鎖。同一種角色只需要購買一次，付款完成後自動顯示完整報告。</p>
-          <button class="primary-btn full" id="chooseUnlockBtn" type="button">從卡冊選一張完整解鎖</button>
-          <small class="price-trust">綠界安全付款｜本站不保存完整信用卡資料</small>
-        </div>
-      </div>
-
-      <div class="premium-feature-grid premium-feature-grid-six reveal">
-        <article><span>🪄</span><h3>角色核心反差</h3><p>看懂別人先看到的你，和真正熟悉後才會發現的你。</p></article>
-        <article><span>💘</span><h3>戀愛攻略</h3><p>拆解你的心動訊號、關係盲點與最適合的溝通方式。</p></article>
-        <article><span>👥</span><h3>朋友與社交定位</h3><p>你在群體裡的自然能力，以及最容易被消耗的情境。</p></article>
-        <article><span>💼</span><h3>工作與金錢模式</h3><p>你的優勢、工作陷阱、衝動消費時刻與值得投資的方向。</p></article>
-        <article><span>👾</span><h3>隱藏 Boss 攻略</h3><p>替你的核心弱點命名，並給出真正可執行的破關條件。</p></article>
-        <article><span>🗓️</span><h3>7 日＋30 天升級</h3><p>從一週小任務到四週養成地圖，把角色設定變成行動。</p></article>
-      </div>
-    </section>
-
-    <section class="section-pad roadmap-section reveal">
-      <div class="section-title center"><p class="eyebrow">即將開放</p><h2>更多有趣玩法準備中</h2></div>
-      <div class="roadmap-grid">
-        <article><strong>雙人合卡</strong><span>情侶、曖昧、朋友配對，看看你們是什麼副本組合。</span></article>
-        <article><strong>朋友團隊卡</strong><span>開房間一起測，產生隊伍組成，很適合群組分享。</span></article>
-        <article><strong>實體角色卡</strong><span>把喜歡的角色卡做成可以保存的實體卡牌。</span></article>
-      </div>
-    </section>
-
-    <section class="section-pad faq-section" id="faq">
-      <div class="section-title center reveal"><p class="eyebrow">常見問題</p><h2>使用前可以先看這裡</h2></div>
-      <div class="faq-grid reveal">
-        <details open><summary>同一個角色會重複收費嗎？</summary><p>不會。同一個備份碼下，同一種角色只需要購買一次；之後抽到同角色可直接查看完整報告。</p></details>
-        <details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
-        <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
-        <details><summary>可以抽幾次？</summary><p>不限次數，隨時都可以重新測驗。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看。</p></details>
-        <details><summary>換手機後還能查看嗎？</summary><p>可以先在「我的卡冊」保存私人備份碼，再於新裝置輸入備份碼同步已購買角色。備份碼等同卡冊鑰匙，請勿公開。</p></details>
-        <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
-        <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；若發生重複扣款、系統錯誤或已付款卻無法取得內容，請來信協助處理。</p></details>
-        <details><summary>付款資料會怎麼使用？</summary><p>付款由綠界科技處理，本站只保存訂單編號、角色與解鎖狀態，不會在網站儲存信用卡資料。</p></details>
-      </div>
-    </section>
-  </main>
-
-  
-  <footer class="site-footer commercial-footer">
-    <div class="footer-brand">
-      <strong>人生副本</strong>
-      <span>娛樂性角色卡測驗與個人化數位內容</span>
-    </div>
-    <div class="footer-links">
-      <button type="button" data-policy="terms">服務條款</button>
-      <button type="button" data-policy="refund">退款政策</button>
-      <button type="button" data-policy="privacy">隱私權政策</button>
-      <button type="button" data-policy="disclaimer">免責聲明</button>
-    </div>
-    <div class="footer-contact">
-      <span>聯絡信箱</span>
-      <a href="mailto:miller20031102@gmail.com">miller20031102@gmail.com</a>
-    </div>
-    <small>© 2026 LifeQuest. All rights reserved.</small>
-  </footer>
-
-
-  <div class="modal hidden" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payTitle">
-    <div class="modal-backdrop" data-close-modal></div>
-    <div class="modal-panel">
-      <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
-      <p class="eyebrow">綠界安全付款</p>
-      <h2 id="payTitle">解鎖這張角色的完整攻略</h2>
-      <p class="modal-copy">你將解鎖這張角色專屬的 10 個章節。付款成功後會自動返回網站並立即顯示完整內容。</p>
-      <div class="pay-role-preview">
-        <strong id="payRoleHeading">正在確認角色卡</strong>
-        <p id="payRoleTeaser">戀愛、社交、工作、金錢與升級任務會依這張卡的技能和弱點產生。</p>
-      </div>
-      <div class="pay-value-summary">
-        <span><b>10 章</b>角色專屬解析</span>
-        <span><b>一次</b>同角色不重複付費</span>
-        <span><b>自動</b>付款成功立即解鎖</span>
-      </div>
-      <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
-      <div class="pay-steps">
-        <div><strong>1</strong><span>前往綠界選擇可用的付款方式</span></div>
-        <div><strong>2</strong><span>完成 NT$49 付款</span></div>
-        <div><strong>3</strong><span>返回網站，自動解鎖完整報告</span></div>
-      </div>
-      <div class="payment-note policy-reminder">🔒 付款由綠界科技處理，本站不會取得或保存完整信用卡資料。</div><div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
-      <button class="primary-btn full pay-confirm-btn" id="payNowBtn" type="button">前往綠界安全付款｜NT$49</button>
-      <div class="modal-message" id="modalMessage" aria-live="polite"></div>
-    </div>
-  </div>
-
-
-  <div class="modal hidden" id="savedModal" role="dialog" aria-modal="true" aria-labelledby="savedTitle">
-    <div class="modal-backdrop" data-close-saved></div>
-    <div class="modal-panel saved-panel">
-      <button class="modal-close" data-close-saved type="button" aria-label="關閉">×</button>
-      <p class="eyebrow">我的卡冊</p>
-      <h2 id="savedTitle">選擇你要查看或購買的卡</h2>
-      <p class="modal-copy">每張卡都會自動保存在這裡。同一種角色只需要購買一次；可用私人備份碼在其他裝置同步已購買角色。</p>
-      <div class="cardbook-tools">
-        <button class="secondary-btn small" id="syncCardsBtn" type="button">重新同步購買紀錄</button>
-        <button class="ghost-btn small" id="backupCodeBtn" type="button">備份／換裝置</button>
-      </div>
-      <div class="saved-list" id="savedList"></div>
-    </div>
-  </div>
-
-
-  <div class="modal hidden" id="saveImageModal" role="dialog" aria-modal="true" aria-labelledby="saveImageTitle">
-    <div class="modal-backdrop" data-close-save-image></div>
-    <div class="modal-panel image-save-panel">
-      <button class="modal-close" data-close-save-image type="button" aria-label="關閉">×</button>
-      <p class="eyebrow">角色卡已生成</p>
-      <h2 id="saveImageTitle">點圖片儲存到手機</h2>
-      <p class="modal-copy">JPG 圖片已經產生。點下方圖片會嘗試儲存；如果手機沒有反應，再長按圖片選「儲存影像」。</p>
-      <div class="save-image-frame">
-        <img id="saveImagePreview" alt="人生副本角色卡 JPG 預覽" />
-      </div>
-      <p class="ios-save-tip">小提醒：點圖片就會嘗試儲存；如果是在 Threads / LINE / IG 內建瀏覽器，沒反應時再長按圖片儲存，或用 Safari 開啟。</p>
-    </div>
-  </div>
-
-  
-
-  <div class="modal hidden" id="recoveryModal" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
-    <div class="modal-backdrop" data-close-recovery></div>
-    <div class="modal-panel recovery-panel">
-      <button class="modal-close" data-close-recovery type="button" aria-label="關閉">×</button>
-      <p class="eyebrow">卡冊備份</p>
-      <h2 id="recoveryTitle">保存你的私人備份碼</h2>
-      <p class="modal-copy">備份碼可在換手機或清除瀏覽器資料後，同步已購買角色。它等同卡冊鑰匙，請勿貼在公開場合。</p>
-      <div class="recovery-code-box"><code id="recoveryCodeText"></code><button class="secondary-btn small" id="copyRecoveryBtn" type="button">複製備份碼</button></div>
-      <div class="recovery-restore">
-        <label for="recoveryCodeInput">在新裝置輸入備份碼</label>
-        <input id="recoveryCodeInput" type="text" autocomplete="off" spellcheck="false" placeholder="guest_..." />
-        <button class="primary-btn full" id="restoreRecoveryBtn" type="button">同步我的已購買角色</button>
-        <p class="modal-message" id="recoveryMessage" aria-live="polite"></p>
-      </div>
-    </div>
-  </div>
-
-  <div class="payment-status-bar hidden" id="pendingPaymentBar" role="status" aria-live="polite">
-    <div><strong>付款結果仍在確認</strong><span id="pendingPaymentText">可稍後重新確認，不需要再次付款。</span></div>
-    <button class="primary-btn tiny" id="checkPaymentBtn" type="button">重新確認</button>
-    <button class="ghost-btn tiny" id="dismissPaymentBtn" type="button" aria-label="關閉付款提示">關閉</button>
-  </div>
-
-  <div class="modal hidden" id="policyModal" role="dialog" aria-modal="true" aria-labelledby="policyTitle">
-    <div class="modal-backdrop" data-close-policy></div>
-    <div class="modal-panel policy-panel">
-      <button class="modal-close" data-close-policy type="button" aria-label="關閉">×</button>
-      <p class="eyebrow">網站資訊</p>
-      <h2 id="policyTitle">政策內容</h2>
-      <div class="policy-content" id="policyContent"></div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast" aria-live="polite"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="script.js?v=15.7" defer></script>
+<img alt="Visa" class="payment-logo payment-logo-compact" decoding="async" loading="lazy" src="payment-icons/visa.svg"/>
+<img alt="Mastercard" class="payment-logo payment-logo-compact" decoding="async" loading="lazy" src="payment-icons/mastercard.svg"/>
+<img alt="JCB" class="payment-logo payment-logo-compact" decoding="async" loading="lazy" src="payment-icons/jcb.svg"/>
+<img alt="Apple Pay" class="payment-logo payment-logo-compact" decoding="async" loading="lazy" src="payment-icons/apple-pay.svg"/>
+</div>
+<p class="upsell-safe-note">點擊後會先確認角色與付款資訊，不會在這一步直接扣款。實際可用方式依綠界付款頁顯示。</p>
+</div>
+</aside>
+</div>
+<div class="premium-report hidden" id="premiumReport">
+<div class="premium-report-head">
+<div><p class="eyebrow">付費報告已解鎖</p><h2 id="premiumTitle">你的完整角色報告</h2><p>這是你解鎖的專屬角色報告。之後同角色都能在「我的卡冊」查看，也很適合截圖保存 ♡</p></div>
+<button class="secondary-btn" id="copyPremiumBtn" type="button">複製完整報告</button>
+</div>
+<div class="premium-grid" id="premiumGrid"></div>
+</div>
+</section>
+<section class="section-pad premium-section" id="premium">
+<div class="premium-card premium-sales-card reveal">
+<div class="premium-sales-copy">
+<p class="eyebrow">完整報告版</p>
+<h2>不是把免費版寫長，<br/>是把你的角色拆成一份攻略。</h2>
+<p>每張角色都有自己的核心反差、戀愛訊號、社交位置、工作優勢、金錢雷點、Boss 攻略與升級任務。內容會直接引用這張卡的技能、被動與弱點，不是只替換角色名稱。</p>
+<div class="premium-proof-strip">
+<span>33 種角色各自內容</span>
+<span>10 個完整章節</span>
+<span>可複製、截圖與重複查看</span>
+</div>
+</div>
+<div class="price-box unlock-select-box premium-price-box">
+<span class="price-kicker">一次解鎖・不是訂閱</span>
+<strong><small>NT$</small>49</strong>
+<p class="price-note">選一張你最有感的角色卡解鎖。同一種角色只需要購買一次，付款完成後自動顯示完整報告。</p>
+<button class="primary-btn full" id="chooseUnlockBtn" type="button">從卡冊選一張完整解鎖</button>
+<div class="price-payment-note">🔒 綠界安全付款・實際方式於付款頁選擇</div>
+<small class="price-trust">綠界安全付款｜本站不保存完整信用卡資料｜實際方式依付款頁顯示</small>
+</div>
+</div>
+<div class="premium-feature-grid premium-feature-grid-six reveal">
+<article><span>🪄</span><h3>角色核心反差</h3><p>看懂別人先看到的你，和真正熟悉後才會發現的你。</p></article>
+<article><span>💘</span><h3>戀愛攻略</h3><p>拆解你的心動訊號、關係盲點與最適合的溝通方式。</p></article>
+<article><span>👥</span><h3>朋友與社交定位</h3><p>你在群體裡的自然能力，以及最容易被消耗的情境。</p></article>
+<article><span>💼</span><h3>工作與金錢模式</h3><p>你的優勢、工作陷阱、衝動消費時刻與值得投資的方向。</p></article>
+<article><span>👾</span><h3>隱藏 Boss 攻略</h3><p>替你的核心弱點命名，並給出真正可執行的破關條件。</p></article>
+<article><span>🗓️</span><h3>7 日＋30 天升級</h3><p>從一週小任務到四週養成地圖，把角色設定變成行動。</p></article>
+</div>
+</section>
+<section class="section-pad roadmap-section reveal">
+<div class="section-title center"><p class="eyebrow">即將開放</p><h2>更多有趣玩法準備中</h2></div>
+<div class="roadmap-grid">
+<article><strong>雙人合卡</strong><span>情侶、曖昧、朋友配對，看看你們是什麼副本組合。</span></article>
+<article><strong>朋友團隊卡</strong><span>開房間一起測，產生隊伍組成，很適合群組分享。</span></article>
+<article><strong>實體角色卡</strong><span>把喜歡的角色卡做成可以保存的實體卡牌。</span></article>
+</div>
+</section>
+<section class="section-pad faq-section" id="faq">
+<div class="section-title center reveal"><p class="eyebrow">常見問題</p><h2>使用前可以先看這裡</h2></div>
+<div class="faq-grid reveal">
+<details open=""><summary>同一個角色會重複收費嗎？</summary><p>不會。同一個備份碼下，同一種角色只需要購買一次；之後抽到同角色可直接查看完整報告。</p></details>
+<details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
+<details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
+<details><summary>可以抽幾次？</summary><p>不限次數，隨時都可以重新測驗。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看。</p></details>
+<details><summary>換手機後還能查看嗎？</summary><p>可以先在「我的卡冊」保存私人備份碼，再於新裝置輸入備份碼同步已購買角色。備份碼等同卡冊鑰匙，請勿公開。</p></details>
+<details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
+<details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；若發生重複扣款、系統錯誤或已付款卻無法取得內容，請來信協助處理。</p></details>
+<details><summary>付款資料會怎麼使用？</summary><p>付款由綠界科技處理，本站只保存訂單編號、角色與解鎖狀態，不會在網站儲存信用卡資料。</p></details>
+</div>
+</section>
+</main>
+<footer class="site-footer commercial-footer">
+<div class="footer-brand">
+<strong>人生副本</strong>
+<span>娛樂性角色卡測驗與個人化數位內容</span>
+</div>
+<div class="footer-links">
+<button data-policy="terms" type="button">服務條款</button>
+<button data-policy="refund" type="button">退款政策</button>
+<button data-policy="privacy" type="button">隱私權政策</button>
+<button data-policy="disclaimer" type="button">免責聲明</button>
+</div>
+<div class="footer-contact">
+<span>聯絡信箱</span>
+<a href="mailto:miller20031102@gmail.com">miller20031102@gmail.com</a>
+</div>
+<small>© 2026 LifeQuest. All rights reserved.</small>
+</footer>
+<div aria-labelledby="payTitle" aria-modal="true" class="modal hidden" id="payModal" role="dialog">
+<div class="modal-backdrop" data-close-modal=""></div>
+<div class="modal-panel">
+<button aria-label="關閉" class="modal-close" data-close-modal="" type="button">×</button>
+<p class="eyebrow">綠界安全付款</p>
+<h2 id="payTitle">解鎖這張角色的完整攻略</h2>
+<p class="modal-copy">你將解鎖這張角色專屬的 10 個章節。付款成功後會自動返回網站並立即顯示完整內容。</p>
+<div class="pay-role-preview">
+<strong id="payRoleHeading">正在確認角色卡</strong>
+<p id="payRoleTeaser">戀愛、社交、工作、金錢與升級任務會依這張卡的技能和弱點產生。</p>
+</div>
+<div class="pay-value-summary">
+<span><b>10 章</b>角色專屬解析</span>
+<span><b>一次</b>同角色不重複付費</span>
+<span><b>自動</b>付款成功立即解鎖</span>
+</div>
+<div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
+<div class="pay-steps">
+<div><strong>1</strong><span>前往綠界選擇可用的付款方式</span></div>
+<div><strong>2</strong><span>完成 NT$49 付款</span></div>
+<div><strong>3</strong><span>返回網站，自動解鎖完整報告</span></div>
+</div>
+<div class="payment-note policy-reminder">🔒 付款由綠界科技處理，本站不會取得或保存完整信用卡資料。</div>
+<div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
+<div aria-label="綠界付款方式" class="modal-payment-methods">
+<div class="modal-payment-title"><strong>前往綠界後可選擇付款方式</strong><small>實際顯示依裝置與商店設定為準</small></div>
+<div class="payment-brand-row payment-logo-row modal-brand-row">
+<img alt="Visa" class="payment-logo" decoding="async" loading="lazy" src="payment-icons/visa.svg"/>
+<img alt="Mastercard" class="payment-logo" decoding="async" loading="lazy" src="payment-icons/mastercard.svg"/>
+<img alt="JCB" class="payment-logo" decoding="async" loading="lazy" src="payment-icons/jcb.svg"/>
+<img alt="Apple Pay" class="payment-logo" decoding="async" loading="lazy" src="payment-icons/apple-pay.svg"/>
+</div>
+</div>
+<button class="primary-btn full pay-confirm-btn" id="payNowBtn" type="button">前往綠界安全付款｜NT$49</button>
+<div aria-live="polite" class="modal-message" id="modalMessage"></div>
+</div>
+</div>
+<div aria-labelledby="savedTitle" aria-modal="true" class="modal hidden" id="savedModal" role="dialog">
+<div class="modal-backdrop" data-close-saved=""></div>
+<div class="modal-panel saved-panel">
+<button aria-label="關閉" class="modal-close" data-close-saved="" type="button">×</button>
+<p class="eyebrow">我的卡冊</p>
+<h2 id="savedTitle">選擇你要查看或購買的卡</h2>
+<p class="modal-copy">每張卡都會自動保存在這裡。同一種角色只需要購買一次；可用私人備份碼在其他裝置同步已購買角色。</p>
+<div class="cardbook-tools">
+<button class="secondary-btn small" id="syncCardsBtn" type="button">重新同步購買紀錄</button>
+<button class="ghost-btn small" id="backupCodeBtn" type="button">備份／換裝置</button>
+</div>
+<div class="saved-list" id="savedList"></div>
+</div>
+</div>
+<div aria-labelledby="saveImageTitle" aria-modal="true" class="modal hidden" id="saveImageModal" role="dialog">
+<div class="modal-backdrop" data-close-save-image=""></div>
+<div class="modal-panel image-save-panel">
+<button aria-label="關閉" class="modal-close" data-close-save-image="" type="button">×</button>
+<p class="eyebrow">角色卡已生成</p>
+<h2 id="saveImageTitle">點圖片儲存到手機</h2>
+<p class="modal-copy">JPG 圖片已經產生。點下方圖片會嘗試儲存；如果手機沒有反應，再長按圖片選「儲存影像」。</p>
+<div class="save-image-frame">
+<img alt="人生副本角色卡 JPG 預覽" id="saveImagePreview"/>
+</div>
+<p class="ios-save-tip">小提醒：點圖片就會嘗試儲存；如果是在 Threads / LINE / IG 內建瀏覽器，沒反應時再長按圖片儲存，或用 Safari 開啟。</p>
+</div>
+</div>
+<div aria-labelledby="recoveryTitle" aria-modal="true" class="modal hidden" id="recoveryModal" role="dialog">
+<div class="modal-backdrop" data-close-recovery=""></div>
+<div class="modal-panel recovery-panel">
+<button aria-label="關閉" class="modal-close" data-close-recovery="" type="button">×</button>
+<p class="eyebrow">卡冊備份</p>
+<h2 id="recoveryTitle">保存你的私人備份碼</h2>
+<p class="modal-copy">備份碼可在換手機或清除瀏覽器資料後，同步已購買角色。它等同卡冊鑰匙，請勿貼在公開場合。</p>
+<div class="recovery-code-box"><code id="recoveryCodeText"></code><button class="secondary-btn small" id="copyRecoveryBtn" type="button">複製備份碼</button></div>
+<div class="recovery-restore">
+<label for="recoveryCodeInput">在新裝置輸入備份碼</label>
+<input autocomplete="off" id="recoveryCodeInput" placeholder="guest_..." spellcheck="false" type="text"/>
+<button class="primary-btn full" id="restoreRecoveryBtn" type="button">同步我的已購買角色</button>
+<p aria-live="polite" class="modal-message" id="recoveryMessage"></p>
+</div>
+</div>
+</div>
+<div aria-live="polite" class="payment-status-bar hidden" id="pendingPaymentBar" role="status">
+<div><strong>付款結果仍在確認</strong><span id="pendingPaymentText">可稍後重新確認，不需要再次付款。</span></div>
+<button class="primary-btn tiny" id="checkPaymentBtn" type="button">重新確認</button>
+<button aria-label="關閉付款提示" class="ghost-btn tiny" id="dismissPaymentBtn" type="button">關閉</button>
+</div>
+<div aria-labelledby="policyTitle" aria-modal="true" class="modal hidden" id="policyModal" role="dialog">
+<div class="modal-backdrop" data-close-policy=""></div>
+<div class="modal-panel policy-panel">
+<button aria-label="關閉" class="modal-close" data-close-policy="" type="button">×</button>
+<p class="eyebrow">網站資訊</p>
+<h2 id="policyTitle">政策內容</h2>
+<div class="policy-content" id="policyContent"></div>
+</div>
+</div>
+<div aria-live="polite" class="toast" id="toast"></div>
+<script defer="" src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script defer="" src="script.js?v=16.0"></script>
 </body>
 </html>

@@ -1022,3 +1022,278 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   .pay-value-summary{gap:6px}
   .pay-value-summary span{padding:9px 5px}
 }
+
+
+/* =========================================================
+   v15.8｜付款信任與支付方式顯示
+   ========================================================= */
+
+.payment-trust-card{
+  position:relative;
+  overflow:hidden;
+  margin-top:18px;
+  padding:16px 17px;
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(98,231,255,.12),transparent 38%),
+    linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.045));
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 16px 38px rgba(0,0,0,.18);
+}
+.payment-trust-heading{
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+.secure-lock{
+  display:grid;
+  place-items:center;
+  flex:0 0 38px;
+  height:38px;
+  border-radius:13px;
+  background:rgba(115,242,173,.12);
+  border:1px solid rgba(115,242,173,.20);
+}
+.payment-trust-heading strong{
+  display:block;
+  color:#fff;
+  font-size:14px;
+}
+.payment-trust-heading small{
+  display:block;
+  margin-top:3px;
+  color:rgba(255,255,255,.58);
+  font-size:11px;
+  line-height:1.5;
+}
+.payment-brand-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:13px;
+}
+.payment-brand{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:30px;
+  padding:6px 10px;
+  border-radius:9px;
+  background:#fff;
+  border:1px solid rgba(255,255,255,.80);
+  box-shadow:0 5px 14px rgba(0,0,0,.12);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.01em;
+  white-space:nowrap;
+}
+.ecpay-brand{color:#15675d;background:#eafff8}
+.visa-brand{color:#1a1f71;font-style:italic;letter-spacing:.06em}
+.mastercard-brand{color:#191919}
+.jcb-brand{color:#176b43}
+.applepay-brand{color:#111}
+.payment-availability-note{
+  margin:10px 0 0!important;
+  color:rgba(255,255,255,.45)!important;
+  font-size:10px!important;
+  line-height:1.55!important;
+}
+.compact-payment-trust{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+.compact-payment-trust span{
+  color:rgba(255,255,255,.58);
+  font-size:10px;
+  font-weight:900;
+}
+.compact-payment-trust b{
+  padding:5px 7px;
+  border-radius:7px;
+  color:#1c1830;
+  background:rgba(255,255,255,.90);
+  font-size:9px;
+  line-height:1;
+}
+.mini-payment-brand-row{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:4px;
+}
+.mini-payment-brand-row span{
+  padding:5px 7px;
+  border-radius:7px;
+  color:#1b1830;
+  background:rgba(255,255,255,.90);
+  font-size:9px;
+  font-weight:900;
+}
+.modal-payment-methods{
+  margin:13px 0;
+  padding:13px;
+  border-radius:18px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10);
+}
+.modal-payment-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+.modal-payment-title strong{
+  color:#fff;
+  font-size:12px;
+}
+.modal-payment-title small{
+  color:rgba(255,255,255,.45);
+  text-align:right;
+  font-size:9px;
+  line-height:1.4;
+}
+.modal-brand-row{
+  margin-top:10px;
+}
+.modal-brand-row .payment-brand{
+  min-height:27px;
+  padding:5px 8px;
+  font-size:9px;
+}
+
+@media(max-width:600px){
+  .hero-payment-trust{
+    margin-top:15px;
+    padding:14px;
+  }
+  .payment-brand-row{
+    gap:5px;
+  }
+  .payment-brand{
+    min-height:27px;
+    padding:5px 8px;
+    font-size:9px;
+  }
+  .payment-availability-note{
+    font-size:9px!important;
+  }
+  .modal-payment-title{
+    display:block;
+  }
+  .modal-payment-title small{
+    display:block;
+    margin-top:3px;
+    text-align:left;
+  }
+}
+
+
+/* v15.9｜付款品牌符號 */
+.payment-logo-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.payment-logo{
+  display:block;
+  width:auto;
+  height:36px;
+  max-width:112px;
+  border-radius:8px;
+  filter:drop-shadow(0 5px 12px rgba(0,0,0,.13));
+  transition:transform .18s ease,filter .18s ease;
+}
+.payment-logo:hover{
+  transform:translateY(-1px);
+  filter:drop-shadow(0 7px 15px rgba(0,0,0,.18));
+}
+.payment-logo[src*="ecpay"]{max-width:124px}
+.payment-logo-compact{
+  height:27px;
+  max-width:78px;
+  border-radius:6px;
+}
+.payment-logo-compact[src*="mastercard"]{max-width:88px}
+.compact-logo-row span{margin-right:2px}
+.modal-brand-row .payment-logo{
+  height:31px;
+  max-width:91px;
+}
+.hero-payment-trust .payment-logo-row{margin-top:13px}
+.mini-payment-brand-row{gap:6px;margin-top:6px}
+.compact-payment-trust{gap:6px}
+
+@media(max-width:600px){
+  .payment-logo{height:30px;max-width:91px}
+  .payment-logo[src*="ecpay"]{max-width:104px}
+  .payment-logo-compact{height:24px;max-width:69px}
+  .payment-logo-compact[src*="mastercard"]{max-width:78px}
+  .modal-brand-row .payment-logo{height:27px;max-width:78px}
+}
+
+
+/* =========================================================
+   v16.0｜首頁自然化
+   首頁先吸引使用者測驗，付款資訊只出現在有購買意圖的位置
+   ========================================================= */
+
+.hero .trust-row{
+  margin-top:4px;
+}
+.hero .trust-row span{
+  background:rgba(255,255,255,.055);
+}
+
+/* 首頁已移除付款品牌卡，避免第一眼過度商業化 */
+.hero-payment-trust{
+  display:none!important;
+}
+
+/* 完整報告中段只保留一行付款安心說明 */
+.price-payment-note{
+  margin-top:5px;
+  padding:8px 10px;
+  border-radius:12px;
+  color:rgba(255,255,255,.64);
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.09);
+  font-size:10px;
+  font-weight:800;
+  line-height:1.45;
+  text-align:center;
+}
+
+/* 結果頁付款品牌圖示保持低調，不搶過內容與 CTA */
+.premium-conversion-card .compact-logo-row{
+  margin-top:11px;
+  opacity:.82;
+}
+.premium-conversion-card .payment-logo-compact{
+  height:24px;
+  max-width:72px;
+}
+.premium-conversion-card .payment-logo-compact[src*="mastercard"]{
+  max-width:82px;
+}
+
+/* 最後付款確認視窗才完整顯示付款品牌 */
+.modal-payment-methods{
+  margin-top:14px;
+}
+
+@media(max-width:600px){
+  .hero .trust-row{
+    gap:7px;
+  }
+  .hero .trust-row span{
+    padding:8px 10px;
+    font-size:11px;
+  }
+}
