@@ -369,6 +369,9 @@ const state = {
   currentRole: null,
   resultId: null,
   generatedImage: null,
+  duoResult: null,
+  duoMode: 'friends',
+  paymentContext: {type:'report'},
   answerLocked: false,
   isGenerating: false
 };
@@ -466,6 +469,8 @@ async function init(){
   renderSamples();
   renderQuestion();
   bindEvents();
+  populateDuoSelectors();
+  renderDuoSavedChips();
   resetPaymentButton();
 
   await syncEntitlements({mergeCards:true});
@@ -494,6 +499,19 @@ function bindEvents(){
   on('againBtn','click',resetQuiz);
   on('downloadBtn','click',downloadCard);
   on('shareBtn','click',copyShareText);
+  on('duoFromResultBtn','click',openDuoWithCurrent);
+  on('savedDuoBtn','click',()=>{ closeSavedModal(); openDuoWithCurrent(); });
+  on('generateDuoBtn','click',generateDuoCard);
+  on('unlockDuoBtn','click',openDuoPayModal);
+  on('swapDuoBtn','click',swapDuoRoles);
+  on('downloadDuoBtn','click',downloadDuoCard);
+  on('shareDuoBtn','click',copyDuoShareText);
+  on('changeDuoBtn','click',resetDuoResult);
+  on('duoRoleA','change',()=>updateDuoSelectPreview('A'));
+  on('duoRoleB','change',()=>updateDuoSelectPreview('B'));
+  document.querySelectorAll('[data-duo-mode]').forEach(button=>{
+    button.addEventListener('click',()=>setDuoMode(button.dataset.duoMode));
+  });
   on('savedBtn','click',showSavedCards);
   on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
@@ -1071,11 +1089,17 @@ async function downloadCard(){
 
     if(jpgCanvas.toBlob){
       jpgCanvas.toBlob(blob=>{
-        showSaveImageModal(dataUrl, fileName, blob);
+        showSaveImageModal(dataUrl, fileName, blob, {
+          title:'角色卡已生成',
+          alt:`${state.currentRole.name} 人生副本角色卡`
+        });
         if(!isIOSLike() && !isInAppBrowser()) triggerBlobDownload(blob, fileName);
       }, 'image/jpeg', 0.94);
     }else{
-      showSaveImageModal(dataUrl, fileName, null);
+      showSaveImageModal(dataUrl, fileName, null, {
+        title:'角色卡已生成',
+        alt:`${state.currentRole.name} 人生副本角色卡`
+      });
     }
   }catch(err){
     console.error(err);
@@ -1086,7 +1110,7 @@ async function downloadCard(){
   }
 }
 
-function showSaveImageModal(dataUrl, fileName, blob){
+function showSaveImageModal(dataUrl, fileName, blob, options={}){
   const old = state.generatedImage;
   if(old && old.objectUrl) URL.revokeObjectURL(old.objectUrl);
 
@@ -1094,9 +1118,15 @@ function showSaveImageModal(dataUrl, fileName, blob){
   const imageUrl = objectUrl || dataUrl;
   state.generatedImage = { dataUrl, objectUrl, fileName };
 
+  const title = $('saveImageTitle');
+  const copy = $('saveImageCopy');
+  if(title) title.textContent = options.title || '點圖片儲存到手機';
+  if(copy) copy.textContent = options.copy || 'JPG 圖片已經產生。點下方圖片會嘗試儲存；如果手機沒有反應，再長按圖片選「儲存影像」。';
+
   const img = $('saveImagePreview');
   if(img){
     img.src = imageUrl;
+    img.alt = options.alt || '人生副本 JPG 圖片預覽';
     img.title = '點一下嘗試儲存 JPG';
     img.onclick = retryImageDownload;
   }
@@ -1152,6 +1182,858 @@ function copyShareText(){
   copyText(text,'已複製 Threads 分享文');
   $('shareBox').textContent = '已複製，可以直接貼到 Threads。';
 }
+
+
+const DUO_AXIS_LABELS = {
+  warm:'暖光', cool:'月影', social:'派對', solo:'夜行',
+  romance:'心動', avoid:'隱身', ambition:'升級', chaos:'混亂',
+  support:'補血', warrior:'闖關', creative:'靈感', overthink:'深夜'
+};
+
+const DUO_MODES = Object.freeze({
+  friends:{
+    label:'朋友模式', badge:'FRIEND DUO', icon:'🫶',
+    calibration:[0.4472666667,0.914425],
+    weights:{rhythm:.22,closeness:.08,drive:.10,fun:.25,communication:.20,support:.15}
+  },
+  couple:{
+    label:'情侶模式', badge:'COUPLE DUO', icon:'💞',
+    calibration:[0.4205666667,0.88023],
+    weights:{rhythm:.15,closeness:.25,drive:.08,fun:.10,communication:.20,support:.22}
+  },
+  crush:{
+    label:'曖昧模式', badge:'CRUSH DUO', icon:'💌',
+    calibration:[0.4671166667,0.914425],
+    weights:{rhythm:.14,closeness:.28,drive:.05,fun:.18,communication:.20,support:.15}
+  },
+  teammates:{
+    label:'搭檔模式', badge:'TEAM DUO', icon:'⚔️',
+    calibration:[0.35569,0.8849566667],
+    weights:{rhythm:.15,closeness:.05,drive:.28,fun:.10,communication:.20,support:.22}
+  }
+});
+
+function populateDuoSelectors(){
+  const selects = [$('duoRoleA'),$('duoRoleB')].filter(Boolean);
+  if(!selects.length) return;
+
+  const rarityOrder = {UR:0,SSR:1,SR:2,R:3};
+  const sorted = [...roles].sort((a,b)=>
+    (rarityOrder[a.rarity] ?? 9) - (rarityOrder[b.rarity] ?? 9) ||
+    a.name.localeCompare(b.name,'zh-Hant')
+  );
+
+  selects.forEach((select,index)=>{
+    const current = select.value;
+    select.innerHTML = `<option value="">${index===0?'選擇第一張角色卡':'選擇第二張角色卡'}</option>` +
+      sorted.map(role=>`<option value="${role.id}">${role.emoji} ${role.name}｜${role.rarity}</option>`).join('');
+    if(current && getRoleById(current)) select.value = current;
+  });
+}
+
+function renderDuoSavedChips(){
+  const box = $('duoSavedChips');
+  if(!box) return;
+
+  const unique = [];
+  const seen = new Set();
+  getSavedList().forEach(item=>{
+    if(item?.roleId && !seen.has(item.roleId) && getRoleById(item.roleId)){
+      seen.add(item.roleId);
+      unique.push(getRoleById(item.roleId));
+    }
+  });
+
+  if(!unique.length){
+    box.innerHTML = '<span class="duo-no-saved">完成測驗後，你的角色會出現在這裡。</span>';
+    return;
+  }
+
+  box.innerHTML = unique.slice(0,12).map(role=>
+    `<button type="button" class="duo-saved-chip" data-duo-role="${role.id}">
+      <span>${role.emoji}</span>${role.name}
+    </button>`
+  ).join('');
+
+  box.querySelectorAll('[data-duo-role]').forEach(button=>{
+    button.addEventListener('click',()=>quickPickDuoRole(button.dataset.duoRole));
+  });
+}
+
+function quickPickDuoRole(roleId){
+  const first = $('duoRoleA');
+  const second = $('duoRoleB');
+  if(!first || !second) return;
+
+  if(!first.value || (first.value && second.value)){
+    first.value = roleId;
+    if(second.value === roleId && roles.length > 1) second.value = '';
+    updateDuoSelectPreview('A');
+  }else{
+    second.value = roleId;
+    updateDuoSelectPreview('B');
+  }
+}
+
+function openDuoWithCurrent(){
+  closeSavedModal();
+  populateDuoSelectors();
+  renderDuoSavedChips();
+
+  if(state.currentRole && $('duoRoleA')){
+    $('duoRoleA').value = state.currentRole.id;
+    updateDuoSelectPreview('A');
+  }
+
+  location.hash = '#duo';
+  setTimeout(()=>$('duo')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+}
+
+function setDuoMode(mode){
+  if(!DUO_MODES[mode]) return;
+  state.duoMode = mode;
+
+  document.querySelectorAll('[data-duo-mode]').forEach(button=>{
+    const active = button.dataset.duoMode === mode;
+    button.classList.toggle('is-active',active);
+    button.setAttribute('aria-pressed',active?'true':'false');
+  });
+
+  if(state.duoResult){
+    generateDuoCard({silent:true});
+  }
+}
+
+function updateDuoSelectPreview(side){
+  const select = $(side==='A' ? 'duoRoleA' : 'duoRoleB');
+  const preview = $(side==='A' ? 'duoRoleAPreview' : 'duoRoleBPreview');
+  if(!select || !preview) return;
+
+  const role = getRoleById(select.value);
+  preview.textContent = role
+    ? `${role.emoji} ${role.line}`
+    : (side==='A' ? '完成測驗後，可以自動帶入你的角色。' : '知道朋友的角色名稱就能直接選。');
+}
+
+function swapDuoRoles(){
+  const a = $('duoRoleA');
+  const b = $('duoRoleB');
+  if(!a || !b) return;
+  [a.value,b.value] = [b.value,a.value];
+  updateDuoSelectPreview('A');
+  updateDuoSelectPreview('B');
+  if(state.duoResult) generateDuoCard({silent:true});
+}
+
+function clampNumber(value,min,max){
+  return Math.min(max,Math.max(min,value));
+}
+
+function stablePairHash(firstId,secondId,extra=''){
+  const input = `${[firstId,secondId].sort().join('|')}|${extra}`;
+  let hash = 2166136261;
+  for(let i=0;i<input.length;i++){
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash,16777619);
+  }
+  return Math.abs(hash >>> 0);
+}
+
+function makeDuoPairKey(firstId,secondId){
+  return `duo:${[firstId,secondId].sort().join(':')}`;
+}
+
+function parseDuoPairKey(pairKey){
+  const parts = String(pairKey||'').split(':');
+  if(parts.length!==3 || parts[0]!=='duo') return null;
+  const roleA = getRoleById(parts[1]);
+  const roleB = getRoleById(parts[2]);
+  return roleA && roleB ? {roleA,roleB} : null;
+}
+
+function roleVectorArray(role){
+  return axes.map(axis=>Number(role?.vector?.[axis] || 0));
+}
+
+function duoValue(role,axis){
+  return Number(role?.vector?.[axis] || 0) / 5;
+}
+
+function duoProfile(role){
+  return {
+    warmth:(duoValue(role,'warm')+duoValue(role,'support'))/2,
+    coolness:(duoValue(role,'cool')+duoValue(role,'solo'))/2,
+    social:(duoValue(role,'social')+(1-duoValue(role,'solo')))/2,
+    closeness:(duoValue(role,'romance')+duoValue(role,'warm')+(1-duoValue(role,'avoid')))/3,
+    drive:(duoValue(role,'ambition')+duoValue(role,'warrior'))/2,
+    fun:(duoValue(role,'creative')+duoValue(role,'chaos'))/2,
+    sensitivity:duoValue(role,'overthink'),
+    care:(duoValue(role,'support')+duoValue(role,'warm'))/2,
+    avoid:duoValue(role,'avoid'),
+    chaos:duoValue(role,'chaos'),
+    romance:duoValue(role,'romance'),
+    warrior:duoValue(role,'warrior'),
+    ambition:duoValue(role,'ambition'),
+    creative:duoValue(role,'creative'),
+    solo:duoValue(role,'solo'),
+    socialRaw:duoValue(role,'social')
+  };
+}
+
+function smoothStep(value){
+  const t=clampNumber(value,0,1);
+  return t*t*(3-2*t);
+}
+
+function componentScore(value,penalty=0){
+  return Math.round(clampNumber(24 + 74*value - 24*penalty,18,98));
+}
+
+function computeDuoMetrics(roleA,roleB,mode){
+  const config=DUO_MODES[mode] || DUO_MODES.friends;
+  const a=duoProfile(roleA);
+  const b=duoProfile(roleB);
+
+  const rhythm=clampNumber(1-Math.abs(a.social-b.social),0,1);
+  const closeness=clampNumber(1-Math.abs(a.closeness-b.closeness),0,1);
+  const drive=clampNumber(1-Math.abs(a.drive-b.drive),0,1);
+  const fun=clampNumber(1-Math.abs(a.fun-b.fun),0,1);
+
+  const styleA=a.warmth-a.coolness;
+  const styleB=b.warmth-b.coolness;
+  const styleFit=clampNumber(1-Math.abs(styleA-styleB)/1.5,0,1);
+  const closenessMismatch=Math.max(a.romance*b.avoid,b.romance*a.avoid);
+  const communication=clampNumber(
+    .65*styleFit + .35*((a.care+b.care)/2) - .18*closenessMismatch,
+    0,1
+  );
+
+  const emotionalSupport=Math.max(a.care*b.sensitivity,b.care*a.sensitivity);
+  const mutualCare=(a.care+b.care)/2;
+  const support=clampNumber(.55*emotionalSupport+.45*mutualCare,0,1);
+
+  const grounding=Math.max(a.drive*b.fun,b.drive*a.fun);
+  const rescue=Math.max(a.care*b.sensitivity,b.care*a.sensitivity);
+  const courage=Math.max(a.warrior*b.avoid,b.warrior*a.avoid);
+  const complementBase=clampNumber(.42*grounding+.38*rescue+.20*courage,0,1);
+
+  const avoidBoth=a.avoid*b.avoid;
+  const overthinkBoth=a.sensitivity*b.sensitivity;
+  const chaosBoth=a.chaos*b.chaos;
+  const socialMismatch=Math.abs(a.solo-b.solo)*Math.max(a.socialRaw,b.socialRaw);
+  const styleMismatch=1-styleFit;
+
+  const penalties={
+    avoidBoth,
+    overthinkBoth,
+    chaosBoth,
+    closenessMismatch,
+    socialMismatch,
+    styleMismatch
+  };
+
+  const w=config.weights;
+  const raw=
+    w.rhythm*rhythm +
+    w.closeness*closeness +
+    w.drive*drive +
+    w.fun*fun +
+    w.communication*communication +
+    w.support*support;
+
+  const bonus=.08*grounding+.08*rescue+.05*courage;
+  const penalty=
+    .16*avoidBoth+
+    .12*overthinkBoth+
+    .12*chaosBoth+
+    .11*closenessMismatch+
+    .08*socialMismatch;
+
+  const quality=raw+bonus-penalty;
+  const [minQuality,maxQuality]=config.calibration;
+  const normalized=clampNumber((quality-minQuality)/(maxQuality-minQuality),0,1);
+  const score=Math.round(38+59*smoothStep(normalized));
+
+  const coverage=roleVectorArray(roleA).reduce(
+    (sum,value,index)=>sum+Math.max(value,roleVectorArray(roleB)[index])/5,0
+  )/axes.length;
+  const tension=roleVectorArray(roleA).reduce(
+    (sum,value,index)=>sum+Math.abs(value-roleVectorArray(roleB)[index])/5,0
+  )/axes.length;
+  const complementFit=clampNumber(1-Math.abs(tension-.30)/.30,0,1);
+  const complement=clampNumber(.48*complementBase+.30*coverage+.22*complementFit,0,1);
+  const safety=clampNumber(
+    .38*mutualCare+.30*closeness+.22*(1-avoidBoth)+.10*communication-.16*overthinkBoth,
+    0,1
+  );
+  const action=clampNumber(
+    .48*drive+.27*grounding+.25*(1-chaosBoth)-.12*Math.abs(a.drive-b.drive),
+    0,1
+  );
+
+  return {
+    score,
+    quality,
+    rhythm:componentScore(rhythm,socialMismatch*.35),
+    communication:componentScore(communication,styleMismatch*.15),
+    complement:componentScore(complement),
+    safety:componentScore(safety,avoidBoth*.20+overthinkBoth*.10),
+    action:componentScore(action,chaosBoth*.20),
+    raw:{rhythm,closeness,drive,fun,communication,support,complement,safety,action},
+    penalties
+  };
+}
+
+function getDuoDominantAxes(roleA,roleB){
+  return axes
+    .map(axis=>({axis,value:(roleA.vector[axis]||0)+(roleB.vector[axis]||0)}))
+    .sort((a,b)=>b.value-a.value || a.axis.localeCompare(b.axis))
+    .slice(0,3);
+}
+
+function duoScoreTier(score){
+  if(score>=90) return {label:'傳說級默契',className:'tier-legend'};
+  if(score>=80) return {label:'高默契隊伍',className:'tier-high'};
+  if(score>=70) return {label:'穩定同盟',className:'tier-good'};
+  if(score>=60) return {label:'可培養默契',className:'tier-mid'};
+  if(score>=50) return {label:'反差磨合組',className:'tier-challenge'};
+  return {label:'高難度副本',className:'tier-hard'};
+}
+
+function duoScoreRange(score){
+  const low=Math.floor(score/10)*10;
+  const high=score>=90?97:low+9;
+  return `${low}–${high}`;
+}
+
+function determineDuoType(roleA,roleB,mode,metrics){
+  const total=axis=>(roleA.vector[axis]||0)+(roleB.vector[axis]||0);
+
+  if(metrics.score<50) return '高難度磨合組';
+  if(total('romance')+total('avoid')>=11 && ['couple','crush'].includes(mode)) return '心動拉扯搭檔';
+  if(total('support')+total('warm')>=12) return '溫柔補血同盟';
+  if(total('ambition')+total('warrior')>=12) return '雙核心闖關隊';
+  if(total('creative')+total('chaos')>=11) return '混亂靈感聯盟';
+  if(total('cool')+total('solo')>=12) return '靜音默契組';
+  if(total('social')+total('creative')>=10) return '氣氛爆擊雙人組';
+  if(total('overthink')+total('support')>=12) return '深夜理解同盟';
+  if(metrics.communication>=84 && metrics.rhythm>=82) return '同頻共振組';
+  if(metrics.complement>=82 && Math.abs(metrics.rhythm-metrics.complement)>=8) return '反差互補組';
+  if(metrics.action>=85) return '主線推進小隊';
+  return '穩定合作組';
+}
+
+const DUO_TITLE_SUFFIXES = {
+  '心動拉扯搭檔':['祕密契約','訊號偵測局','心動防線','曖昧讀條組'],
+  '溫柔補血同盟':['雙向補血站','守護同盟','安全屋小隊','柔光支援組'],
+  '雙核心闖關隊':['破關同盟','主線加速組','雙核心戰隊','升級遠征隊'],
+  '混亂靈感聯盟':['火花製造局','新坑發射站','靈感暴走組','混亂創作社'],
+  '靜音默契組':['夜行同盟','無聲連線組','低電量基地','安靜共振局'],
+  '氣氛爆擊雙人組':['派對接管局','冷場救援隊','笑點連鎖組','氣氛點火站'],
+  '深夜理解同盟':['月光聊天室','凌晨共感組','情緒翻譯局','深夜安全站'],
+  '同頻共振組':['同步開大隊','共振同盟','同頻連線組','默契直連局'],
+  '反差互補組':['缺口補位隊','反差小隊','互補連攜組','雙向支援局'],
+  '主線推進小隊':['任務推進局','進度加速隊','行動連攜組','目標突破隊'],
+  '高難度磨合組':['高難度攻略隊','反差試煉組','磨合副本隊','需要說明書組'],
+  '穩定合作組':['長線搭檔','日常同盟','穩定連線組','耐玩合作隊']
+};
+
+function buildDuoTitle(roleA,roleB,mode,type,dominant){
+  const hash=stablePairHash(roleA.id,roleB.id,mode);
+  const first=DUO_AXIS_LABELS[dominant[0]?.axis] || '未知';
+  const second=DUO_AXIS_LABELS[dominant[1]?.axis] || '冒險';
+  const suffixes=DUO_TITLE_SUFFIXES[type] || DUO_TITLE_SUFFIXES['穩定合作組'];
+  const suffix=suffixes[hash%suffixes.length];
+
+  const modePrefix={
+    friends:['好友','日常','友情','並肩'],
+    couple:['戀人','雙向','心動','親密'],
+    crush:['曖昧','訊號','心跳','未讀'],
+    teammates:['任務','主線','作戰','合作']
+  }[mode] || ['雙人'];
+
+  return `${modePrefix[(hash>>>4)%modePrefix.length]}・${first}${second}${suffix}`;
+}
+
+function highestDuoMetric(metrics){
+  return [
+    ['communication',metrics.communication],
+    ['rhythm',metrics.rhythm],
+    ['complement',metrics.complement],
+    ['safety',metrics.safety],
+    ['action',metrics.action]
+  ].sort((a,b)=>b[1]-a[1])[0][0];
+}
+
+function largestDuoRisk(metrics){
+  return Object.entries(metrics.penalties).sort((a,b)=>b[1]-a[1])[0][0];
+}
+
+function buildDuoSummary(roleA,roleB,mode,type,metrics){
+  const tier=duoScoreTier(metrics.score).label;
+  const modeText={
+    friends:'當朋友時',
+    couple:'進入親密關係時',
+    crush:'還在曖昧讀訊號時',
+    teammates:'一起完成任務時'
+  }[mode];
+
+  const main=highestDuoMetric(metrics);
+  const strengths={
+    communication:'最容易出現的優勢是「話有機會說進對方心裡」',
+    rhythm:'最容易出現的優勢是「不用一直解釋彼此的電量」',
+    complement:'最容易出現的優勢是「一個人的缺口剛好有人能補」',
+    safety:'最容易出現的優勢是「可以不用一直表現得很好」',
+    action:'最容易出現的優勢是「兩個人一起比單獨更容易開始」'
+  };
+
+  return `${modeText}，你們屬於「${type}」。${strengths[main]}。免費結果顯示為 ${tier}，完整副本會揭曉精確分數與真正的卡關點。`;
+}
+
+function buildDuoSkill(result){
+  const {roleA,roleB,type,mode}=result;
+  const skillA=String(roleA.skill||'').split('：')[0];
+  const skillB=String(roleB.skill||'').split('：')[0];
+
+  const templates={
+    friends:`友情連攜・${skillA} × ${skillB}：一個人開始掉線時，另一個人通常能用最自然的方式把對方拉回隊伍。`,
+    couple:`親密連攜・${skillA} × ${skillB}：安全感建立後，你們會把彼此原本藏起來的能力一起放大。`,
+    crush:`訊號連攜・${skillA} × ${skillB}：一句普通訊息也能產生只有你們看得懂的第二層意思。`,
+    teammates:`任務連攜・${skillA} × ${skillB}：一個人負責打開局面，另一個人負責讓結果真的落地。`
+  };
+  return templates[mode] || `${skillA} × ${skillB} 形成專屬雙人技能。`;
+}
+
+function buildDuoStrength(result){
+  const {roleA,roleB,metrics,mode}=result;
+  const top=highestDuoMetric(metrics);
+  const byMetric={
+    communication:`${roleA.name} 與 ${roleB.name} 的表達方式雖不一定相同，但比較有機會在誤會變大前抓到重點。`,
+    rhythm:`你們對出現、安靜、聊天與關機的節奏相對容易找到交集，不需要靠高頻互動證明關係。`,
+    complement:`你們真正的優勢不是很像，而是角色能力能補位。有人卡住時，另一個人比較有機會提供不同解法。`,
+    safety:`這組合最珍貴的是情緒安全感。狀態不好時，不必先整理成完美版本才有資格靠近對方。`,
+    action:`你們一起做事時比較容易進入狀態，適合把想很久的計畫變成一個真的完成的版本。`
+  };
+  const modeTail={
+    friends:'這會讓友情很耐玩。',
+    couple:'這會成為長期關係的重要底盤。',
+    crush:'這會讓曖昧不只停在猜測。',
+    teammates:'這會直接反映在合作效率上。'
+  }[mode];
+  return `${byMetric[top]}${modeTail}`;
+}
+
+function buildDuoFriction(result){
+  const {roleA,roleB,metrics,mode}=result;
+  const risk=largestDuoRisk(metrics);
+  const copy={
+    avoidBoth:`兩個人不舒服時都可能先退後。${roleA.name} 與 ${roleB.name} 如果同時切成隱身模式，「需要休息」很容易被誤會成「不在乎」。`,
+    overthinkBoth:'你們都可能從語氣、回覆時間或一個小動作延伸出很多版本。越想確認，越可能只在腦內互相對話。',
+    chaosBoth:'你們很容易一起興奮、一起開新任務，也可能一起忘記收尾。快樂是真的，行程失控也是真的。',
+    closenessMismatch:mode==='crush'
+      ? '一個人的好感訊號可能剛好撞上另一個人的防禦模式。越在意，反而越容易把話說得不像在意。'
+      : '你們需要的靠近速度不同。有人想確認關係時，另一個人可能正在保護自己的空間。',
+    socialMismatch:'一個人想聊天、出門或熱鬧時，另一個人可能剛好需要關機。沒說明電量，就會被解讀成掃興或冷淡。',
+    styleMismatch:'你們表達在乎的方式不同：一個人期待明確回應，另一個人可能覺得自己已經用行動說明了。',
+  };
+  return copy[risk] || '最容易卡在「以為對方應該懂」。越熟，越需要把真正需求說出來。';
+}
+
+function buildDuoRepair(result){
+  const risk=largestDuoRisk(result.metrics);
+  const repairs={
+    avoidBoth:'建立一句固定關機訊號，例如：「我現在沒電，不是對你冷掉，晚點會回來。」先交代狀態，再保留空間。',
+    overthinkBoth:'不要問「你是不是怎樣」，改成各說一句：「我剛剛看到的事實是＿＿，我腦中猜的是＿＿。」把事實與腦補拆開。',
+    chaosBoth:'每次一起開新坑前，先指定一個人負責收尾，並把完成標準縮到 20 分鐘內看得見。',
+    closenessMismatch:'使用 10% 靠近法：不要逼一次說完全部真心，只提供一個比平常更清楚的訊號，讓對方有時間接住。',
+    socialMismatch:'見面或聊天前先報電量 0～10 分，再決定今天適合熱鬧、安靜陪伴，還是各自休息。',
+    styleMismatch:'各自說出一件「你做了我會感覺被在乎」的具體小事，禁止回答隨便、都可以或你應該知道。'
+  };
+  return repairs[risk] || '把「你應該懂」改成「我真正需要的是＿＿」。說清楚不是破壞默契，而是在保護默契。';
+}
+
+function buildDuoBestScene(result){
+  const top=highestDuoMetric(result.metrics);
+  const mode=result.mode;
+  const scenes={
+    communication:{
+      friends:'最適合深夜散步、長訊息或只有兩個人的真心局。',
+      couple:'最適合在情緒還沒爆炸前，安排固定的關係更新時間。',
+      crush:'最適合用有一點認真、又不會壓迫的方式把訊號說清楚。',
+      teammates:'最適合開會前先對齊目標與分工，避免各做各的。'
+    },
+    rhythm:{
+      friends:'最適合低壓陪伴：各做各的，也知道對方還在線。',
+      couple:'最適合建立兩個人的日常儀式，不必昂貴但要穩定。',
+      crush:'最適合自然增加互動頻率，不用突然把曖昧推到最終關卡。',
+      teammates:'最適合有明確截止、但允許各自安排節奏的合作。'
+    },
+    complement:{
+      friends:'最適合一個人卡關時，請另一個人提供完全不同的觀點。',
+      couple:'最適合把生活分工建立在強項，而不是要求兩個人做事方式一樣。',
+      crush:'最適合一起完成一件小事，比只靠聊天更容易看見彼此的可靠度。',
+      teammates:'最適合角色分工清楚的專案：有人開路、有人整合、有人收尾。'
+    },
+    safety:{
+      friends:'最適合在其中一個人狀態差時，提供不急著解決的陪伴。',
+      couple:'最適合把脆弱說出來，而不是只展示自己很好相處的一面。',
+      crush:'最適合坦白一點點真實感受，測試彼此是否能溫柔接住。',
+      teammates:'最適合在失誤後先處理問題，不把錯誤直接等同能力不足。'
+    },
+    action:{
+      friends:'最適合一起挑戰新體驗、運動、學習或完成拖很久的小目標。',
+      couple:'最適合共同規劃旅行、存錢或生活升級，但要保留個人空間。',
+      crush:'最適合用一起做事創造自然相處，不必每次都把重點放在關係定義。',
+      teammates:'最適合短週期、有成果、能快速回饋的任務。'
+    }
+  };
+  return scenes[top][mode];
+}
+
+function buildDuoQuest(result){
+  const risk=largestDuoRisk(result.metrics);
+  const mode=result.mode;
+  const base={
+    friends:'安排一次 15 分鐘友情副本：一個人說最近最卡的事，另一個人先不給建議，只重述自己聽懂的內容。',
+    couple:'各自完成一句：「最近我最希望你多知道的是＿＿。」說完先不辯解，只確認有沒有聽懂。',
+    crush:'各自丟出一個比平常清楚 10% 的訊號，例如主動約時間、說出期待，或明確表達見面後很開心。',
+    teammates:'選一件 30 分鐘能完成的小任務，先寫清楚誰開始、誰收尾、什麼叫完成。'
+  }[mode];
+
+  const riskTail={
+    avoidBoth:'結束前再約定關機訊號。',
+    overthinkBoth:'過程中出現猜測時，要把事實與腦補分開說。',
+    chaosBoth:'任務完成前不准再開第二個新坑。',
+    closenessMismatch:'不要求立刻給答案，只要求訊號更清楚。',
+    socialMismatch:'開始前先互報今天電量。',
+    styleMismatch:'每人說一件具體會感覺被在乎的行動。'
+  }[risk] || '';
+
+  return `${base}${riskTail}`;
+}
+
+function buildDuoSevenDays(result){
+  const mode=result.mode;
+  const modeTasks={
+    friends:[
+      '互相選出對方角色卡上最像本人的一句話。',
+      '分享一件最近沒有跟其他人說的小煩惱。',
+      '一起完成一個 20 分鐘的小任務。',
+      '各自說出一次被對方幫到、但當時沒有說的事。',
+      '交換一首最近很像自己狀態的歌。',
+      '安排一段不用一直聊天的低壓陪伴。',
+      '替這段友情取一個只有你們懂的副本名稱。'
+    ],
+    couple:[
+      '各自報告今天的情緒電量與需要的陪伴方式。',
+      '說出一個最近有被對方照顧到的細節。',
+      '安排 20 分鐘無手機對話。',
+      '各自完成一句：「我生氣時其實最需要＿＿。」',
+      '一起完成一件生活小任務，不評論彼此做法。',
+      '交換一個下週可以幫對方減少負擔的行動。',
+      '建立一句吵架或關機時的安全訊號。'
+    ],
+    crush:[
+      '主動丟出一次不含糊的聊天開場。',
+      '分享一個只有熟人才知道的小偏好。',
+      '提出一次有日期或時間的具體邀約。',
+      '回覆時少修稿一次，保留真實語氣。',
+      '稱讚對方一個外表以外的特點。',
+      '觀察對方是否也有主動投入，而不是只看自己心動。',
+      '完成一句：「跟你相處時，我最喜歡的是＿＿。」'
+    ],
+    teammates:[
+      '各自寫下自己最擅長與最不想負責的任務。',
+      '把一個大目標拆成 30 分鐘能完成的版本。',
+      '明確指定一位開始者與一位收尾者。',
+      '交換一次不帶批評的具體回饋。',
+      '一起完成最不想做的那個小步驟。',
+      '檢查目前是否同時開了太多任務。',
+      '完成一次復盤：留下有效做法，刪掉沒用流程。'
+    ]
+  };
+  return modeTasks[mode].map((task,index)=>{
+    if(index===3) return `${task}（${result.roleA.name} 與 ${result.roleB.name} 都要回答）`;
+    return task;
+  });
+}
+
+function buildDuoSecret(result){
+  const typeLines={
+    '心動拉扯搭檔':'你們不是沒有訊號，只是兩個人都可能把在意藏成沒事。真正的升級，是讓訊號不必一直靠猜。',
+    '溫柔補血同盟':'真正好的補師關係，不是永遠照顧對方，而是兩個人都敢說自己也需要回血。',
+    '雙核心闖關隊':'你們可以一起變強，但別把關係也變成一張永遠做不完的任務表。',
+    '混亂靈感聯盟':'你們負責把世界玩得有趣，也要記得留一個人負責存檔。',
+    '靜音默契組':'安靜不是距離，只要彼此知道門沒有真的關上。',
+    '氣氛爆擊雙人組':'你們很會讓場面快樂，兩個人單獨相處時也可以不用一直有梗。',
+    '深夜理解同盟':'你們能聽懂彼此沒說完的話，也別忘了有些答案需要白天真的去做。',
+    '同頻共振組':'很像是一種幸運，但保留不同，才不會把彼此困在同一個盲點裡。',
+    '反差互補組':'你們不需要變成一樣，真正的默契是知道何時接手、何時讓對方自己完成。',
+    '主線推進小隊':'一起前進很強，但也要允許其中一個人偶爾只想被陪，而不是被推進。',
+    '高難度磨合組':'分數低不是判定不適合，而是你們需要更多明確說明書；願意理解差異，才是這關真正的獎勵。',
+    '穩定合作組':'最耐玩的關係不一定最戲劇化，而是每次回頭都還找得到彼此。'
+  };
+  return typeLines[result.type] || '你們的雙人副本，不是要證明多完美，而是學會怎麼一起玩得更久。';
+}
+
+function buildDuoResult(roleA,roleB,mode=state.duoMode){
+  const metrics=computeDuoMetrics(roleA,roleB,mode);
+  const dominant=getDuoDominantAxes(roleA,roleB);
+  const type=determineDuoType(roleA,roleB,mode,metrics);
+  const pairKey=makeDuoPairKey(roleA.id,roleB.id);
+  const hash=stablePairHash(roleA.id,roleB.id,mode);
+  const tier=duoScoreTier(metrics.score);
+
+  const result={
+    roleA,roleB,mode,pairKey,metrics,
+    score:metrics.score,
+    scoreRange:duoScoreRange(metrics.score),
+    tier,
+    type,
+    title:buildDuoTitle(roleA,roleB,mode,type,dominant),
+    code:`#DUO-${String(hash%10000).padStart(4,'0')}`,
+    resultId:`DUO-${String(stablePairHash(roleA.id,roleB.id)).padStart(1,'0')}-${mode}`.slice(0,100),
+    traits:dominant.map(item=>DUO_AXIS_LABELS[item.axis]).filter(Boolean)
+  };
+
+  result.summary=buildDuoSummary(roleA,roleB,mode,type,metrics);
+  result.skill=buildDuoSkill(result);
+  result.strength=buildDuoStrength(result);
+  result.friction=buildDuoFriction(result);
+  result.repair=buildDuoRepair(result);
+  result.bestScene=buildDuoBestScene(result);
+  result.quest=buildDuoQuest(result);
+  result.sevenDays=buildDuoSevenDays(result);
+  result.secret=buildDuoSecret(result);
+  return result;
+}
+
+function hasDuoAccess(pairKey){
+  if(!pairKey) return false;
+  if(localStorage.getItem(`lifequest:duoAccess:${pairKey}`)) return true;
+  return getRemoteRoleIds().has(pairKey);
+}
+
+function grantDuoAccess(pairKey){
+  if(!pairKey) return;
+  localStorage.setItem(`lifequest:duoAccess:${pairKey}`,JSON.stringify({
+    pairKey,at:new Date().toISOString(),source:'ECPAY'
+  }));
+  const remote=getRemoteRoleIds();
+  remote.add(pairKey);
+  localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify([...remote]));
+}
+
+function generateDuoCard(options={}){
+  const roleA=getRoleById($('duoRoleA')?.value);
+  const roleB=getRoleById($('duoRoleB')?.value);
+
+  if(!roleA || !roleB){
+    if(!options.silent) toast('請先選擇兩張角色卡');
+    return;
+  }
+
+  const result=buildDuoResult(roleA,roleB,state.duoMode);
+  state.duoResult=result;
+  renderDuoResult(result);
+
+  $('duoEmptyState')?.classList.add('hidden');
+  $('duoResult')?.classList.remove('hidden');
+
+  if(!options.silent){
+    setTimeout(()=>$('duoResult')?.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+  }
+}
+
+function renderDuoResult(result){
+  const set=(id,value)=>{
+    const node=$(id);
+    if(node) node.textContent=value;
+  };
+
+  set('duoEmojiA',result.roleA.emoji);
+  set('duoEmojiB',result.roleB.emoji);
+  set('duoRoleNames',`${result.roleA.name} × ${result.roleB.name}`);
+  set('duoTitle',result.title);
+  set('duoType',result.type);
+  set('duoPairCode',result.code);
+  set('duoModeBadge',DUO_MODES[result.mode].badge);
+  set('duoScoreRange',result.scoreRange);
+  set('duoSummary',result.summary);
+
+  const row=$('duoTraitRow');
+  if(row) row.innerHTML=result.traits.map(trait=>`<span>${trait}</span>`).join('');
+
+  const card=$('duoCard');
+  if(card){
+    card.style.setProperty('--duo-a',result.roleA.accent||'#a87cff');
+    card.style.setProperty('--duo-b',result.roleB.accent||'#ff6cab');
+  }
+
+  if(hasDuoAccess(result.pairKey)) revealDuoPremium(result,{silent:true});
+  else lockDuoPremium();
+}
+
+function lockDuoPremium(){
+  $('duoLockedPanel')?.classList.remove('hidden');
+  $('duoPremiumDetails')?.classList.add('hidden');
+  $('downloadDuoBtn')?.classList.add('hidden');
+  $('shareDuoBtn')?.classList.add('hidden');
+  $('duoCard')?.classList.add('duo-card-free');
+  $('duoCard')?.classList.remove('duo-card-unlocked');
+}
+
+function revealDuoPremium(result=state.duoResult,options={}){
+  if(!result) return;
+
+  const set=(id,value)=>{
+    const node=$(id);
+    if(node) node.textContent=value;
+  };
+  const setBar=(id,value)=>{
+    const node=$(id);
+    if(node) node.style.width=`${clampNumber(value,0,100)}%`;
+  };
+
+  set('duoScore',result.score);
+  set('duoTierLabel',result.tier.label);
+  set('duoExactTitle',`${DUO_MODES[result.mode].icon} ${DUO_MODES[result.mode].label}完整攻略`);
+  set('duoExactSummary',`${result.roleA.name} × ${result.roleB.name} 的精確默契為 ${result.score}。分數反映此模式下的溝通、節奏、互補、安全感與行動配合。`);
+  set('duoMetricCommunication',result.metrics.communication);
+  set('duoMetricRhythm',result.metrics.rhythm);
+  set('duoMetricComplement',result.metrics.complement);
+  set('duoMetricSafety',result.metrics.safety);
+  set('duoMetricAction',result.metrics.action);
+  setBar('duoBarCommunication',result.metrics.communication);
+  setBar('duoBarRhythm',result.metrics.rhythm);
+  setBar('duoBarComplement',result.metrics.complement);
+  setBar('duoBarSafety',result.metrics.safety);
+  setBar('duoBarAction',result.metrics.action);
+
+  set('duoSkill',result.skill);
+  set('duoStrength',result.strength);
+  set('duoFriction',result.friction);
+  set('duoRepair',result.repair);
+  set('duoBestScene',result.bestScene);
+  set('duoQuest',result.quest);
+  set('duoModeLabel',DUO_MODES[result.mode].label);
+  set('duoSecret',result.secret);
+
+  const list=$('duoSevenDayList');
+  if(list) list.innerHTML=result.sevenDays.map((task,index)=>`<li><b>DAY ${index+1}</b><span>${task}</span></li>`).join('');
+
+  const ring=$('duoScoreRing');
+  if(ring) ring.style.setProperty('--duo-score',`${result.score*3.6}deg`);
+
+  const tier=$('duoTierLabel');
+  if(tier){
+    tier.className=`duo-tier-label ${result.tier.className}`;
+  }
+
+  $('duoLockedPanel')?.classList.add('hidden');
+  $('duoPremiumDetails')?.classList.remove('hidden');
+  $('downloadDuoBtn')?.classList.remove('hidden');
+  $('shareDuoBtn')?.classList.remove('hidden');
+  $('duoCard')?.classList.remove('duo-card-free');
+  $('duoCard')?.classList.add('duo-card-unlocked');
+
+  if(!options.silent) toast('完整雙人副本已解鎖');
+}
+
+function resetDuoResult(){
+  state.duoResult=null;
+  $('duoResult')?.classList.add('hidden');
+  $('duoEmptyState')?.classList.remove('hidden');
+  $('duoRoleA')?.focus();
+  $('duo')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+async function downloadDuoCard(){
+  const result=state.duoResult;
+  if(!result) return toast('請先生成雙人副本');
+  if(!hasDuoAccess(result.pairKey)) return openDuoPayModal();
+  if(typeof html2canvas==='undefined') return toast('圖片套件還在載入，請再按一次');
+
+  const button=$('downloadDuoBtn');
+  const original=button?.textContent||'';
+  if(button){
+    button.disabled=true;
+    button.textContent='正在生成完整雙人卡…';
+  }
+
+  try{
+    const sourceCanvas=await html2canvas($('duoCard'),{
+      backgroundColor:'#100f1f',
+      scale:Math.min(3,Math.max(2,window.devicePixelRatio||2)),
+      useCORS:true,
+      allowTaint:true,
+      logging:false
+    });
+
+    const jpgCanvas=document.createElement('canvas');
+    jpgCanvas.width=sourceCanvas.width;
+    jpgCanvas.height=sourceCanvas.height;
+    const ctx=jpgCanvas.getContext('2d');
+    ctx.fillStyle='#100f1f';
+    ctx.fillRect(0,0,jpgCanvas.width,jpgCanvas.height);
+    ctx.drawImage(sourceCanvas,0,0);
+
+    const fileName=`${result.title}-人生副本完整雙人卡.jpg`;
+    const dataUrl=jpgCanvas.toDataURL('image/jpeg',.94);
+
+    if(jpgCanvas.toBlob){
+      jpgCanvas.toBlob(blob=>{
+        showSaveImageModal(dataUrl,fileName,blob,{
+          title:'完整雙人卡已生成',
+          alt:`${result.roleA.name}與${result.roleB.name}完整雙人卡`,
+          copy:'完整雙人卡已經產生。點圖片嘗試儲存；手機沒有反應時，可以長按圖片選擇儲存影像。'
+        });
+        if(!isIOSLike()&&!isInAppBrowser()) triggerBlobDownload(blob,fileName);
+      },'image/jpeg',.94);
+    }else{
+      showSaveImageModal(dataUrl,fileName,null,{
+        title:'完整雙人卡已生成',
+        alt:`${result.roleA.name}與${result.roleB.name}完整雙人卡`
+      });
+    }
+  }catch(error){
+    console.error(error);
+    toast('雙人卡生成失敗，請再試一次或直接截圖保存');
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=original||'下載完整雙人合卡 JPG';
+    }
+  }
+}
+
+function copyDuoShareText(){
+  const result=state.duoResult;
+  if(!result) return toast('請先生成雙人副本');
+  if(!hasDuoAccess(result.pairKey)) return openDuoPayModal();
+
+  const text=`我們在「人生副本」合出：
+${result.title}｜精確默契 ${result.score}
+
+${result.roleA.emoji} ${result.roleA.name}
+×
+${result.roleB.emoji} ${result.roleB.name}
+
+模式：${DUO_MODES[result.mode].label}
+隊伍類型：${result.type}
+合體技能：${result.skill}
+最容易卡關：${result.friction}
+修復攻略：${result.repair}
+雙人任務：${result.quest}
+
+你和朋友會開出什麼雙人副本？`;
+
+  copyText(text,'已複製完整 Threads 合卡文');
+  const box=$('duoShareBox');
+  if(box) box.textContent='已複製，可以貼到 Threads 並標記對方一起玩。';
+}
+
+
 function getSavedList(){
   try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.saved)||'[]')}catch{return []}
 }
@@ -1193,6 +2075,7 @@ function saveResultToCollection(showToast=true){
   if(idx >= 0) list[idx] = {...list[idx], ...item, at:list[idx].at || item.at};
   else list.unshift(item);
   setSavedList(list);
+  renderDuoSavedChips();
   if(showToast) toast(item.premium ? '已保存完整報告到我的卡冊' : '已自動存進我的卡冊');
 }
 function saveCurrentCard(){ saveResultToCollection(true); }
@@ -1278,11 +2161,34 @@ function copyPremiumReport(){
   copyText(`${state.currentRole.name}｜完整角色報告\n\n${text}`,'已複製完整報告');
 }
 
+function configurePayModal(config){
+  const set=(id,value)=>{
+    const node=$(id);
+    if(node) node.textContent=value;
+  };
+
+  set('payTitle',config.title);
+  set('payModalCopy',config.copy);
+  set('payRoleHeading',config.heading);
+  set('payRoleTeaser',config.teaser);
+  set('unlockTargetText',config.target);
+  set('payStepTwo',`完成 NT$${config.amount} 付款`);
+  set('payStepThree',config.returnText);
+  set('payPolicyNote',config.policy);
+  set('payNowBtn',`前往綠界安全付款｜NT$${config.amount}`);
+
+  const values=$('payValueSummary');
+  if(values) values.innerHTML=config.values.map(item=>`<span><b>${item.title}</b>${item.text}</span>`).join('');
+
+  setModalMessage('',true);
+  openModalElement($('payModal'));
+}
+
 function openPayModal(){
   if(!state.currentRole){
-    const list = getSavedList();
+    const list=getSavedList();
     if(list.length){ openUnlockChooser(); return; }
-    location.hash = '#quiz';
+    location.hash='#quiz';
     toast('先完成測驗，才會知道要解鎖哪份報告');
     return;
   }
@@ -1298,23 +2204,74 @@ function openPayModal(){
     return;
   }
 
-  const target = $('unlockTargetText');
-  if(target){
-    target.textContent = `購買角色：${state.currentRole.name}｜${state.currentRole.rarity}
-結果編號：${state.resultId}`;
+  state.paymentContext={
+    type:'report',
+    amount:49,
+    roleId:state.currentRole.id,
+    resultId:state.resultId
+  };
+
+  const note=rolePremiumNotes[state.currentRole.id]||{};
+  configurePayModal({
+    title:'解鎖這張角色的完整攻略',
+    copy:'你將解鎖這張角色專屬的 10 個章節。付款成功後會自動返回網站並立即顯示完整內容。',
+    heading:`${state.currentRole.emoji} ${state.currentRole.name}｜${state.currentRole.rarity}`,
+    teaser:firstSentence(note.hook||roleContradiction(state.currentRole),105),
+    target:`購買角色：${state.currentRole.name}｜${state.currentRole.rarity}
+結果編號：${state.resultId}`,
+    amount:49,
+    returnText:'返回網站，自動解鎖完整報告',
+    policy:'🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。',
+    values:[
+      {title:'10 章',text:'角色專屬解析'},
+      {title:'一次',text:'同角色不重複付費'},
+      {title:'自動',text:'付款成功立即解鎖'}
+    ]
+  });
+}
+
+function openDuoPayModal(){
+  const result=state.duoResult;
+  if(!result){
+    toast('請先免費試算雙人副本');
+    return;
   }
 
-  const note = rolePremiumNotes[state.currentRole.id] || {};
-  const payHeading = $('payRoleHeading');
-  const payTeaser = $('payRoleTeaser');
-  if(payHeading) payHeading.textContent = `${state.currentRole.emoji} ${state.currentRole.name}｜${state.currentRole.rarity}`;
-  if(payTeaser) payTeaser.textContent = firstSentence(note.hook || roleContradiction(state.currentRole), 105);
+  if(hasDuoAccess(result.pairKey)){
+    revealDuoPremium(result);
+    return;
+  }
 
-  setModalMessage('', true);
-  openModalElement($('payModal'));
+  state.paymentContext={
+    type:'duo',
+    amount:10,
+    pairKey:result.pairKey,
+    roleAId:result.roleA.id,
+    roleBId:result.roleB.id,
+    resultId:result.resultId,
+    duoMode:result.mode
+  };
+
+  configurePayModal({
+    title:'解鎖完整雙人副本',
+    copy:'付款後會揭曉精確默契分數、五項能力、合體技能、衝突攻略與 7 日雙人任務。',
+    heading:`${result.roleA.emoji} ${result.roleA.name} × ${result.roleB.emoji} ${result.roleB.name}`,
+    teaser:`目前免費試算為「${result.type}｜默契 ${result.scoreRange}」。同一組角色解鎖一次，四種關係模式都可以查看。`,
+    target:`購買項目：完整雙人副本
+配對編號：${result.code}`,
+    amount:10,
+    returnText:'返回網站，自動顯示完整雙人副本',
+    policy:'🎀 完整雙人副本為娛樂性數位內容；付款成功並顯示完整內容後，即視為服務完成。',
+    values:[
+      {title:'精確',text:'默契與五項能力'},
+      {title:'4 模式',text:'朋友／情侶／曖昧／搭檔'},
+      {title:'一次',text:'同一組角色永久解鎖'}
+    ]
+  });
 }
 
 function closePayModal(){ closeModalElement($('payModal')); }
+
 
 function getCustomerId(){
   let id = localStorage.getItem(STORAGE_KEYS.customerId);
@@ -1346,7 +2303,10 @@ async function syncEntitlements(opts={}){
     localStorage.setItem(STORAGE_KEYS.lastSyncAt,new Date().toISOString());
 
     if(opts.mergeCards) mergeRemoteEntitlements(data.entitlements);
-    if(opts.showFeedback) toast(`已同步 ${roleIds.length} 個已購買角色`);
+    if(state.duoResult && hasDuoAccess(state.duoResult.pairKey)){
+      revealDuoPremium(state.duoResult,{silent:true});
+    }
+    if(opts.showFeedback) toast(`已同步 ${roleIds.length} 個已購買項目`);
     return data.entitlements;
   }catch(error){
     console.warn('entitlements sync failed',error);
@@ -1413,7 +2373,7 @@ async function restoreFromRecoveryCode(){
     }
     renderSavedCards();
     $('recoveryCodeText').textContent=code;
-    setRecoveryMessage(`同步完成，共找到 ${entitlements.length} 個已購買角色。`,true);
+    setRecoveryMessage(`同步完成，共找到 ${entitlements.length} 個已購買項目。`,true);
     toast('卡冊購買紀錄已同步');
   }catch(error){
     setRecoveryMessage(error.message||'同步失敗，請稍後再試。',false);
@@ -1423,51 +2383,80 @@ async function restoreFromRecoveryCode(){
 }
 
 async function startEcpayPayment(){
-  if(!state.currentRole || !state.resultId){
-    setModalMessage('請先完成測驗並選擇要解鎖的卡牌。',false);
-    return;
+  const context=state.paymentContext||{type:'report'};
+
+  if(context.type==='duo'){
+    const result=state.duoResult;
+    if(!result || result.pairKey!==context.pairKey){
+      setModalMessage('雙人副本資料已變更，請關閉視窗後重新試算。',false);
+      return;
+    }
+    if(hasDuoAccess(result.pairKey)){
+      closePayModal();
+      revealDuoPremium(result);
+      return;
+    }
+  }else{
+    if(!state.currentRole || !state.resultId){
+      setModalMessage('請先完成測驗並選擇要解鎖的卡牌。',false);
+      return;
+    }
+    if(hasPremiumAccess(state.resultId)){
+      closePayModal();
+      showPremiumReport();
+      toast('這個角色已經解鎖');
+      return;
+    }
   }
 
-  if(hasPremiumAccess(state.resultId)){
-    closePayModal();
-    showPremiumReport();
-    toast('這個角色已經解鎖');
-    return;
-  }
-
-  const button = $('payNowBtn');
+  const amount=context.type==='duo'?10:49;
+  const button=$('payNowBtn');
   if(button){
-    button.disabled = true;
-    button.textContent = '正在前往綠界…';
+    button.disabled=true;
+    button.textContent='正在前往綠界…';
   }
   hidePendingPaymentBar();
   setModalMessage('正在建立安全付款頁面…',true);
 
   try{
-    const customerId = getCustomerId();
-    const data = await fetchJsonWithTimeout(`${CONFIG.WORKER_URL}/create-payment`,{
+    const customerId=getCustomerId();
+    const payload=context.type==='duo'
+      ? {
+          customerId,
+          productType:'duo',
+          resultId:context.resultId,
+          roleAId:context.roleAId,
+          roleBId:context.roleBId
+        }
+      : {
+          customerId,
+          productType:'report',
+          resultId:state.resultId,
+          roleId:state.currentRole.id
+        };
+
+    const data=await fetchJsonWithTimeout(`${CONFIG.WORKER_URL}/create-payment`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        customerId,
-        resultId:state.resultId,
-        roleId:state.currentRole.id,
-        roleName:state.currentRole.name
-      })
+      body:JSON.stringify(payload)
     },15000);
 
-    if(!data.ok){
-      throw new Error(data.message || '建立付款失敗');
-    }
+    if(!data.ok) throw new Error(data.message||'建立付款失敗');
 
     if(data.alreadyOwned){
-      const remote = getRemoteRoleIds();
-      remote.add(state.currentRole.id);
+      const remote=getRemoteRoleIds();
+      remote.add(data.productKey || (context.type==='duo'?context.pairKey:state.currentRole.id));
       localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify([...remote]));
-      grantRoleAccessToCurrentResult();
       closePayModal();
-      showPremiumReport();
-      toast('這個角色已經解鎖');
+
+      if(context.type==='duo'){
+        grantDuoAccess(context.pairKey);
+        revealDuoPremium(state.duoResult);
+      }else{
+        grantRoleAccessToCurrentResult();
+        showPremiumReport();
+        toast('這個角色已經解鎖');
+      }
       return;
     }
 
@@ -1476,31 +2465,66 @@ async function startEcpayPayment(){
       JSON.stringify({
         tradeNo:data.tradeNo,
         customerId,
-        resultId:state.resultId,
-        roleId:state.currentRole.id,
+        productType:context.type,
+        productKey:data.productKey || (context.type==='duo'?context.pairKey:state.currentRole.id),
+        resultId:context.type==='duo'?context.resultId:state.resultId,
+        roleId:context.type==='report'?state.currentRole.id:'',
+        roleAId:context.roleAId||'',
+        roleBId:context.roleBId||'',
+        duoMode:context.duoMode||'friends',
+        amount,
         createdAt:new Date().toISOString()
       })
     );
 
     submitPaymentForm(data.action,data.fields);
   }catch(error){
-    setModalMessage(error.name==='AbortError' ? '付款服務連線逾時，請稍後再試。' : (error.message || '付款服務暫時無法使用，請稍後再試。'),false);
+    console.warn('create payment failed',error);
+    let message='付款服務暫時無法使用，請稍後再試。';
+    if(error?.name==='AbortError') message='付款服務連線逾時，請確認網路後再試。';
+    else if(error?.name==='NetworkError' || error?.message==='Failed to fetch') message='目前無法連上付款服務，請重新整理頁面後再試。';
+    else if(error?.message) message=error.message;
+
+    setModalMessage(message,false);
     if(button){
-      button.disabled = false;
-      button.textContent = '前往綠界安全付款 NT$49';
+      button.disabled=false;
+      button.textContent=`重新前往綠界安全付款｜NT$${amount}`;
     }
   }
 }
 
 async function fetchJsonWithTimeout(url,options={},timeoutMs=12000){
+  if(typeof navigator!=='undefined' && navigator.onLine===false){
+    throw new Error('目前沒有網路連線，請連線後再試。');
+  }
+
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),timeoutMs);
+
   try{
-    const response=await fetch(url,{...options,cache:'no-store',signal:controller.signal});
+    let response;
+    try{
+      response=await fetch(url,{
+        ...options,
+        mode:'cors',
+        credentials:'omit',
+        cache:'no-store',
+        signal:controller.signal
+      });
+    }catch(error){
+      if(error?.name==='AbortError') throw error;
+      const networkError=new Error('目前無法連上付款服務，請重新整理頁面後再試。');
+      networkError.name='NetworkError';
+      throw networkError;
+    }
+
     let data;
     try{ data=await response.json(); }
-    catch{ throw new Error('服務回傳格式錯誤'); }
-    if(!response.ok) throw new Error(data.message || `服務錯誤 (${response.status})`);
+    catch{ throw new Error('付款服務回傳格式錯誤，請稍後再試。'); }
+
+    if(!response.ok){
+      throw new Error(data.message || `付款服務暫時異常（${response.status}）`);
+    }
     return data;
   }finally{
     clearTimeout(timeout);
@@ -1584,7 +2608,7 @@ async function confirmPendingPayment({tradeNo,attempts}){
       applyPaidOrder(data.order);
       localStorage.removeItem(STORAGE_KEYS.pendingPayment);
       hidePendingPaymentBar(); resetPaymentButton();
-      toast('付款成功，完整報告已解鎖');
+      toast(data.order?.role_id?.startsWith('duo:') ? '付款成功，完整雙人副本已解鎖' : '付款成功，完整報告已解鎖');
       return true;
     }
     showPendingPaymentBar('尚未收到付款成功通知；請勿重複付款，可稍後重新確認。');
@@ -1623,29 +2647,60 @@ function showPendingPaymentBar(message){
 }
 function hidePendingPaymentBar(){ $('pendingPaymentBar')?.classList.add('hidden'); }
 function resetPaymentButton(){
-  const button=$('payNowBtn'); if(!button) return;
-  button.disabled=false; button.textContent='前往綠界安全付款 NT$49';
+  const button=$('payNowBtn');
+  if(!button) return;
+  const context=state.paymentContext||{type:'report'};
+  const amount=context.type==='duo'?10:49;
+  button.disabled=false;
+  button.textContent=`前往綠界安全付款｜NT$${amount}`;
 }
 
 function applyPaidOrder(order){
   if(!order) return;
 
-  const remote = getRemoteRoleIds();
+  const remote=getRemoteRoleIds();
   remote.add(order.role_id);
   localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify([...remote]));
 
-  const saved = getSavedList().find(item=>item.resultId===order.result_id)
+  if(String(order.role_id||'').startsWith('duo:')){
+    const parsed=parseDuoPairKey(order.role_id);
+    if(!parsed) return;
+
+    grantDuoAccess(order.role_id);
+
+    const pending=getPendingPayment();
+    const mode=DUO_MODES[pending?.duoMode] ? pending.duoMode : 'friends';
+    state.duoMode=mode;
+
+    if($('duoRoleA')) $('duoRoleA').value=parsed.roleA.id;
+    if($('duoRoleB')) $('duoRoleB').value=parsed.roleB.id;
+    setDuoMode(mode);
+    updateDuoSelectPreview('A');
+    updateDuoSelectPreview('B');
+
+    const result=buildDuoResult(parsed.roleA,parsed.roleB,mode);
+    state.duoResult=result;
+    renderDuoResult(result);
+    revealDuoPremium(result,{silent:true});
+    $('duoEmptyState')?.classList.add('hidden');
+    $('duoResult')?.classList.remove('hidden');
+
+    setTimeout(()=>$('duoPremiumDetails')?.scrollIntoView({behavior:'smooth',block:'start'}),150);
+    return;
+  }
+
+  const saved=getSavedList().find(item=>item.resultId===order.result_id)
     || getSavedList().find(item=>item.roleId===order.role_id);
 
-  const role = getRoleById(order.role_id);
+  const role=getRoleById(order.role_id);
   if(!role) return;
 
-  state.currentRole = role;
-  state.resultId = saved?.resultId || order.result_id;
-  state.answers = Array.isArray(saved?.answers) && saved.answers.length===questions.length
+  state.currentRole=role;
+  state.resultId=saved?.resultId||order.result_id;
+  state.answers=Array.isArray(saved?.answers)&&saved.answers.length===questions.length
     ? saved.answers
     : synthesizeAnswersFromRole(role);
-  state.scores = calculateScores();
+  state.scores=calculateScores();
 
   grantPremiumAccess(state.resultId,'ECPAY');
   renderResult(role);
@@ -1653,10 +2708,7 @@ function applyPaidOrder(order){
   showPremiumReport();
   saveLastResult();
 
-  setTimeout(
-    ()=>$('premiumReport').scrollIntoView({behavior:'smooth',block:'start'}),
-    150
-  );
+  setTimeout(()=>$('premiumReport').scrollIntoView({behavior:'smooth',block:'start'}),150);
 }
 
 function clearPaymentQuery(){

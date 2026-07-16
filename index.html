@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=16.0" />
+  <link rel="stylesheet" href="style.css?v=16.2" />
 </head>
 <body>
   <div class="bg-noise" aria-hidden="true"></div>
@@ -34,6 +34,7 @@
     <nav class="nav-links" aria-label="主要選單">
       <a href="#samples">範例</a>
       <a href="#quiz">測驗</a>
+      <a href="#duo">雙人合卡</a>
       <a href="#premium">完整報告</a>
       <a href="#faq">說明</a>
     </nav>
@@ -214,6 +215,7 @@
           <div class="action-stack">
             <button class="primary-btn full" id="downloadBtn" type="button">下載角色卡 JPG</button>
             <button class="secondary-btn full" id="shareBtn" type="button">複製 Threads 分享文</button>
+            <button class="secondary-btn full duo-action-btn" id="duoFromResultBtn" type="button">和朋友合一張雙人卡</button>
             <button class="ghost-btn full" id="againBtn" type="button">重新測一次</button>
           </div>
 
@@ -270,7 +272,6 @@
               <span>✓ 同角色之後都能再看</span>
               <span>✓ 不是訂閱制</span>
             </div>
-</div>
             <p class="upsell-safe-note">點擊後會先看到角色與付款確認，不會在這一步直接扣款。</p>
           </div>
         </aside>
@@ -285,7 +286,173 @@
       </div>
     </section>
 
-    <section class="section-pad premium-section" id="premium">
+    <section class="section-pad duo-section" id="duo">
+      <div class="section-title center reveal">
+        <p class="eyebrow">雙人副本模式</p>
+        <h2>兩張角色卡，會開出什麼關係副本？</h2>
+        <p class="section-subtitle">先免費試算隊伍類型與默契區間；解鎖後會看到精確默契、五項能力圖、合體技能、衝突攻略與 7 日雙人任務。</p>
+      </div>
+
+      <div class="duo-layout reveal">
+        <div class="duo-picker-panel">
+          <div class="duo-price-row">
+            <span class="duo-free-pill">免費試算・不限次數</span>
+            <span class="duo-unlock-pill">完整雙人副本 NT$10</span>
+          </div>
+
+          <h3>先選你們是什麼關係</h3>
+          <p>同一組角色只需要解鎖一次，朋友、情侶、曖昧、工作搭檔四種模式都可以切換查看。</p>
+
+          <div class="duo-mode-tabs" id="duoModeTabs" role="group" aria-label="選擇雙人關係模式">
+            <button class="duo-mode-btn is-active" type="button" data-duo-mode="friends">
+              <span>🫶</span><strong>朋友</strong><small>相處與陪伴</small>
+            </button>
+            <button class="duo-mode-btn" type="button" data-duo-mode="couple">
+              <span>💞</span><strong>情侶</strong><small>親密與安全感</small>
+            </button>
+            <button class="duo-mode-btn" type="button" data-duo-mode="crush">
+              <span>💌</span><strong>曖昧</strong><small>心動與訊號</small>
+            </button>
+            <button class="duo-mode-btn" type="button" data-duo-mode="teammates">
+              <span>⚔️</span><strong>搭檔</strong><small>合作與行動</small>
+            </button>
+          </div>
+
+          <div class="duo-select-grid">
+            <label class="duo-select-card" for="duoRoleA">
+              <span class="duo-player-label">玩家 A</span>
+              <select id="duoRoleA" aria-label="選擇玩家 A 的角色">
+                <option value="">選擇第一張角色卡</option>
+              </select>
+              <small id="duoRoleAPreview">完成測驗後，可以自動帶入你的角色。</small>
+            </label>
+
+            <button class="duo-swap-btn" id="swapDuoBtn" type="button" aria-label="交換兩張角色卡">⇄</button>
+
+            <label class="duo-select-card" for="duoRoleB">
+              <span class="duo-player-label">玩家 B</span>
+              <select id="duoRoleB" aria-label="選擇玩家 B 的角色">
+                <option value="">選擇第二張角色卡</option>
+              </select>
+              <small id="duoRoleBPreview">知道朋友的角色名稱就能直接選。</small>
+            </label>
+          </div>
+
+          <div class="duo-saved-wrap">
+            <strong>從我的卡冊快速選擇</strong>
+            <div class="duo-saved-chips" id="duoSavedChips"></div>
+          </div>
+
+          <button class="primary-btn full duo-generate-btn" id="generateDuoBtn" type="button">免費試算我們的雙人副本</button>
+          <p class="duo-disclaimer">默契分數依兩張角色卡的 12 項設定與所選關係模式計算，屬娛樂性互動內容，不代表真實關係診斷。</p>
+        </div>
+
+        <div class="duo-result-shell">
+          <div class="duo-empty-state" id="duoEmptyState">
+            <div class="duo-empty-icons"><span>🎴</span><b>＋</b><span>🎴</span></div>
+            <h3>你們是同頻、互補，還是高難度副本？</h3>
+            <p>不同角色與關係模式會得到不同的隊伍名稱、默契高低、優勢與卡關點。</p>
+          </div>
+
+          <div class="duo-result hidden" id="duoResult">
+            <article class="duo-card duo-card-free" id="duoCard">
+              <div class="duo-card-glow" aria-hidden="true"></div>
+              <div class="duo-card-top">
+                <span class="duo-badge" id="duoModeBadge">FRIEND DUO</span>
+                <span id="duoPairCode">#DUO-0000</span>
+              </div>
+
+              <div class="duo-avatars">
+                <div class="duo-avatar" id="duoEmojiA">🎴</div>
+                <div class="duo-link-symbol">×</div>
+                <div class="duo-avatar" id="duoEmojiB">🎴</div>
+              </div>
+
+              <p class="duo-role-names" id="duoRoleNames">角色 A × 角色 B</p>
+              <h3 id="duoTitle">雙人隊伍名稱</h3>
+              <p class="duo-type" id="duoType">隊伍類型</p>
+
+              <div class="duo-free-score-block" id="duoFreeScoreBlock">
+                <div>
+                  <span>免費試算結果</span>
+                  <strong id="duoScoreRange">60–69</strong>
+                  <small>默契區間</small>
+                </div>
+                <p id="duoSummary">選擇兩張卡後，這裡會顯示免費隊伍摘要。</p>
+              </div>
+
+              <div class="duo-trait-row" id="duoTraitRow"></div>
+
+              <div class="duo-unlock-preview" id="duoLockedPanel">
+                <div class="duo-lock-head">
+                  <span>🔒 完整雙人副本</span>
+                  <strong>NT$10</strong>
+                </div>
+                <p>解鎖精確默契分數、五項能力、合體技能、最強優勢、衝突點、修復方式與 7 日雙人任務。</p>
+
+                <div class="duo-blurred-preview" aria-hidden="true">
+                  <div class="fake-score">87</div>
+                  <div class="fake-bars"><i></i><i></i><i></i><i></i><i></i></div>
+                </div>
+
+                <button class="primary-btn full duo-unlock-btn" id="unlockDuoBtn" type="button">
+                  解鎖這組完整雙人副本 NT$10
+                </button>
+                <small>同一組角色只需解鎖一次，四種關係模式都能查看。不是訂閱制。</small>
+              </div>
+
+              <div class="duo-premium-details hidden" id="duoPremiumDetails">
+                <div class="duo-exact-head">
+                  <div class="duo-score-ring" id="duoScoreRing">
+                    <strong id="duoScore">--</strong>
+                    <span>精確默契</span>
+                  </div>
+                  <div>
+                    <span class="duo-tier-label" id="duoTierLabel">默契等級</span>
+                    <h4 id="duoExactTitle">完整副本已解鎖</h4>
+                    <p id="duoExactSummary"></p>
+                  </div>
+                </div>
+
+                <div class="duo-metrics" id="duoMetrics">
+                  <div><span>溝通理解</span><b id="duoMetricCommunication">0</b><i><em id="duoBarCommunication"></em></i></div>
+                  <div><span>相處節奏</span><b id="duoMetricRhythm">0</b><i><em id="duoBarRhythm"></em></i></div>
+                  <div><span>互補能力</span><b id="duoMetricComplement">0</b><i><em id="duoBarComplement"></em></i></div>
+                  <div><span>情緒安全</span><b id="duoMetricSafety">0</b><i><em id="duoBarSafety"></em></i></div>
+                  <div><span>行動配合</span><b id="duoMetricAction">0</b><i><em id="duoBarAction"></em></i></div>
+                </div>
+
+                <div class="duo-ability-list duo-premium-grid">
+                  <div><strong>⚡ 合體技能</strong><p id="duoSkill"></p></div>
+                  <div><strong>✨ 最強優勢</strong><p id="duoStrength"></p></div>
+                  <div><strong>⚠️ 最容易卡關</strong><p id="duoFriction"></p></div>
+                  <div><strong>🛠️ 修復攻略</strong><p id="duoRepair"></p></div>
+                  <div><strong>🌟 最適合你們的時刻</strong><p id="duoBestScene"></p></div>
+                  <div><strong>🎯 本週雙人任務</strong><p id="duoQuest"></p></div>
+                </div>
+
+                <div class="duo-seven-day">
+                  <div class="duo-seven-head"><strong>7 日雙人升級任務</strong><span id="duoModeLabel">朋友模式</span></div>
+                  <ol id="duoSevenDayList"></ol>
+                </div>
+
+                <p class="duo-secret-line" id="duoSecret"></p>
+                <small class="duo-card-brand">人生副本｜完整雙人副本</small>
+              </div>
+            </article>
+
+            <div class="duo-actions">
+              <button class="primary-btn full hidden" id="downloadDuoBtn" type="button">下載完整雙人合卡 JPG</button>
+              <button class="secondary-btn full hidden" id="shareDuoBtn" type="button">複製完整 Threads 合卡文</button>
+              <button class="ghost-btn full" id="changeDuoBtn" type="button">換一組角色</button>
+            </div>
+            <div class="share-box" id="duoShareBox" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section class="section-pad premium-section" id="premium">
       <div class="premium-card premium-sales-card reveal">
         <div class="premium-sales-copy">
           <p class="eyebrow">完整報告版</p>
@@ -320,7 +487,7 @@
     <section class="section-pad roadmap-section reveal">
       <div class="section-title center"><p class="eyebrow">即將開放</p><h2>更多有趣玩法準備中</h2></div>
       <div class="roadmap-grid">
-        <article><strong>雙人合卡</strong><span>情侶、曖昧、朋友配對，看看你們是什麼副本組合。</span></article>
+        <article><strong>三人小隊卡</strong><span>把三位朋友組成冒險小隊，看看誰是輸出、補師與隱藏 Boss。</span></article>
         <article><strong>朋友團隊卡</strong><span>開房間一起測，產生隊伍組成，很適合群組分享。</span></article>
         <article><strong>實體角色卡</strong><span>把喜歡的角色卡做成可以保存的實體卡牌。</span></article>
       </div>
@@ -333,6 +500,7 @@
         <details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
         <details><summary>可以抽幾次？</summary><p>不限次數，隨時都可以重新測驗。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看。</p></details>
+        <details><summary>雙人合卡怎麼使用？</summary><p>兩個人先各自完成測驗，再到「雙人合卡」選擇角色與關係模式。免費可查看隊伍名稱、默契區間與摘要；完整雙人副本 NT$10，解鎖精確分數、五項能力、衝突攻略、7 日任務與下載分享。同一組角色只需解鎖一次。</p></details>
         <details><summary>換手機後還能查看嗎？</summary><p>可以先在「我的卡冊」保存私人備份碼，再於新裝置輸入備份碼同步已購買角色。備份碼等同卡冊鑰匙，請勿公開。</p></details>
         <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
         <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；若發生重複扣款、系統錯誤或已付款卻無法取得內容，請來信協助處理。</p></details>
@@ -367,12 +535,12 @@
       <button class="modal-close" data-close-modal type="button" aria-label="關閉">×</button>
       <p class="eyebrow">綠界安全付款</p>
       <h2 id="payTitle">解鎖這張角色的完整攻略</h2>
-      <p class="modal-copy">你將解鎖這張角色專屬的 10 個章節。付款成功後會自動返回網站並立即顯示完整內容。</p>
+      <p class="modal-copy" id="payModalCopy">你將解鎖這張角色專屬的 10 個章節。付款成功後會自動返回網站並立即顯示完整內容。</p>
       <div class="pay-role-preview">
         <strong id="payRoleHeading">正在確認角色卡</strong>
         <p id="payRoleTeaser">戀愛、社交、工作、金錢與升級任務會依這張卡的技能和弱點產生。</p>
       </div>
-      <div class="pay-value-summary">
+      <div class="pay-value-summary" id="payValueSummary">
         <span><b>10 章</b>角色專屬解析</span>
         <span><b>一次</b>同角色不重複付費</span>
         <span><b>自動</b>付款成功立即解鎖</span>
@@ -380,11 +548,11 @@
       <div class="unlock-target" id="unlockTargetText">正在解鎖：尚未選擇卡牌</div>
       <div class="pay-steps">
         <div><strong>1</strong><span>前往綠界選擇可用的付款方式</span></div>
-        <div><strong>2</strong><span>完成 NT$49 付款</span></div>
-        <div><strong>3</strong><span>返回網站，自動解鎖完整報告</span></div>
+        <div><strong>2</strong><span id="payStepTwo">完成 NT$49 付款</span></div>
+        <div><strong>3</strong><span id="payStepThree">返回網站，自動解鎖完整報告</span></div>
       </div>
       <div class="payment-note policy-reminder">🔒 付款由綠界科技處理，本站不會取得或保存完整信用卡資料。</div>
-      <div class="payment-note policy-reminder">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
+      <div class="payment-note policy-reminder" id="payPolicyNote">🎀 本服務為娛樂性數位內容；付款成功並顯示完整報告後，即視為服務完成。</div>
       <div class="modal-payment-methods" aria-label="綠界付款方式">
         <div class="modal-payment-title"><strong>付款將由綠界處理</strong><small>實際方式依裝置與付款頁顯示</small></div>
         
@@ -448,6 +616,7 @@
       <div class="cardbook-tools">
         <button class="secondary-btn small" id="syncCardsBtn" type="button">重新同步購買紀錄</button>
         <button class="ghost-btn small" id="backupCodeBtn" type="button">備份／換裝置</button>
+        <button class="primary-btn small" id="savedDuoBtn" type="button">雙人合卡</button>
       </div>
       <div class="saved-list" id="savedList"></div>
     </div>
@@ -460,7 +629,7 @@
       <button class="modal-close" data-close-save-image type="button" aria-label="關閉">×</button>
       <p class="eyebrow">角色卡已生成</p>
       <h2 id="saveImageTitle">點圖片儲存到手機</h2>
-      <p class="modal-copy">JPG 圖片已經產生。點下方圖片會嘗試儲存；如果手機沒有反應，再長按圖片選「儲存影像」。</p>
+      <p class="modal-copy" id="saveImageCopy">JPG 圖片已經產生。點下方圖片會嘗試儲存；如果手機沒有反應，再長按圖片選「儲存影像」。</p>
       <div class="save-image-frame">
         <img id="saveImagePreview" alt="人生副本角色卡 JPG 預覽" />
       </div>
@@ -506,6 +675,6 @@
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="script.js?v=16.0" defer></script>
+  <script src="script.js?v=16.2" defer></script>
 </body>
 </html>
