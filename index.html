@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=16.2" />
+  <link rel="stylesheet" href="style.css?v=16.3" />
 </head>
 <body>
   <div class="bg-noise" aria-hidden="true"></div>
@@ -428,6 +428,7 @@
                   <div><strong>⚠️ 最容易卡關</strong><p id="duoFriction"></p></div>
                   <div><strong>🛠️ 修復攻略</strong><p id="duoRepair"></p></div>
                   <div><strong>🌟 最適合你們的時刻</strong><p id="duoBestScene"></p></div>
+                  <div><strong>📊 分數為什麼是這樣</strong><p id="duoScoreReason"></p></div>
                   <div><strong>🎯 本週雙人任務</strong><p id="duoQuest"></p></div>
                 </div>
 
@@ -633,7 +634,12 @@
       <div class="save-image-frame">
         <img id="saveImagePreview" alt="人生副本角色卡 JPG 預覽" />
       </div>
-      <p class="ios-save-tip">小提醒：點圖片就會嘗試儲存；如果是在 Threads / LINE / IG 內建瀏覽器，沒反應時再長按圖片儲存，或用 Safari 開啟。</p>
+      <div class="save-image-actions">
+        <button class="primary-btn full" id="saveImageDownloadBtn" type="button">下載 JPG 檔案</button>
+        <button class="secondary-btn full" id="shareImageBtn" type="button">分享圖片／儲存到相簿</button>
+      </div>
+      <p class="modal-message save-image-status" id="saveImageStatus" aria-live="polite"></p>
+      <p class="ios-save-tip">手機建議先按「分享圖片／儲存到相簿」。在 Threads、LINE、IG 內建瀏覽器無法下載時，可以長按圖片，或改用 Safari／Chrome 開啟。</p>
     </div>
   </div>
 
@@ -675,6 +681,6 @@
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="script.js?v=16.2" defer></script>
+  <script src="script.js?v=16.3" defer></script>
 </body>
 </html>

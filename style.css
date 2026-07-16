@@ -1501,10 +1501,7 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   padding:25px;
   border:1px solid rgba(255,255,255,.20);
   border-radius:29px;
-  background:
-    radial-gradient(circle at 0% 0%,color-mix(in srgb,var(--duo-a) 30%,transparent),transparent 35%),
-    radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--duo-b) 30%,transparent),transparent 35%),
-    linear-gradient(155deg,#24203d,#141326 72%);
+  background:linear-gradient(155deg,#322b55 0%,#201d3b 40%,#141326 78%);
   box-shadow:0 28px 68px rgba(0,0,0,.34);
 }
 .duo-card::before{
@@ -2122,4 +2119,89 @@ body:has(#saveImageModal:not(.hidden)) .toast{
     grid-template-columns:72px 25px 1fr;
     gap:7px;
   }
+}
+
+
+/* =========================================================
+   v16.3｜雙人內容差異化、JPG 與排版修正
+   ========================================================= */
+.duo-result-shell,.duo-result,.duo-card{min-width:0;max-width:100%}
+.duo-card h3{
+  overflow-wrap:anywhere;
+  text-wrap:balance;
+}
+.duo-card-glow{
+  opacity:.16;
+  filter:blur(34px);
+}
+.duo-card-free .duo-card-glow{opacity:.10}
+.duo-card-unlocked .duo-card-glow{opacity:.18}
+.duo-premium-grid > div:last-child:nth-child(odd){grid-column:1/-1}
+.duo-score-ring{flex-shrink:0}
+.duo-seven-day li span{overflow-wrap:anywhere}
+
+.save-image-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin-top:12px;
+}
+.save-image-actions button{min-height:48px}
+.save-image-status{margin:10px 0 0;text-align:center}
+.image-save-panel{width:min(680px,100%)}
+.save-image-frame{
+  max-height:55vh;
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+.save-image-frame img{min-height:120px;object-fit:contain}
+
+.image-export-host{
+  position:fixed;
+  left:-12000px;
+  top:0;
+  z-index:-9999;
+  width:760px;
+  padding:0;
+  pointer-events:none;
+  background:#100f1f;
+}
+.duo-card.duo-card-export{
+  width:760px!important;
+  max-width:none!important;
+  min-height:0!important;
+  padding:34px!important;
+  border-radius:34px!important;
+  box-shadow:none!important;
+}
+.duo-card-export .duo-card h3,
+.duo-card-export h3{font-size:38px!important}
+.duo-card-export .duo-avatars{margin:22px 0 12px!important}
+.duo-card-export .duo-avatar{width:100px!important;height:100px!important;font-size:46px!important}
+.duo-card-export .duo-exact-head{grid-template-columns:120px 1fr!important}
+.duo-card-export .duo-score-ring{width:104px!important;height:104px!important}
+.duo-card-export .duo-premium-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.duo-card-export .duo-premium-grid > div:last-child:nth-child(odd){grid-column:1/-1!important}
+.duo-card-export .duo-ability-list p{font-size:12px!important;line-height:1.62!important}
+.duo-card-export .duo-seven-day li span{font-size:11px!important}
+.duo-card-export .duo-card-brand{font-size:10px!important}
+.duo-card-export::after{display:none!important}
+
+@media(max-width:620px){
+  .duo-card h3{font-size:clamp(25px,8vw,34px)}
+  .duo-role-names{font-size:11px}
+  .duo-free-score-block{grid-template-columns:88px minmax(0,1fr)}
+  .duo-free-score-block > p{font-size:11px}
+  .duo-exact-head h4{font-size:16px}
+  .duo-exact-head p{font-size:10px}
+  .save-image-actions{grid-template-columns:1fr}
+  .save-image-frame{max-height:48vh}
+}
+@media(max-width:360px){
+  .duo-picker-panel{padding:15px}
+  .duo-result-shell{padding:7px}
+  .duo-card{padding:15px}
+  .duo-avatar{width:68px;height:68px;font-size:31px}
+  .duo-link-symbol{width:31px;height:31px}
+  .duo-metrics > div{grid-template-columns:65px 24px minmax(0,1fr)}
 }
