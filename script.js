@@ -372,11 +372,13 @@ const state = {
   duoResult: null,
   duoMode: 'friends',
   paymentContext: {type:'report'},
+  cardbookTab: 'single',
   answerLocked: false,
   isGenerating: false
 };
 const STORAGE_KEYS = {
   saved: 'lifequest:saved',
+  duoSaved: 'lifequest:duoSaved',
   premiumPrefix: 'lifequest:premium:',
   unlockedReports: 'lifequest:unlockedReports',
   customerId: 'lifequest:customerId',
@@ -393,7 +395,7 @@ const POLICY_CONTENT = {
     html: `
       <p>歡迎使用「人生副本」。本服務提供娛樂性角色卡測驗與個人化數位內容。</p>
       <h3>一、服務內容</h3>
-      <p>使用者可免費完成測驗並生成角色卡；部分完整角色報告需付費解鎖。</p>
+      <p>使用者可免費完成測驗、生成角色卡與試算雙人副本；完整角色報告及完整雙人副本需付費解鎖。</p>
       <h3>二、使用規範</h3>
       <ul>
         <li>不得破解、轉售、散布、冒用付款或解鎖權限。</li>
@@ -426,7 +428,7 @@ const POLICY_CONTENT = {
       <h3>使用目的</h3>
       <p>資料僅用於付款確認、同步購買權限、客服處理與改善服務，不會販售個人資料。</p>
       <h3>保存方式</h3>
-      <p>角色卡主要保存在瀏覽器本機；購買權限會記錄於本站後端。使用者可保存私人備份碼，在其他裝置同步已購買角色。</p>
+      <p>角色卡與免費雙人試算主要保存在瀏覽器本機；已付款的單人報告與雙人副本權限會永久記錄於本站後端。使用者必須保存私人備份碼，才能在其他裝置或清除資料後同步已購買內容。</p>
       <h3>聯絡方式</h3>
       <p>如需查詢或刪除付款與購買權限資料，請來信：miller20031102@gmail.com</p>`
   },
@@ -474,6 +476,7 @@ async function init(){
   resetPaymentButton();
 
   await syncEntitlements({mergeCards:true});
+  renderDuoSavedChips();
 
   const savedResult = loadLastResult();
   if(savedResult){
@@ -515,10 +518,12 @@ function bindEvents(){
     button.addEventListener('click',()=>setDuoMode(button.dataset.duoMode));
   });
   on('savedBtn','click',showSavedCards);
+  on('singleCardsTab','click',()=>setCardbookTab('single'));
+  on('duoCardsTab','click',()=>setCardbookTab('duo'));
   on('chooseUnlockBtn','click',openUnlockChooser);
   on('copyPremiumBtn','click',copyPremiumReport);
   on('payNowBtn','click',startEcpayPayment);
-  on('syncCardsBtn','click',async()=>{ await syncEntitlements({mergeCards:true,showFeedback:true}); renderSavedCards(); });
+  on('syncCardsBtn','click',async()=>{ await syncEntitlements({mergeCards:true,showFeedback:true}); renderSavedCards(); renderDuoSavedChips(); });
   on('backupCodeBtn','click',openRecoveryModal);
   on('copyRecoveryBtn','click',()=>copyText(getCustomerId(),'已複製私人備份碼'));
   on('restoreRecoveryBtn','click',restoreFromRecoveryCode);
@@ -1866,14 +1871,31 @@ function hasDuoAccess(pairKey){
   return getRemoteRoleIds().has(pairKey);
 }
 
-function grantDuoAccess(pairKey){
+function grantDuoAccess(pairKey,options={}){
   if(!pairKey) return;
+  const grantedAt=options.grantedAt||new Date().toISOString();
+
   localStorage.setItem(`lifequest:duoAccess:${pairKey}`,JSON.stringify({
-    pairKey,at:new Date().toISOString(),source:'ECPAY'
+    pairKey,
+    at:grantedAt,
+    source:options.source||'ECPAY',
+    permanent:true
   }));
+
   const remote=getRemoteRoleIds();
   remote.add(pairKey);
   localStorage.setItem(STORAGE_KEYS.remoteRoleIds,JSON.stringify([...remote]));
+
+  ensureDuoPairModesSaved(pairKey,{
+    premium:true,
+    allModes:true,
+    grantedAt,
+    remote:Boolean(options.remote)
+  });
+
+  if(!$('savedModal')?.classList.contains('hidden')){
+    renderDuoSavedCards();
+  }
 }
 
 function generateDuoCard(options={}){
@@ -1888,6 +1910,10 @@ function generateDuoCard(options={}){
   const result=buildDuoResult(roleA,roleB,state.duoMode);
   state.duoResult=result;
   renderDuoResult(result);
+  saveDuoResultToCollection(result,{
+    showToast:!options.silent,
+    render:false
+  });
 
   $('duoEmptyState')?.classList.add('hidden');
   $('duoResult')?.classList.remove('hidden');
@@ -1996,7 +2022,13 @@ function revealDuoPremium(result=state.duoResult,options={}){
   $('duoCard')?.classList.remove('duo-card-free');
   $('duoCard')?.classList.add('duo-card-unlocked');
 
-  if(!options.silent) toast('完整雙人副本已解鎖');
+  saveDuoResultToCollection(result,{
+    premium:true,
+    render:false,
+    showToast:false
+  });
+
+  if(!options.silent) toast('完整雙人副本已永久解鎖並存進卡冊');
 }
 
 function resetDuoResult(){
@@ -2079,10 +2111,319 @@ ${result.roleB.emoji} ${result.roleB.name}
 }
 
 
+
+function getDuoSavedList(){
+  try{
+    const value=JSON.parse(localStorage.getItem(STORAGE_KEYS.duoSaved)||'[]');
+    return Array.isArray(value) ? value.filter(Boolean) : [];
+  }catch{
+    return [];
+  }
+}
+
+function setDuoSavedList(list){
+  const normalized=Array.isArray(list) ? list.filter(Boolean).slice(0,40) : [];
+  localStorage.setItem(STORAGE_KEYS.duoSaved,JSON.stringify(normalized));
+}
+
+function duoModeSnapshot(result){
+  return {
+    mode:result.mode,
+    title:result.title,
+    type:result.type,
+    score:result.score,
+    scoreRange:result.scoreRange,
+    tier:result.tier?.label||'',
+    code:result.code,
+    traits:Array.isArray(result.traits)?[...result.traits]:[],
+    updatedAt:new Date().toISOString()
+  };
+}
+
+function createDuoSavedItem(roleA,roleB,pairKey,options={}){
+  const parsed=parseDuoPairKey(pairKey);
+  const first=parsed?.roleA||roleA;
+  const second=parsed?.roleB||roleB;
+  if(!first || !second) return null;
+
+  return {
+    pairKey,
+    roleAId:first.id,
+    roleBId:second.id,
+    roleAName:first.name,
+    roleBName:second.name,
+    roleAEmoji:first.emoji,
+    roleBEmoji:second.emoji,
+    lastMode:DUO_MODES[options.mode] ? options.mode : 'friends',
+    modes:{},
+    premium:Boolean(options.premium),
+    permanent:Boolean(options.premium),
+    grantedAt:options.grantedAt||'',
+    at:options.at||new Date().toISOString(),
+    updatedAt:new Date().toISOString(),
+    remote:Boolean(options.remote)
+  };
+}
+
+function saveDuoResultToCollection(result=state.duoResult,options={}){
+  if(!result?.pairKey || !result.roleA || !result.roleB) return null;
+
+  const list=getDuoSavedList();
+  let item=list.find(entry=>entry.pairKey===result.pairKey);
+
+  if(!item){
+    item=createDuoSavedItem(result.roleA,result.roleB,result.pairKey,{
+      mode:result.mode,
+      premium:hasDuoAccess(result.pairKey),
+      remote:Boolean(options.remote)
+    });
+    if(!item) return null;
+    list.unshift(item);
+  }
+
+  item.roleAId=parseDuoPairKey(result.pairKey)?.roleA.id||result.roleA.id;
+  item.roleBId=parseDuoPairKey(result.pairKey)?.roleB.id||result.roleB.id;
+  item.roleAName=getRoleById(item.roleAId)?.name||result.roleA.name;
+  item.roleBName=getRoleById(item.roleBId)?.name||result.roleB.name;
+  item.roleAEmoji=getRoleById(item.roleAId)?.emoji||result.roleA.emoji;
+  item.roleBEmoji=getRoleById(item.roleBId)?.emoji||result.roleB.emoji;
+  item.lastMode=result.mode;
+  item.modes={...(item.modes||{}),[result.mode]:duoModeSnapshot(result)};
+  item.premium=Boolean(item.premium||hasDuoAccess(result.pairKey)||options.premium);
+  item.permanent=Boolean(item.permanent||item.premium);
+  item.updatedAt=new Date().toISOString();
+  if(options.grantedAt && !item.grantedAt) item.grantedAt=options.grantedAt;
+
+  list.sort((a,b)=>new Date(b.updatedAt||b.at||0)-new Date(a.updatedAt||a.at||0));
+  setDuoSavedList(list);
+  updateCardbookCounts();
+
+  if(options.render!==false && !$('savedModal')?.classList.contains('hidden')){
+    renderDuoSavedCards();
+  }
+  if(options.showToast){
+    toast(item.premium ? '已存進卡冊，這組雙人副本已永久解鎖' : '雙人試算已自動存進卡冊');
+  }
+  return item;
+}
+
+function ensureDuoPairModesSaved(pairKey,options={}){
+  const parsed=parseDuoPairKey(pairKey);
+  if(!parsed) return null;
+
+  const modes=options.allModes ? Object.keys(DUO_MODES) : [
+    DUO_MODES[options.mode] ? options.mode : 'friends'
+  ];
+
+  let latest=null;
+  modes.forEach(mode=>{
+    const result=buildDuoResult(parsed.roleA,parsed.roleB,mode);
+    latest=saveDuoResultToCollection(result,{
+      premium:Boolean(options.premium),
+      grantedAt:options.grantedAt||'',
+      remote:Boolean(options.remote),
+      render:false,
+      showToast:false
+    });
+  });
+
+  if(options.premium){
+    const list=getDuoSavedList();
+    const item=list.find(entry=>entry.pairKey===pairKey);
+    if(item){
+      item.premium=true;
+      item.permanent=true;
+      item.grantedAt=item.grantedAt||options.grantedAt||new Date().toISOString();
+      item.updatedAt=new Date().toISOString();
+      setDuoSavedList(list);
+      latest=item;
+    }
+  }
+
+  updateCardbookCounts();
+  return latest;
+}
+
+function parseDuoModeFromResultId(resultId){
+  const text=String(resultId||'');
+  const match=text.match(/-(friends|couple|crush|teammates)$/);
+  return match && DUO_MODES[match[1]] ? match[1] : 'friends';
+}
+
+function setCardbookTab(tab){
+  const next=tab==='duo'?'duo':'single';
+  state.cardbookTab=next;
+
+  const singleTab=$('singleCardsTab');
+  const duoTab=$('duoCardsTab');
+  const singlePanel=$('singleCardsPanel');
+  const duoPanel=$('duoCardsPanel');
+
+  singleTab?.classList.toggle('is-active',next==='single');
+  duoTab?.classList.toggle('is-active',next==='duo');
+  singleTab?.setAttribute('aria-selected',next==='single'?'true':'false');
+  duoTab?.setAttribute('aria-selected',next==='duo'?'true':'false');
+  singlePanel?.classList.toggle('hidden',next!=='single');
+  duoPanel?.classList.toggle('hidden',next!=='duo');
+}
+
+function updateCardbookCounts(){
+  const singleCount=$('singleCardsCount');
+  const duoCount=$('duoCardsCount');
+  if(singleCount) singleCount.textContent=String(getSavedList().length);
+  if(duoCount) duoCount.textContent=String(getDuoSavedList().length);
+}
+
+function renderDuoSavedCards(){
+  const list=getDuoSavedList();
+  const box=$('duoSavedList');
+  if(!box) return;
+
+  if(!list.length){
+    box.innerHTML=`<div class="empty-saved duo-empty-saved">
+      <strong>目前還沒有雙人副本</strong>
+      <span>完成一次雙人試算後，配對會自動存進這裡。</span>
+      <button class="primary-btn small" type="button" data-create-duo>建立第一組雙人合卡</button>
+    </div>`;
+    box.querySelector('[data-create-duo]')?.addEventListener('click',()=>{
+      closeSavedModal();
+      openDuoWithCurrent();
+    });
+    return;
+  }
+
+  box.innerHTML=list.map(item=>{
+    const roleA=getRoleById(item.roleAId);
+    const roleB=getRoleById(item.roleBId);
+    if(!roleA || !roleB) return '';
+
+    const unlocked=hasDuoAccess(item.pairKey)||item.premium;
+    const mode=DUO_MODES[item.lastMode] ? item.lastMode : 'friends';
+    const modeInfo=DUO_MODES[mode];
+    const snapshot=item.modes?.[mode]||duoModeSnapshot(buildDuoResult(roleA,roleB,mode));
+    const savedModes=Object.keys(item.modes||{}).filter(key=>DUO_MODES[key]);
+    const date=item.updatedAt||item.at;
+    const dateText=date ? new Date(date).toLocaleDateString('zh-TW') : '';
+
+    return `<article class="saved-card duo-saved-card ${unlocked?'is-unlocked is-permanent':''}">
+      <div class="duo-saved-emojis">
+        <span>${roleA.emoji}</span><b>×</b><span>${roleB.emoji}</span>
+      </div>
+
+      <div class="saved-main">
+        <div class="saved-title duo-saved-title">
+          <strong>${roleA.name} × ${roleB.name}</strong>
+          <span>${modeInfo.icon} ${modeInfo.label.replace('模式','')}</span>
+        </div>
+        <p>${snapshot.title}｜${snapshot.type}</p>
+
+        <div class="duo-cardbook-meta">
+          <span>${unlocked ? `精確默契 <b>${snapshot.score}</b>` : `默契區間 <b>${snapshot.scoreRange}</b>`}</span>
+          <span>${unlocked ? '四種模式永久解鎖' : `已保存 ${savedModes.length||1} 種模式`}</span>
+        </div>
+
+        <div class="duo-cardbook-modes">
+          ${Object.entries(DUO_MODES).map(([key,info])=>{
+            const active=key===mode;
+            const available=unlocked||Boolean(item.modes?.[key]);
+            return `<button type="button"
+              class="${active?'is-active':''} ${available?'is-available':'is-locked'}"
+              data-open-duo-pair="${item.pairKey}"
+              data-open-duo-mode="${key}"
+              ${available?'':'disabled'}>
+              ${info.icon} ${info.label.replace('模式','')}
+            </button>`;
+          }).join('')}
+        </div>
+
+        <small>${item.pairKey}${dateText?'｜'+dateText:''}</small>
+      </div>
+
+      <div class="saved-actions duo-saved-actions">
+        <button class="secondary-btn tiny" type="button"
+          data-open-duo-pair="${item.pairKey}"
+          data-open-duo-mode="${mode}">
+          查看雙人副本
+        </button>
+        ${unlocked
+          ? `<button class="primary-btn tiny" type="button"
+              data-open-duo-pair="${item.pairKey}"
+              data-open-duo-mode="${mode}">
+              🔐 永久解鎖・直接查看
+            </button>`
+          : `<button class="primary-btn tiny" type="button"
+              data-unlock-duo-pair="${item.pairKey}"
+              data-unlock-duo-mode="${mode}">
+              完整雙人副本 · NT$10
+            </button>`
+        }
+      </div>
+    </article>`;
+  }).join('');
+
+  box.querySelectorAll('[data-open-duo-pair]').forEach(button=>{
+    button.addEventListener('click',()=>restoreSavedDuo(
+      button.dataset.openDuoPair,
+      button.dataset.openDuoMode
+    ));
+  });
+
+  box.querySelectorAll('[data-unlock-duo-pair]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      restoreSavedDuo(
+        button.dataset.unlockDuoPair,
+        button.dataset.unlockDuoMode,
+        {openPayment:true}
+      );
+    });
+  });
+}
+
+function restoreSavedDuo(pairKey,mode='friends',options={}){
+  const parsed=parseDuoPairKey(pairKey);
+  if(!parsed) return toast('找不到這組雙人副本');
+
+  const resolvedMode=DUO_MODES[mode] ? mode : 'friends';
+  state.duoMode=resolvedMode;
+
+  populateDuoSelectors();
+  if($('duoRoleA')) $('duoRoleA').value=parsed.roleA.id;
+  if($('duoRoleB')) $('duoRoleB').value=parsed.roleB.id;
+  updateDuoSelectPreview('A');
+  updateDuoSelectPreview('B');
+
+  document.querySelectorAll('[data-duo-mode]').forEach(button=>{
+    const active=button.dataset.duoMode===resolvedMode;
+    button.classList.toggle('is-active',active);
+    button.setAttribute('aria-pressed',active?'true':'false');
+  });
+
+  const result=buildDuoResult(parsed.roleA,parsed.roleB,resolvedMode);
+  state.duoResult=result;
+  renderDuoResult(result);
+  saveDuoResultToCollection(result,{render:false,showToast:false});
+
+  $('duoEmptyState')?.classList.add('hidden');
+  $('duoResult')?.classList.remove('hidden');
+  closeSavedModal();
+  location.hash='#duo';
+
+  if(options.openPayment && !hasDuoAccess(pairKey)){
+    setTimeout(openDuoPayModal,100);
+  }else{
+    if(hasDuoAccess(pairKey)) revealDuoPremium(result,{silent:true});
+    setTimeout(()=>$('duoResult')?.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  }
+}
+
+
 function getSavedList(){
   try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.saved)||'[]')}catch{return []}
 }
-function setSavedList(list){ localStorage.setItem(STORAGE_KEYS.saved, JSON.stringify(list.slice(0,40))); }
+function setSavedList(list){
+  localStorage.setItem(STORAGE_KEYS.saved,JSON.stringify(list.slice(0,40)));
+  updateCardbookCounts();
+}
 function getUnlockedReports(){
   try{return JSON.parse(localStorage.getItem(STORAGE_KEYS.unlockedReports)||'{}')}catch{return {}}
 }
@@ -2125,11 +2466,12 @@ function saveResultToCollection(showToast=true){
 }
 function saveCurrentCard(){ saveResultToCollection(true); }
 function showSavedCards(){
-  const title = $('savedTitle');
-  if(title) title.textContent = '選擇你要查看或解鎖的卡';
-  const copy = document.querySelector('#savedModal .modal-copy');
-  if(copy) copy.textContent = '每張卡都會自動保存在這裡。同一種角色只需要購買一次；可用私人備份碼在其他裝置同步已購買角色。';
+  const title=$('savedTitle');
+  if(title) title.textContent='我的角色卡與雙人副本';
+  const copy=document.querySelector('#savedModal .modal-copy');
+  if(copy) copy.textContent='免費結果會存在這台裝置；已付款的單人報告與雙人副本會永久記錄在後端。換裝置時請使用同一組私人備份碼同步。';
   renderSavedCards();
+  setCardbookTab(state.cardbookTab);
   openModalElement($('savedModal'));
 }
 function openUnlockChooser(){
@@ -2144,14 +2486,21 @@ function openUnlockChooser(){
   const copy = document.querySelector('#savedModal .modal-copy');
   if(copy) copy.textContent = '同一種角色只需購買一次。請選擇想購買完整報告的角色卡。';
   renderSavedCards();
+  setCardbookTab('single');
   openModalElement($('savedModal'));
 }
 function closeSavedModal(){ closeModalElement($('savedModal')); }
 function renderSavedCards(){
-  const list = getSavedList();
-  const box = $('savedList');
+  const list=getSavedList();
+  const box=$('savedList');
+  renderDuoSavedCards();
+  updateCardbookCounts();
+
   if(!list.length){
-    box.innerHTML = `<div class="empty-saved">目前還沒有卡牌。先完成一次測驗，系統會自動幫你存到卡冊。</div>`;
+    box.innerHTML=`<div class="empty-saved">
+      <strong>目前還沒有單人角色卡</strong>
+      <span>先完成一次測驗，系統會自動幫你存到卡冊。</span>
+    </div>`;
     return;
   }
   box.innerHTML = list.map(item=>{
@@ -2349,6 +2698,7 @@ async function syncEntitlements(opts={}){
 
     if(opts.mergeCards) mergeRemoteEntitlements(data.entitlements);
     if(state.duoResult && hasDuoAccess(state.duoResult.pairKey)){
+      saveDuoResultToCollection(state.duoResult,{premium:true,render:false});
       revealDuoPremium(state.duoResult,{silent:true});
     }
     if(opts.showFeedback) toast(`已同步 ${roleIds.length} 個已購買項目`);
@@ -2362,30 +2712,67 @@ async function syncEntitlements(opts={}){
 }
 
 function mergeRemoteEntitlements(entitlements){
-  const list = getSavedList();
-  let changed = false;
+  const list=getSavedList();
+  let singleChanged=false;
+  let duoChanged=false;
 
   entitlements.forEach(item=>{
-    const role = getRoleById(item.role_id);
+    const productKey=String(item.role_id||'');
+
+    if(productKey.startsWith('duo:')){
+      const parsed=parseDuoPairKey(productKey);
+      if(!parsed) return;
+
+      grantDuoAccess(productKey,{
+        grantedAt:item.granted_at||new Date().toISOString(),
+        source:'REMOTE_SYNC',
+        remote:true
+      });
+
+      const preferredMode=parseDuoModeFromResultId(item.source_result_id);
+      const duoList=getDuoSavedList();
+      const duoItem=duoList.find(entry=>entry.pairKey===productKey);
+      if(duoItem){
+        duoItem.lastMode=preferredMode;
+        duoItem.premium=true;
+        duoItem.permanent=true;
+        duoItem.remote=true;
+        duoItem.grantedAt=duoItem.grantedAt||item.granted_at||new Date().toISOString();
+        setDuoSavedList(duoList);
+      }
+      duoChanged=true;
+      return;
+    }
+
+    const role=getRoleById(productKey);
     if(!role) return;
 
-    const existing = list.find(card=>card.roleId===role.id);
+    const existing=list.find(card=>card.roleId===role.id);
     if(existing){
-      existing.premium = true;
-      if(!existing.resultId && item.source_result_id) existing.resultId = item.source_result_id;
+      existing.premium=true;
+      if(!existing.resultId&&item.source_result_id) existing.resultId=item.source_result_id;
+      singleChanged=true;
       return;
     }
 
     list.unshift({
-      roleId:role.id, roleName:role.name, rarity:role.rarity, emoji:role.emoji,
-      line:role.line, resultId:item.source_result_id || `REMOTE-${role.id}`,
-      answers:synthesizeAnswersFromRole(role), premium:true,
-      at:item.granted_at || new Date().toISOString(), remote:true
+      roleId:role.id,
+      roleName:role.name,
+      rarity:role.rarity,
+      emoji:role.emoji,
+      line:role.line,
+      resultId:item.source_result_id||`REMOTE-${role.id}`,
+      answers:synthesizeAnswersFromRole(role),
+      premium:true,
+      at:item.granted_at||new Date().toISOString(),
+      remote:true
     });
-    changed = true;
+    singleChanged=true;
   });
 
-  if(changed || entitlements.length) setSavedList(list);
+  if(singleChanged) setSavedList(list);
+  if(duoChanged) renderDuoSavedCards();
+  updateCardbookCounts();
 }
 
 function openRecoveryModal(){
@@ -2418,7 +2805,7 @@ async function restoreFromRecoveryCode(){
     }
     renderSavedCards();
     $('recoveryCodeText').textContent=code;
-    setRecoveryMessage(`同步完成，共找到 ${entitlements.length} 個已購買項目。`,true);
+    setRecoveryMessage(`同步完成，共找回 ${entitlements.length} 個永久解鎖項目，雙人副本也已恢復到卡冊。`,true);
     toast('卡冊購買紀錄已同步');
   }catch(error){
     setRecoveryMessage(error.message||'同步失敗，請稍後再試。',false);
@@ -2495,7 +2882,7 @@ async function startEcpayPayment(){
       closePayModal();
 
       if(context.type==='duo'){
-        grantDuoAccess(context.pairKey);
+        grantDuoAccess(context.pairKey,{source:'SERVER_ALREADY_OWNED'});
         revealDuoPremium(state.duoResult);
       }else{
         grantRoleAccessToCurrentResult();
@@ -2711,7 +3098,10 @@ function applyPaidOrder(order){
     const parsed=parseDuoPairKey(order.role_id);
     if(!parsed) return;
 
-    grantDuoAccess(order.role_id);
+    grantDuoAccess(order.role_id,{
+      grantedAt:order.paid_at||new Date().toISOString(),
+      source:'ECPAY'
+    });
 
     const pending=getPendingPayment();
     const mode=DUO_MODES[pending?.duoMode] ? pending.duoMode : 'friends';

@@ -2205,3 +2205,226 @@ body:has(#saveImageModal:not(.hidden)) .toast{
   .duo-link-symbol{width:31px;height:31px}
   .duo-metrics > div{grid-template-columns:65px 24px minmax(0,1fr)}
 }
+
+
+/* =========================================================
+   v16.4｜雙人副本卡冊＋永久解鎖
+   ========================================================= */
+.cardbook-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin:16px 0 4px;
+  padding:5px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background:rgba(0,0,0,.16);
+}
+.cardbook-tab{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:43px;
+  padding:9px 12px;
+  border:1px solid transparent;
+  border-radius:14px;
+  color:rgba(255,255,255,.58);
+  background:transparent;
+  font-weight:900;
+}
+.cardbook-tab b{
+  display:grid;
+  place-items:center;
+  min-width:23px;
+  height:23px;
+  padding:0 6px;
+  border-radius:999px;
+  color:rgba(255,255,255,.62);
+  background:rgba(255,255,255,.08);
+  font-size:10px;
+}
+.cardbook-tab.is-active{
+  color:#fff;
+  border-color:rgba(255,209,92,.24);
+  background:linear-gradient(145deg,rgba(255,209,92,.13),rgba(168,124,255,.11));
+  box-shadow:0 8px 20px rgba(0,0,0,.16);
+}
+.cardbook-tab.is-active b{
+  color:#20182a;
+  background:var(--gold);
+}
+.cardbook-panel{
+  min-height:110px;
+}
+.duo-cardbook-note{
+  display:grid;
+  grid-template-columns:36px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+  margin-top:14px;
+  padding:12px 14px;
+  border:1px solid rgba(115,242,173,.18);
+  border-radius:17px;
+  background:rgba(115,242,173,.07);
+}
+.duo-cardbook-note > span{
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  background:rgba(115,242,173,.11);
+}
+.duo-cardbook-note p{
+  margin:0;
+  color:rgba(255,255,255,.58);
+  font-size:10px;
+  line-height:1.5;
+}
+.duo-cardbook-note strong{
+  display:block;
+  margin-bottom:2px;
+  color:var(--green);
+  font-size:11px;
+}
+.empty-saved{
+  display:grid;
+  gap:8px;
+}
+.empty-saved strong{
+  color:#fff;
+}
+.empty-saved span{
+  display:block;
+}
+.duo-empty-saved button{
+  justify-self:center;
+  margin-top:4px;
+}
+.duo-saved-card{
+  grid-template-columns:auto minmax(0,1fr);
+  position:relative;
+  overflow:hidden;
+}
+.duo-saved-card.is-permanent::before{
+  content:'永久解鎖';
+  position:absolute;
+  right:-31px;
+  top:17px;
+  width:112px;
+  padding:4px 0;
+  color:#163927;
+  background:var(--green);
+  text-align:center;
+  font-size:8px;
+  font-weight:1000;
+  letter-spacing:.08em;
+  transform:rotate(38deg);
+}
+.duo-saved-emojis{
+  display:grid;
+  grid-template-columns:42px 18px 42px;
+  align-items:center;
+  min-width:102px;
+}
+.duo-saved-emojis span{
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(168,124,255,.20),rgba(255,143,195,.15));
+  font-size:23px;
+}
+.duo-saved-emojis b{
+  color:var(--gold);
+  text-align:center;
+  font-size:14px;
+}
+.duo-saved-title{
+  padding-right:52px;
+}
+.duo-cardbook-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:8px 0;
+}
+.duo-cardbook-meta span{
+  padding:6px 8px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:999px;
+  color:rgba(255,255,255,.60);
+  background:rgba(255,255,255,.055);
+  font-size:9px;
+}
+.duo-cardbook-meta b{
+  color:#fff1ad;
+  font-size:10px;
+}
+.duo-cardbook-modes{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-bottom:8px;
+}
+.duo-cardbook-modes button{
+  padding:6px 8px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:9px;
+  color:rgba(255,255,255,.52);
+  background:rgba(255,255,255,.04);
+  font-size:8px;
+  font-weight:900;
+}
+.duo-cardbook-modes button.is-active{
+  color:#1d1728;
+  border-color:var(--gold);
+  background:var(--gold);
+}
+.duo-cardbook-modes button.is-available:not(.is-active):hover{
+  color:#fff;
+  border-color:rgba(98,231,255,.28);
+  background:rgba(98,231,255,.08);
+}
+.duo-cardbook-modes button.is-locked{
+  opacity:.35;
+  cursor:not-allowed;
+}
+.duo-saved-actions{
+  grid-template-columns:1fr 1.35fr;
+}
+.saved-card.is-permanent .saved-title::after{
+  content:'永久解鎖';
+  color:var(--green);
+  border-color:rgba(115,242,173,.30);
+  background:rgba(115,242,173,.12);
+}
+
+@media(max-width:600px){
+  .cardbook-tabs{
+    position:sticky;
+    top:-1px;
+    z-index:3;
+    background:rgba(22,19,39,.96);
+    backdrop-filter:blur(14px);
+  }
+  .cardbook-tab{
+    padding:8px 6px;
+    font-size:11px;
+  }
+  .duo-saved-card{
+    grid-template-columns:1fr;
+  }
+  .duo-saved-emojis{
+    justify-self:start;
+  }
+  .duo-saved-title{
+    padding-right:38px;
+  }
+  .duo-saved-actions{
+    grid-template-columns:1fr;
+  }
+}

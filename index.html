@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=16.3" />
+  <link rel="stylesheet" href="style.css?v=16.4" />
 </head>
 <body>
   <div class="bg-noise" aria-hidden="true"></div>
@@ -501,7 +501,7 @@
         <details><summary>付款後怎麼解鎖？</summary><p>選擇要解鎖的卡牌後，前往綠界付款。付款成功會自動返回網站並解鎖完整報告。</p></details>
         <details><summary>我可以選擇要解鎖哪一張卡嗎？</summary><p>可以。每張卡都有結果編號；同一種角色只需要解鎖一次，之後同角色都可以直接查看完整報告。</p></details>
         <details><summary>可以抽幾次？</summary><p>不限次數，隨時都可以重新測驗。抽出的卡會自動存進「我的卡冊」，已解鎖的完整報告也能重複查看。</p></details>
-        <details><summary>雙人合卡怎麼使用？</summary><p>兩個人先各自完成測驗，再到「雙人合卡」選擇角色與關係模式。免費可查看隊伍名稱、默契區間與摘要；完整雙人副本 NT$10，解鎖精確分數、五項能力、衝突攻略、7 日任務與下載分享。同一組角色只需解鎖一次。</p></details>
+        <details><summary>雙人合卡怎麼使用？</summary><p>兩個人先各自完成測驗，再到「雙人合卡」選擇角色與關係模式。免費試算也會自動存進卡冊；完整雙人副本 NT$10，同一組角色付款一次即可永久解鎖四種模式。換裝置時使用原本的私人備份碼同步。</p></details>
         <details><summary>換手機後還能查看嗎？</summary><p>可以先在「我的卡冊」保存私人備份碼，再於新裝置輸入備份碼同步已購買角色。備份碼等同卡冊鑰匙，請勿公開。</p></details>
         <details><summary>這是心理諮商或診斷嗎？</summary><p>不是。本服務是娛樂性角色卡與個人化文字內容，僅供娛樂與自我觀察參考，不構成心理諮商、醫療診斷、法律、投資或人生決策建議。</p></details>
         <details><summary>可以退款嗎？</summary><p>完整報告屬於數位內容。付款成功並顯示完整報告後，即視為服務完成；若發生重複扣款、系統錯誤或已付款卻無法取得內容，請來信協助處理。</p></details>
@@ -612,14 +612,35 @@
     <div class="modal-panel saved-panel">
       <button class="modal-close" data-close-saved type="button" aria-label="關閉">×</button>
       <p class="eyebrow">我的卡冊</p>
-      <h2 id="savedTitle">選擇你要查看或購買的卡</h2>
-      <p class="modal-copy">每張卡都會自動保存在這裡。同一種角色只需要購買一次；可用私人備份碼在其他裝置同步已購買角色。</p>
+      <h2 id="savedTitle">我的角色卡與雙人副本</h2>
+      <p class="modal-copy">單人角色與雙人配對都會自動保存在這裡。已付款內容會永久記錄在後端；換裝置時使用同一組私人備份碼即可同步回來。</p>
+
       <div class="cardbook-tools">
-        <button class="secondary-btn small" id="syncCardsBtn" type="button">重新同步購買紀錄</button>
+        <button class="secondary-btn small" id="syncCardsBtn" type="button">同步永久解鎖紀錄</button>
         <button class="ghost-btn small" id="backupCodeBtn" type="button">備份／換裝置</button>
-        <button class="primary-btn small" id="savedDuoBtn" type="button">雙人合卡</button>
+        <button class="primary-btn small" id="savedDuoBtn" type="button">建立雙人合卡</button>
       </div>
-      <div class="saved-list" id="savedList"></div>
+
+      <div class="cardbook-tabs" role="tablist" aria-label="卡冊分類">
+        <button class="cardbook-tab is-active" id="singleCardsTab" type="button" role="tab" aria-selected="true" aria-controls="singleCardsPanel">
+          <span>🎴 單人角色卡</span><b id="singleCardsCount">0</b>
+        </button>
+        <button class="cardbook-tab" id="duoCardsTab" type="button" role="tab" aria-selected="false" aria-controls="duoCardsPanel">
+          <span>🤝 雙人副本</span><b id="duoCardsCount">0</b>
+        </button>
+      </div>
+
+      <section class="cardbook-panel" id="singleCardsPanel" role="tabpanel" aria-labelledby="singleCardsTab">
+        <div class="saved-list" id="savedList"></div>
+      </section>
+
+      <section class="cardbook-panel hidden" id="duoCardsPanel" role="tabpanel" aria-labelledby="duoCardsTab">
+        <div class="duo-cardbook-note">
+          <span>🔐</span>
+          <p><strong>雙人副本永久解鎖</strong>同一組角色支付一次 NT$10，朋友、情侶、曖昧、搭檔四種模式都能永久查看。</p>
+        </div>
+        <div class="saved-list duo-saved-list" id="duoSavedList"></div>
+      </section>
     </div>
   </div>
 
@@ -681,6 +702,6 @@
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="script.js?v=16.3" defer></script>
+  <script src="script.js?v=16.4" defer></script>
 </body>
 </html>
